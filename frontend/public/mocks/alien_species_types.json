@@ -1,0 +1,101 @@
+[
+  {
+    "prefixes": ["Pyro", "Inferno", "Magma", "Volcanic", "Blaze"],
+    "suffixes": ["lizards", "serpents", "beasts", "drakes", "worms"],
+    "desc": "Heat-loving species adapted to extreme temperatures",
+    "temp": [70, 130],
+    "atmo": [0.7, 1.6],
+    "water": [0.0, 0.4],
+    "grav": [0.7, 1.4],
+    "rad": [0.1, 0.7],
+    "colors": ["#FF4500", "#FF8C00", "#FF6347", "#FF0000", "#CD5C5C"]
+  },
+  {
+    "prefixes": ["Cryo", "Frost", "Glacial", "Arctic", "Polar"],
+    "suffixes": ["crystals", "spirits", "shards", "entities", "moss"],
+    "desc": "Cold-adapted lifeforms thriving in frigid conditions",
+    "temp": [-60, 0],
+    "atmo": [0.1, 0.5],
+    "water": [0.1, 0.7],
+    "grav": [0.4, 1.3],
+    "rad": [0.5, 1.0],
+    "colors": ["#00BFFF", "#87CEFA", "#ADD8E6", "#4682B4", "#B0E0E6"]
+  },
+  {
+    "prefixes": ["Aqua", "Hydro", "Marine", "Oceanic", "Tidal"],
+    "suffixes": ["mollusks", "jellies", "coraloids", "leviathans", "sponges"],
+    "desc": "Water-dwelling species requiring aquatic environments",
+    "temp": [5, 35],
+    "atmo": [0.7, 1.3],
+    "water": [0.6, 1.0],
+    "grav": [0.6, 1.2],
+    "rad": [0.0, 0.4],
+    "colors": ["#20B2AA", "#008B8B", "#5F9EA0", "#48D1CC", "#00CED1"]
+  },
+  {
+    "prefixes": ["Arid", "Desert", "Dune", "Sand", "Sun"],
+    "suffixes": ["nomads", "scorpions", "stalkers", "roamers", "worms"],
+    "desc": "Hardy species adapted to dry, desert conditions",
+    "temp": [50, 95],
+    "atmo": [0.1, 0.4],
+    "water": [0.0, 0.2],
+    "grav": [0.7, 1.3],
+    "rad": [0.2, 0.8],
+    "colors": ["#DEB887", "#F4A460", "#D2B48C", "#CD853F", "#DAA520"]
+  },
+  {
+    "prefixes": ["Grav", "Dense", "Massive", "Heavy", "Titan"],
+    "suffixes": ["behemoths", "walkers", "colossi", "giants", "titans"],
+    "desc": "Species evolved in high gravity environments",
+    "temp": [15, 45],
+    "atmo": [0.7, 1.0],
+    "water": [0.0, 0.3],
+    "grav": [1.2, 2.0],
+    "rad": [0.0, 0.2],
+    "colors": ["#A9A9A9", "#696969", "#808080", "#C0C0C0", "#D3D3D3"]
+  },
+  {
+    "prefixes": ["Electro", "Magneto", "Plasma", "Ion", "Neuro"],
+    "suffixes": ["forms", "entities", "beings", "specters", "wraiths"],
+    "desc": "Energy-based life forms with unique electromagnetic properties",
+    "temp": [10, 50],
+    "atmo": [0.5, 1.5],
+    "water": [0.0, 0.1],
+    "grav": [0.5, 1.0],
+    "rad": [0.1, 0.9],
+    "colors": ["#8A2BE2", "#9370DB", "#7B68EE", "#6A5ACD", "#483D8B"]
+  },
+  {
+    "prefixes": ["Bio", "Eco", "Phyto", "Zeo", "Chloro"],
+    "suffixes": ["forms", "creatures", "entities", "specters", "wraiths"],
+    "desc": "Life forms with strong connections to biological and ecological processes",
+    "temp": [-20, 40],
+    "atmo": [0.2, 1.2],
+    "water": [0.3, 0.8],
+    "grav": [0.8, 1.2],
+    "rad": [0.0, 0.3],
+    "colors": ["#228B22", "#32CD32", "#98FB98", "#00FF7F", "#3CB371"]
+  },
+  {
+    "prefixes": ["Chrono", "Tempus", "Aeon", "Eon", "Nexus"],
+    "suffixes": ["walkers", "runners", "drifters", "shifters", "sliders"],
+    "desc": "Temporal species capable of manipulating time",
+    "temp": [-10, 60],
+    "atmo": [0.5, 1.5],
+    "water": [0.0, 0.2],
+    "grav": [0.5, 1.5],
+    "rad": [0.0, 0.1],
+    "colors": ["#FFD700", "#FFA500", "#FF4500", "#FF0000", "#DC143C"]
+  },
+  {
+    "prefixes": ["Spectro", "Phantom", "Shadow", "Umbral", "Nocturne"],
+    "suffixes": ["wraiths", "shades", "spirits", "entities", "forms"],
+    "desc": "Ethereal species existing between dimensions",
+    "temp": [-50, 50],
+    "atmo": [0.0, 2.0],
+    "water": [0.0, 0.1],
+    "grav": [0.0, 0.5],
+    "rad": [0.0, 0.5],
+    "colors": ["#4B0082", "#800080", "#FF00FF", "#FF1493", "#C71585"]
+  }
+]

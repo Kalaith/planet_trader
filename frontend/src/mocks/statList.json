@@ -1,0 +1,32 @@
+[
+  {
+    "label": "Temperature",
+    "id": "temperature",
+    "unit": "°C",
+    "bar": "Math.max(0, Math.min(100, (p.temperature + 50) / 150 * 100))"
+  },
+  {
+    "label": "Atmosphere",
+    "id": "atmosphere",
+    "unit": "x",
+    "bar": "Math.min(100, p.atmosphere / 2 * 100)"
+  },
+  {
+    "label": "Water",
+    "id": "water",
+    "unit": "%",
+    "bar": "(p.water || 0) * 100"
+  },
+  {
+    "label": "Gravity",
+    "id": "gravity",
+    "unit": "x",
+    "bar": "Math.min(100, p.gravity / 3 * 100)"
+  },
+  {
+    "label": "Radiation",
+    "id": "radiation",
+    "unit": "x",
+    "bar": "Math.min(100, p.radiation / 1.5 * 100)"
+  }
+]

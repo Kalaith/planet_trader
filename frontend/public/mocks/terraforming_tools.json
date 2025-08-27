@@ -1,0 +1,101 @@
+[
+  {
+    "id": "heat-generator",
+    "name": "Heat Generator",
+    "category": "temperature",
+    "effect": { "temperature": 10 },
+    "sideEffects": { "water": -0.05, "atmosphere": 0.05 },
+    "cost": 100,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Raises planetary temperature through controlled fusion reactions. Increases atmospheric retention but may evaporate water."
+  },
+  {
+    "id": "cooling-system",
+    "name": "Cooling System",
+    "category": "temperature",
+    "effect": { "temperature": -10 },
+    "sideEffects": { "water": 0.03 },
+    "cost": 100,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Reduces temperature using orbital solar shades and heat dispersal, encouraging water condensation."
+  },
+  {
+    "id": "atmosphere-processor",
+    "name": "Atmosphere Processor",
+    "category": "atmosphere",
+    "effect": { "atmosphere": 0.2 },
+    "sideEffects": { "radiation": -0.05, "gravity": 0.01 },
+    "cost": 150,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Generates breathable atmosphere from planetary materials. Adds mass and shields against radiation."
+  },
+  {
+    "id": "atmospheric-scrubber",
+    "name": "Atmospheric Scrubber",
+    "category": "atmosphere",
+    "effect": { "atmosphere": -0.2 },
+    "sideEffects": { "radiation": 0.1 },
+    "cost": 150,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Removes excess atmospheric gases through molecular filtration. Reduces radiation shielding."
+  },
+  {
+    "id": "ocean-former",
+    "name": "Ocean Former",
+    "category": "water",
+    "effect": { "water": 0.1 },
+    "sideEffects": { "temperature": -2 },
+    "cost": 120,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Terraforms land into ocean basins and manages water distribution. Promotes cooling."
+  },
+  {
+    "id": "water-pump",
+    "name": "Water Pump",
+    "category": "water",
+    "effect": { "water": -0.1 },
+    "sideEffects": { "temperature": 1 },
+    "cost": 80,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Pumps water vapor out of the atmosphere to reduce pressure and promote cooling."
+  },
+  {
+    "id": "magnetosphere-generator",
+    "name": "Magnetosphere Generator",
+    "category": "radiation",
+    "effect": { "radiation": -0.1 },
+    "sideEffects": { "gravity": -0.01 },
+    "cost": 200,
+    "tier": 2,
+    "unlocked": false,
+    "description": "Creates a magnetic field to deflect solar radiation. Requires significant energy and maintenance."
+  },
+  {
+    "id": "gravity-well",
+    "name": "Gravity Well",
+    "category": "gravity",
+    "effect": { "gravity": 0.1 },
+    "sideEffects": { "radiation": 0.05 },
+    "cost": 250,
+    "tier": 2,
+    "unlocked": false,
+    "description": "Increases planetary gravity to retain atmosphere and water. May increase radiation exposure."
+  },
+  {
+    "id": "terraforming-fleet",
+    "name": "Terraforming Fleet",
+    "category": "infrastructure",
+    "effect": { "infrastructure": 1 },
+    "sideEffects": { "none": 0 },
+    "cost": 500,
+    "tier": 3,
+    "unlocked": false,
+    "description": "Deploys automated drones to build and maintain terraforming installations."
+  }
+]

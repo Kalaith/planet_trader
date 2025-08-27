@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Set the base path
+RewriteBase /planet_trader/
+
+# Route API requests to backend
+RewriteCond %{REQUEST_URI} ^/planet_trader/api/
+RewriteRule ^api/(.*)$ backend/public/index.php [QSA,L]
+
+# Handle client-side routing for React app
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/planet_trader/backend/
+RewriteRule . index.html [L]

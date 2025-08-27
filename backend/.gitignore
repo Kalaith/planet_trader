@@ -1,0 +1,96 @@
+﻿# Dependencies
+vendor/
+composer.lock
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+
+# Storage and logs
+storage/logs/*
+storage/sessions/*
+storage/cache/*
+storage/uploads/*
+storage/temp/*
+!storage/.gitkeep
+
+# Database
+*.sqlite
+*.db
+database.sqlite
+
+# PHP
+*.php~
+.phpunit.result.cache
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build and deployment
+build/
+dist/
+*.phar
+
+# Testing
+phpunit.xml
+tests/coverage/
+.nyc_output
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache directories
+cache/
+.php-cache/
+
+# Session files
+sessions/
+
+# Error logs
+error_log
+error.log
+*.log
+
+# Backup files
+*.bak
+*.backup
+*~backup
+
+# Node modules (if any frontend assets)
+node_modules/
+
+# Web server files
+.htaccess
+.htpasswd
+web.config
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

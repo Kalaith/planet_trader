@@ -1,0 +1,68 @@
+[
+  {
+    "prefixes": ["Pyro", "Inferno", "Magma", "Volcanic", "Blaze"],
+    "suffixes": ["lizards", "serpents", "beasts", "drakes", "worms"],
+    "desc": "Heat-loving species adapted to extreme temperatures",
+    "temp": [70, 130],
+    "atmo": [0.7, 1.6],
+    "water": [0.0, 0.4],
+    "grav": [0.7, 1.4],
+    "rad": [0.1, 0.7],
+    "colors": ["#FF4500", "#FF8C00", "#FF6347", "#FF0000", "#CD5C5C"]
+  },
+  {
+    "prefixes": ["Cryo", "Frost", "Glacial", "Arctic", "Polar"],
+    "suffixes": ["crystals", "spirits", "shards", "entities", "moss"],
+    "desc": "Cold-adapted lifeforms thriving in frigid conditions",
+    "temp": [-60, 0],
+    "atmo": [0.1, 0.5],
+    "water": [0.1, 0.7],
+    "grav": [0.4, 1.3],
+    "rad": [0.5, 1.0],
+    "colors": ["#00BFFF", "#87CEFA", "#ADD8E6", "#4682B4", "#B0E0E6"]
+  },
+  {
+    "prefixes": ["Aqua", "Hydro", "Marine", "Oceanic", "Tidal"],
+    "suffixes": ["mollusks", "jellies", "coraloids", "leviathans", "sponges"],
+    "desc": "Water-dwelling species requiring aquatic environments",
+    "temp": [5, 35],
+    "atmo": [0.7, 1.3],
+    "water": [0.6, 1.0],
+    "grav": [0.6, 1.2],
+    "rad": [0.0, 0.4],
+    "colors": ["#20B2AA", "#008B8B", "#5F9EA0", "#48D1CC", "#00CED1"]
+  },
+  {
+    "prefixes": ["Arid", "Desert", "Dune", "Sand", "Sun"],
+    "suffixes": ["nomads", "scorpions", "stalkers", "roamers", "worms"],
+    "desc": "Hardy species adapted to dry, desert conditions",
+    "temp": [50, 95],
+    "atmo": [0.1, 0.4],
+    "water": [0.0, 0.2],
+    "grav": [0.7, 1.3],
+    "rad": [0.2, 0.8],
+    "colors": ["#DEB887", "#F4A460", "#D2B48C", "#CD853F", "#DAA520"]
+  },
+  {
+    "prefixes": ["Grav", "Dense", "Massive", "Heavy", "Titan"],
+    "suffixes": ["behemoths", "walkers", "colossi", "giants", "titans"],
+    "desc": "Species evolved in high gravity environments",
+    "temp": [15, 45],
+    "atmo": [0.9, 1.9],
+    "water": [0.1, 0.6],
+    "grav": [1.8, 3.2],
+    "rad": [0.1, 0.5],
+    "colors": ["#8B4513", "#A0522D", "#800000", "#B8860B", "#D2691E"]
+  },
+  {
+    "prefixes": ["Energy", "Plasma", "Quantum", "Radiant", "Luminous"],
+    "suffixes": ["feeders", "siphons", "vortexes", "beings", "essences"],
+    "desc": "Exotic lifeforms that consume pure energy",
+    "temp": [-20, 70],
+    "atmo": [0.0, 0.3],
+    "water": [0.0, 0.5],
+    "grav": [0.2, 1.1],
+    "rad": [0.7, 1.0],
+    "colors": ["#9400D3", "#9932CC", "#BA55D3", "#8A2BE2", "#9370DB"]
+  }
+]

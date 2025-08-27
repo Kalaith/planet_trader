@@ -1,0 +1,162 @@
+[
+  {
+    "name": "Heat Generator",
+    "category": "temperature",
+    "effect": { "temperature": 10 },
+    "sideEffects": { "water": -0.05, "atmosphere": 0.05 },
+    "cost": 100,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Raises planetary temperature through controlled fusion reactions. Increases atmospheric retention but may evaporate water."
+  },
+  {
+    "name": "Cooling System",
+    "category": "temperature",
+    "effect": { "temperature": -10 },
+    "sideEffects": { "water": 0.03 },
+    "cost": 100,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Reduces temperature using orbital solar shades and heat dispersal, encouraging water condensation."
+  },
+  {
+    "name": "Atmosphere Processor",
+    "category": "atmosphere",
+    "effect": { "atmosphere": 0.2 },
+    "sideEffects": { "radiation": -0.05, "gravity": 0.01 },
+    "cost": 150,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Generates breathable atmosphere from planetary materials. Adds mass and shields against radiation."
+  },
+  {
+    "name": "Atmospheric Scrubber",
+    "category": "atmosphere",
+    "effect": { "atmosphere": -0.2 },
+    "sideEffects": { "radiation": 0.1 },
+    "cost": 150,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Removes excess atmospheric gases through molecular filtration. Reduces radiation shielding."
+  },
+  {
+    "name": "Ocean Former",
+    "category": "water",
+    "effect": { "water": 0.1 },
+    "sideEffects": { "temperature": -2 },
+    "cost": 120,
+    "tier": 1,
+    "unlocked": true,
+    "description": "Terraforms land into ocean basins and manages water distribution. Promotes cooling."
+  },
+  {
+    "name": "Ice Comet Bombardment",
+    "category": "water",
+    "effect": { "water": 0.15, "temperature": -5 },
+    "sideEffects": { "atmosphere": 0.1 },
+    "cost": 200,
+    "tier": 2,
+    "unlocked": false,
+    "upgradeRequired": "Cryo Engineering",
+    "description": "Directs ice comets to increase planetary water content. Reduces temperature but adds vapor to the atmosphere."
+  },
+  {
+    "name": "Gravity Intensifier",
+    "category": "gravity",
+    "effect": { "gravity": 0.3 },
+    "sideEffects": { "atmosphere": 0.1 },
+    "cost": 300,
+    "tier": 2,
+    "unlocked": false,
+    "upgradeRequired": "Graviton Research",
+    "description": "Increases planetary mass through controlled matter compression, which helps retain atmosphere."
+  },
+  {
+    "name": "Gravity Stabilizer",
+    "category": "gravity",
+    "effect": { "gravity": -0.2 },
+    "sideEffects": { "atmosphere": -0.05 },
+    "cost": 280,
+    "tier": 2,
+    "unlocked": false,
+    "upgradeRequired": "Gravity Tech II",
+    "description": "Lowers gravity via mass redistribution. Reduces atmospheric density due to escape velocity effects."
+  },
+  {
+    "name": "Magnetic Field Generator",
+    "category": "radiation",
+    "effect": { "radiation": -0.2 },
+    "sideEffects": { "atmosphere": 0.02 },
+    "cost": 250,
+    "tier": 2,
+    "unlocked": false,
+    "upgradeRequired": "Magnetic Shielding",
+    "description": "Creates protective magnetic field to deflect harmful radiation. Slightly increases atmospheric pressure."
+  },
+  {
+    "name": "Radiation Enhancer",
+    "category": "radiation",
+    "effect": { "radiation": 0.2 },
+    "sideEffects": {},
+    "cost": 180,
+    "tier": 2,
+    "unlocked": false,
+    "upgradeRequired": "Exotic Radiation Handling",
+    "description": "Emits high-energy particles to simulate stellar radiation environments. Used to please exotic buyers or photosynthetic species."
+  },
+  {
+    "name": "Cloud Seeder",
+    "category": "water",
+    "effect": { "water": 0.05 },
+    "sideEffects": { "radiation": -0.05 },
+    "cost": 140,
+    "tier": 2,
+    "unlocked": false,
+    "upgradeRequired": "Weather Control",
+    "description": "Injects condensation nuclei to form clouds. Adds water and reduces radiation via albedo effect."
+  },
+  {
+    "name": "Cryo-Atmos Converter",
+    "category": "atmosphere",
+    "effect": { "atmosphere": 0.1 },
+    "sideEffects": { "temperature": -2 },
+    "cost": 170,
+    "tier": 3,
+    "unlocked": false,
+    "upgradeRequired": "Atmospheric Catalysis",
+    "description": "Extracts atmospheric gases from frozen sources. Adds atmosphere while cooling the planet."
+  },
+  {
+    "name": "Thermal Balancer",
+    "category": "temperature",
+    "effect": { "temperature": 5 },
+    "sideEffects": {},
+    "cost": 180,
+    "tier": 3,
+    "unlocked": false,
+    "upgradeRequired": "Adaptive Thermal Systems",
+    "description": "Smart thermal management system that adjusts between heating and cooling based on surrounding conditions. Side-effect neutral."
+  },
+  {
+    "name": "Bio-Seeder Pods",
+    "category": "biological",
+    "effect": { "biosphere": 1 },
+    "sideEffects": { "atmosphere": 0.05 },
+    "cost": 400,
+    "tier": 3,
+    "unlocked": false,
+    "upgradeRequired": "Xeno Bioengineering",
+    "description": "Deploys genetically tailored microbial and plant life. Boosts atmosphere and begins biosphere development."
+  },
+  {
+    "name": "Radiant Bloom",
+    "category": "biological",
+    "effect": { "biosphere": 1 },
+    "sideEffects": { "radiation": -0.1 },
+    "cost": 450,
+    "tier": 3,
+    "unlocked": false,
+    "upgradeRequired": "Bio-Luminescence Cultivation",
+    "description": "Spreads radiant-tolerant flora that thrive under moderate radiation and help stabilize biospheres."
+  }
+]
