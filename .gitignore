@@ -1,2 +1,5 @@
-﻿# Environment variables
+# Environment variables
+# Logs
+.env
 .env*
+mcp
