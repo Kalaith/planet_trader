@@ -64,17 +64,39 @@ class CreatePlanetTraderTables
             )
         ");
         
-        // Create players table
+        // Create users table (for Auth0 integration)
+        $this->pdo->exec("
+            CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(36) PRIMARY KEY,
+                auth0_id VARCHAR(255) NOT NULL UNIQUE,
+                email VARCHAR(100) NOT NULL,
+                username VARCHAR(50) NOT NULL,
+                display_name VARCHAR(100) NOT NULL,
+                password_hash VARCHAR(255) NULL,
+                credits BIGINT DEFAULT 10000,
+                level INT DEFAULT 1,
+                experience INT DEFAULT 0,
+                reputation INT DEFAULT 0,
+                role VARCHAR(50) DEFAULT 'trader',
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        ");
+        
+        // Create players table (legacy compatibility - references users)
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS players (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id VARCHAR(36),
                 username VARCHAR(50) NOT NULL UNIQUE,
                 email VARCHAR(100) UNIQUE,
                 credits BIGINT DEFAULT 10000,
                 experience_points INT DEFAULT 0,
                 level INT DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
             )
         ");
         
@@ -182,6 +204,7 @@ class CreatePlanetTraderTables
             'planets',
             'game_sessions',
             'players',
+            'users',
             'tools',
             'species',
             'planet_types'

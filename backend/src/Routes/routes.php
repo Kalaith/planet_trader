@@ -5,11 +5,21 @@ use Slim\Routing\RouteCollectorProxy;
 use App\Controllers\GameController;
 use App\Controllers\PlanetController;
 use App\Controllers\TradingController;
+use App\Controllers\Auth0Controller;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 return function (App $app) {
     
     // API Routes
     $app->group('/api', function (RouteCollectorProxy $group) {
+        
+        // Auth0 endpoints
+        $group->group('/auth0', function (RouteCollectorProxy $auth) {
+            $auth->post('/verify', [Auth0Controller::class, 'verifyUser'])->add(new \App\Middleware\Auth0Middleware());
+            $auth->get('/me', [Auth0Controller::class, 'getCurrentUser'])->add(new \App\Middleware\Auth0Middleware());
+            $auth->get('/validate', [Auth0Controller::class, 'validateSession'])->add(new \App\Middleware\Auth0Middleware());
+        });
         
         // Game Management Routes
         $group->group('/game', function (RouteCollectorProxy $game) {

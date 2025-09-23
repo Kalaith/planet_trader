@@ -16,6 +16,9 @@ if (file_exists(__DIR__ . '/../.env')) {
     $dotenv->load();
 }
 
+// Initialize Eloquent for Auth0 User model
+\App\Database\EloquentSetup::initialize();
+
 // Create Container using PHP-DI
 $container = new Container();
 
@@ -171,6 +174,10 @@ $container->set(\App\Controllers\DataController::class, function ($container) {
     return new \App\Controllers\DataController(
         $container->get(\App\Repositories\RepositoryManager::class)
     );
+});
+
+$container->set(\App\Controllers\Auth0Controller::class, function ($container) {
+    return new \App\Controllers\Auth0Controller();
 });
 
 $container->set(\App\Actions\GetOwnedPlanetsAction::class, function ($container) {
