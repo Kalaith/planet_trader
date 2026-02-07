@@ -224,5 +224,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Ready to transform planets and build your terraforming empire!** 🚀🪐</content>
+**Ready to transform planets and build your terraforming empire!** 🚀🪐
+
+## License
+
+This project is licensed under the MIT License - see the individual component README files for details.
+
+Part of the WebHatchery game collection.</content>
 <parameter name="filePath">h:\WebHatchery\game_apps\planet_trader\README.md
