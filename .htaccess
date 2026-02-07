@@ -1,5 +1,9 @@
 RewriteEngine On
 
+# Ensure Authorization header is available to backend
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Set the base path
 RewriteBase /planet_trader/
 

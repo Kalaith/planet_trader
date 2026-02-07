@@ -3,8 +3,8 @@
 namespace App\Controllers;
 
 use App\Repositories\RepositoryManager;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Http\Response;
+use App\Http\Request;
 
 class DataController extends BaseController
 {

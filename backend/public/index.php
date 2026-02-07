@@ -1,130 +1,128 @@
 <?php
 
-use App\Database\Connection;
-use App\Utils\Logger;
-use App\Services\AuthPortalService;
-use App\Middleware\JwtAuthMiddleware;
-
 require __DIR__ . '/../vendor/autoload.php';
 
-// Load environment variables
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+use Dotenv\Dotenv;
+use App\Core\Router;
+use App\Database\Connection;
+use App\Repositories\RepositoryManager;
+use App\Services\PlanetNameService;
+use App\Services\PlanetGeneratorService;
+use App\Services\PricingService;
+use App\Services\TradingService;
+use App\Services\GameStateService;
+use App\Services\GameStateServiceEnhanced;
+use App\Controllers\GameController;
+use App\Controllers\PlanetController;
+use App\Controllers\TradingController;
+use App\Controllers\DataController;
+use App\Actions\CreatePlanetAction;
+use App\Actions\GeneratePlanetOptionsAction;
+use App\Actions\GetOwnedPlanetsAction;
+use App\Actions\GetCurrentPlanetAction;
+use App\Actions\GetPlanetAction;
+use App\Actions\PurchasePlanetAction;
+use App\Actions\SetCurrentPlanetAction;
+use App\Actions\AnalyzePlanetAction;
 
-// Set CORS headers
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
-header('Content-Type: application/json');
+// Load environment variables first
+$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->safeLoad();
 
-// Handle preflight OPTIONS requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+// Initialize database connection
+$connection = Connection::getInstance();
+$pdo = $connection->getPdo();
+
+// Repositories
+$repositories = new RepositoryManager($pdo);
+
+// Services
+$planetNameService = new PlanetNameService();
+$planetGeneratorService = new PlanetGeneratorService($planetNameService);
+$gameStateServiceEnhanced = new GameStateServiceEnhanced($repositories, $planetGeneratorService);
+$gameStateService = new GameStateService($pdo);
+$pricingService = new PricingService();
+$tradingService = new TradingService($gameStateService, $pricingService);
+
+// Actions
+$createPlanetAction = new CreatePlanetAction($repositories->planets());
+$generatePlanetOptionsAction = new GeneratePlanetOptionsAction(
+    $repositories->planetTypes(),
+    $createPlanetAction
+);
+$getOwnedPlanetsAction = new GetOwnedPlanetsAction($repositories->planets());
+$getCurrentPlanetAction = new GetCurrentPlanetAction($repositories->planets());
+$getPlanetAction = new GetPlanetAction($repositories->planets());
+$purchasePlanetAction = new PurchasePlanetAction(
+    $repositories->planets(),
+    $repositories->players(),
+    $repositories->sessions()
+);
+$setCurrentPlanetAction = new SetCurrentPlanetAction($repositories->planets());
+$analyzePlanetAction = new AnalyzePlanetAction($repositories->planets());
+
+// Controllers
+$gameController = new GameController($gameStateServiceEnhanced);
+$planetController = new PlanetController(
+    $planetGeneratorService,
+    $tradingService,
+    $gameStateServiceEnhanced,
+    $generatePlanetOptionsAction,
+    $getOwnedPlanetsAction,
+    $getCurrentPlanetAction,
+    $getPlanetAction,
+    $purchasePlanetAction,
+    $setCurrentPlanetAction,
+    $analyzePlanetAction
+);
+$tradingController = new TradingController(
+    $tradingService,
+    $gameStateServiceEnhanced,
+    $pricingService
+);
+$dataController = new DataController($repositories);
+
+// Router
+$router = new Router();
+
+// Set base path for subdirectory deployment (preview environment)
+if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'preview') {
+    $router->setBasePath('/planet_trader');
+} else {
+    $requestPath = $_SERVER['REQUEST_URI'] ?? '';
+    $requestPath = parse_url($requestPath, PHP_URL_PATH) ?? '';
+    $apiPos = strpos($requestPath, '/api');
+    if ($apiPos !== false) {
+        $basePath = substr($requestPath, 0, $apiPos);
+        if ($basePath !== '') {
+            $router->setBasePath($basePath);
+        }
+    } elseif (isset($_SERVER['SCRIPT_NAME'])) {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $basePath = str_replace('/public/index.php', '', $scriptName);
+        if ($basePath !== $scriptName && $basePath !== '') {
+            $router->setBasePath($basePath);
+        }
+    }
+}
+
+// Handle CORS preflight
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Headers: Content-Type, Accept, Origin, Authorization');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     http_response_code(200);
     exit;
 }
 
-// Initialize services
-try {
-    // Test database connection
-    $dbConnection = Connection::getInstance();
-    
-    $logger = new Logger();
-    
-    // Initialize auth services
-    $authPortalService = new AuthPortalService();
-    $jwtAuthMiddleware = new JwtAuthMiddleware($authPortalService);
-    
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-    exit;
-}
+// Load routes
+(require __DIR__ . '/../src/Routes/router.php')(
+    $router,
+    $gameController,
+    $planetController,
+    $tradingController,
+    $dataController
+);
 
-// Simple routing
-$requestUri = $_SERVER['REQUEST_URI'];
-$requestMethod = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($requestUri, PHP_URL_PATH);
-
-// Extract path after /api/
-if (preg_match('#/api/(.*)#', $path, $matches)) {
-    $route = $matches[1];
-} else {
-    $route = '';
-}
-
-// Route handling
-if ($route === 'status') {
-    echo json_encode([
-        'status' => 'OK',
-        'service' => 'Planet Trader API - Simple PHP',
-        'version' => '1.0.0'
-    ]);
-} elseif ($route === 'me') {
-    // Auth endpoint - requires JWT token
-    // Check multiple sources for Authorization header
-    $authHeader = '';
-    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-    } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-    } elseif (function_exists('apache_request_headers')) {
-        $headers = apache_request_headers();
-        if (isset($headers['Authorization'])) {
-            $authHeader = $headers['Authorization'];
-        } elseif (isset($headers['authorization'])) {
-            $authHeader = $headers['authorization'];
-        }
-    }
-    
-    if (empty($authHeader)) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'Authorization header required']);
-        exit;
-    }
-    
-    if (!preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'Invalid Authorization header format']);
-        exit;
-    }
-    
-    $token = $matches[1];
-    $authUser = $authPortalService->getUserFromToken($token);
-    
-    if (!$authUser || !is_int($authUser['user_id'])) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'Invalid or expired token']);
-        exit;
-    }
-    
-    // Return user info
-    echo json_encode([
-        'success' => true,
-        'data' => $authUser
-    ]);
-} elseif ($route === 'test-db') {
-    // Test database connection
-    try {
-        $pdo = $dbConnection->getPdo();
-        $stmt = $pdo->query('SELECT 1');
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Database connection successful',
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Database connection failed: ' . $e->getMessage()
-        ]);
-    }
-} else {
-    // Route not found
-    http_response_code(404);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Route not found'
-    ]);
-}
+// Run router
+$router->handle();

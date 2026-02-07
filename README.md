@@ -41,7 +41,7 @@ The game features scientifically-grounded terraforming mechanics, diverse alien 
 ## 🛠️ Technology Stack
 
 ### Backend
-- **PHP 8+** with Slim Framework
+- **PHP 8+**
 - **Doctrine ORM** for database management
 - **MySQL/SQLite** database support
 - **JWT Authentication** via WebHatchery Auth Portal
@@ -111,7 +111,7 @@ npm run dev
 
 ```
 planet_trader/
-├── backend/                 # PHP Slim API backend
+├── backend/                 # PHP
 │   ├── config/             # Database and app configuration
 │   ├── public/             # Web server entry point
 │   ├── scripts/            # Database setup and utility scripts

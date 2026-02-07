@@ -13,7 +13,6 @@ class User extends Model
     protected $keyType = 'string';
     
     protected $fillable = [
-        'auth0_id',
         'email',
         'username',
         'display_name',

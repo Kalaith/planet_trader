@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Http\Response;
+use App\Http\Request;
 
 abstract class BaseController
 {
@@ -48,6 +48,11 @@ abstract class BaseController
      */
     protected function getSessionId(Request $request): string
     {
+        $authUser = $request->getAttribute('auth_user');
+        if ($authUser && isset($authUser['id'])) {
+            return (string) $authUser['id'];
+        }
+
         // Try to get from header first
         $sessionHeader = $request->getHeaderLine('X-Session-ID');
         if (!empty($sessionHeader)) {

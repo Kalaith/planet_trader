@@ -6,8 +6,8 @@ use App\Services\TradingService;
 use App\Services\GameStateServiceEnhanced;
 use App\Services\PricingService;
 use App\Utils\RandomUtils;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Http\Response;
+use App\Http\Request;
 
 class TradingController extends BaseController
 {

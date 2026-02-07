@@ -2,20 +2,16 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 interface AuthUser {
-  user_id: number;
-  email: string;
-  username?: string;
-  role: string;
-  roles: string[];
-  exp: number;
-  iat: number;
+  id: number | string;
+  email?: string | null;
+  username?: string | null;
+  roles?: string[];
 }
 
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => void;
   logout: () => void;
 }
 
@@ -26,39 +22,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/backend/api';
-    fetch(`${apiBaseUrl}/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.data) {
-          setUser(data.data);
+    const initUser = () => {
+      try {
+        const storedAuth = localStorage.getItem('auth-storage');
+        if (!storedAuth) {
+          setUser(null);
+          return;
         }
+        const parsed = JSON.parse(storedAuth) as { state?: { user?: AuthUser | null } };
+        setUser(parsed.state?.user ?? null);
+      } catch (err) {
+        console.error('User initialization error:', err);
+        setUser(null);
+      } finally {
         setIsLoading(false);
-      })
-      .catch(() => setIsLoading(false));
+      }
+    };
+
+    initUser();
   }, []);
 
-  const login = () => {
-    const authPortalUrl = import.meta.env.VITE_AUTH_PORTAL_URL || '/auth';
-    window.location.href = `${authPortalUrl}/login?redirect=${encodeURIComponent(window.location.href)}`;
-  };
-
   const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    const authPortalUrl = import.meta.env.VITE_AUTH_PORTAL_URL || '/auth';
-    window.location.href = `${authPortalUrl}/logout`;
+    // Web Hatchery manages auth state; no-op here.
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );

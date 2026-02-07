@@ -64,11 +64,10 @@ class CreatePlanetTraderTables
             )
         ");
         
-        // Create users table (for Auth0 integration)
+        // Create users table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS users (
                 id VARCHAR(36) PRIMARY KEY,
-                auth0_id VARCHAR(255) NOT NULL UNIQUE,
                 email VARCHAR(100) NOT NULL,
                 username VARCHAR(50) NOT NULL,
                 display_name VARCHAR(100) NOT NULL,

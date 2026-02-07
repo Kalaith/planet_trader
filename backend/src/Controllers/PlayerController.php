@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use App\Services\GameStateServiceEnhanced;
 use App\Services\SessionService;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Http\Response;
+use App\Http\Request;
 
 class PlayerController extends BaseController
 {

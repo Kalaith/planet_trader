@@ -1,21 +1,16 @@
 class AuthService {
-  private token: string | null = null;
-  constructor() {
-    this.token = localStorage.getItem('token');
-  }
   getToken(): string | null {
-    return this.token;
-  }
-  setToken(token: string) {
-    this.token = token;
-    localStorage.setItem('token', token);
-  }
-  clearToken() {
-    this.token = null;
-    localStorage.removeItem('token');
+    try {
+      const storedAuth = localStorage.getItem('auth-storage');
+      if (!storedAuth) return null;
+      const parsed = JSON.parse(storedAuth) as { state?: { token?: string | null } };
+      return parsed.state?.token ?? null;
+    } catch {
+      return null;
+    }
   }
   isAuthenticated(): boolean {
-    return !!this.token;
+    return !!this.getToken();
   }
 }
 export default new AuthService();
