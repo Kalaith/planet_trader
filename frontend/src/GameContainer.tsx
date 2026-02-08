@@ -1,4 +1,4 @@
-import { useGameContext } from './contexts/GameContext';
+import { useGameContext } from './contexts/useGameContext';
 import ResourcesPanel from './components/ResourcesPanel';
 import TerraformingToolsPanel from './components/TerraformingToolsPanel';
 import PlanetWorkshop from './components/PlanetWorkshop';

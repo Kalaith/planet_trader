@@ -1,6 +1,19 @@
 import { randomItem } from '../game/useGame';
+import type { Species } from '../types/entities';
 
 const BASE_URL = 'mocks'; // Updated to remove leading slash
+
+interface AlienSpeciesTypeTemplate {
+  prefixes: string[];
+  suffixes: string[];
+  desc: string;
+  temp: [number, number];
+  atmo: [number, number];
+  water: [number, number];
+  grav: [number, number];
+  rad: [number, number];
+  colors: string[];
+}
 
 export const fetchGameData = async () => {
   try {
@@ -12,7 +25,7 @@ export const fetchGameData = async () => {
       fetch(`${BASE_URL}/alien_species_types.json`).then(r => r.json()),
     ]);
 
-    const mappedAlienSpeciesTypes = alienSpeciesTypes.map((species: any) => ({
+    const mappedAlienSpeciesTypes: Species[] = (alienSpeciesTypes as AlienSpeciesTypeTemplate[]).map((species) => ({
       name: `${randomItem(species.prefixes)} ${randomItem(species.suffixes)}`,
       description: species.desc,
       tempRange: species.temp,

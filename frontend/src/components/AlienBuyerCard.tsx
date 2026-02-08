@@ -1,10 +1,31 @@
 import React from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 import { tool_categories } from '../types/entities';
-import type { Planet } from '../types/entities';
+import type { Alien, Planet } from '../types/entities';
 
-const CompactAlienBuyerCard: React.FC<{ buyer: any; compatibility: number; currentPlanet: Planet; toggleAlienDetails: (alienId: number) => void; sellPlanet: (buyer: any) => void }> = ({ buyer, compatibility, currentPlanet, toggleAlienDetails, sellPlanet }) => (
-  <div 
+type PlanetStatCategoryId = 'temperature' | 'atmosphere' | 'water' | 'gravity' | 'radiation';
+
+const PLANET_STAT_CATEGORIES = tool_categories.filter(
+  (c): c is (typeof tool_categories)[number] & { id: PlanetStatCategoryId } =>
+    (['temperature', 'atmosphere', 'water', 'gravity', 'radiation'] as const).includes(c.id as PlanetStatCategoryId)
+);
+
+interface CompactAlienBuyerCardProps {
+  buyer: Alien;
+  compatibility: number;
+  currentPlanet: Planet;
+  toggleAlienDetails: (alienId: number) => void;
+  sellPlanet: (buyer: Alien) => void;
+}
+
+const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
+  buyer,
+  compatibility,
+  currentPlanet,
+  toggleAlienDetails,
+  sellPlanet,
+}) => (
+  <div
     className="p-3 cursor-pointer hover:bg-gray-600 transition-colors duration-200"
     onClick={() => toggleAlienDetails(buyer.id)}
   >
@@ -12,39 +33,43 @@ const CompactAlienBuyerCard: React.FC<{ buyer: any; compatibility: number; curre
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-bold text-white text-sm">{buyer.name}</span>
-          <span className={`text-xs font-medium ${compatibility >= 0.8 ? 'text-green-400' : compatibility >= 0.6 ? 'text-yellow-400' : 'text-red-400'}`}>
+          <span
+            className={`text-xs font-medium ${
+              compatibility >= 0.8 ? 'text-green-400' : compatibility >= 0.6 ? 'text-yellow-400' : 'text-red-400'
+            }`}
+          >
             {Math.round(compatibility * 100)}%
           </span>
         </div>
         <table className="text-xs">
           <thead>
             <tr>
-              {tool_categories.map(category => (
-                <th key={category.id} className="px-2 py-1 text-center">{category.icon}</th>
+              {PLANET_STAT_CATEGORIES.map((category) => (
+                <th key={category.id} className="px-2 py-1 text-center">
+                  {category.icon}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             <tr>
-              {tool_categories.map(category => {
+              {PLANET_STAT_CATEGORIES.map((category) => {
                 const rangeKey = {
                   temperature: 'tempRange',
                   atmosphere: 'atmoRange',
                   water: 'waterRange',
                   gravity: 'gravRange',
                   radiation: 'radRange',
-                  infrastructure: 'infraRange',
                 }[category.id];
 
-                if (!rangeKey) return null;
-
-                const valueKey = category.id as keyof Planet;
-                const range = buyer[rangeKey] || [0, 0];
-                const value = currentPlanet[valueKey] || 0;
+                const range = buyer[rangeKey] ?? [0, 0];
+                const value = currentPlanet[category.id];
                 const met = value >= range[0] && value <= range[1];
 
                 return (
-                  <td key={category.id} className={`px-2 py-1 text-center ${met ? 'text-green-400' : 'text-red-400'}`}>{met ? '✓' : '✗'}</td>
+                  <td key={category.id} className={`px-2 py-1 text-center ${met ? 'text-green-400' : 'text-red-400'}`}>
+                    {met ? '✓' : '✗'}
+                  </td>
                 );
               })}
             </tr>
@@ -53,12 +78,17 @@ const CompactAlienBuyerCard: React.FC<{ buyer: any; compatibility: number; curre
       </div>
       <div className="flex items-center gap-2 ml-2">
         <button
-          className={`py-1 px-2 rounded text-sm font-semibold ${compatibility >= 0.6 ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}
+          className={`py-1 px-2 rounded text-sm font-semibold ${
+            compatibility >= 0.6
+              ? 'bg-green-600 hover:bg-green-700 text-white'
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          }`}
           onClick={(e) => {
             e.stopPropagation();
             if (compatibility >= 0.6) sellPlanet(buyer);
           }}
           disabled={compatibility < 0.6}
+          type="button"
         >
           Sell
         </button>
@@ -67,31 +97,35 @@ const CompactAlienBuyerCard: React.FC<{ buyer: any; compatibility: number; curre
   </div>
 );
 
-const ExpandedAlienBuyerCard: React.FC<{ buyer: any; currentPlanet: Planet }> = ({ buyer, currentPlanet }) => (
+interface ExpandedAlienBuyerCardProps {
+  buyer: Alien;
+  currentPlanet: Planet;
+}
+
+const ExpandedAlienBuyerCard: React.FC<ExpandedAlienBuyerCardProps> = ({ buyer, currentPlanet }) => (
   <div className="px-3 pb-3 border-t border-gray-600">
     <div className="pt-3 space-y-3">
       <div className="text-gray-300 text-sm leading-relaxed">{buyer.description}</div>
       <div className="grid grid-cols-2 gap-2 text-xs">
-        {tool_categories.map(category => {
+        {PLANET_STAT_CATEGORIES.map((category) => {
           const rangeKey = {
             temperature: 'tempRange',
             atmosphere: 'atmoRange',
             water: 'waterRange',
             gravity: 'gravRange',
             radiation: 'radRange',
-            infrastructure: 'infraRange',
           }[category.id];
 
-          if (!rangeKey) return null;
-
-          const range = buyer[rangeKey] || [0, 0];
-          const value = currentPlanet[category.id as keyof Planet] || 0;
+          const range = buyer[rangeKey] ?? [0, 0];
+          const value = currentPlanet[category.id];
           const met = value >= range[0] && value <= range[1];
 
           return (
             <div
               key={category.id}
-              className={`rounded p-2 border ${met ? 'bg-green-900/30 border-green-500' : 'bg-red-900/30 border-red-500'}`}
+              className={`rounded p-2 border ${
+                met ? 'bg-green-900/30 border-green-500' : 'bg-red-900/30 border-red-500'
+              }`}
             >
               <div className="text-gray-400">{category.label}</div>
               <div className="text-xs text-white">
@@ -105,51 +139,46 @@ const ExpandedAlienBuyerCard: React.FC<{ buyer: any; currentPlanet: Planet }> = 
   </div>
 );
 
-const AlienBuyerCard: React.FC<{ buyer: any; isExpanded: boolean; toggleAlienDetails: (alienId: number) => void }> = ({ buyer, isExpanded, toggleAlienDetails }) => {
+interface AlienBuyerCardProps {
+  buyer: Alien;
+  isExpanded: boolean;
+  toggleAlienDetails: (alienId: number) => void;
+}
+
+const AlienBuyerCard: React.FC<AlienBuyerCardProps> = ({ buyer, isExpanded, toggleAlienDetails }) => {
   const { currentPlanet, sellPlanet } = useGameContext();
 
-  if (!currentPlanet) {
-    return null; // Do not render if currentPlanet is null
-  }
+  if (!currentPlanet) return null;
 
-  const calculateCompatibility = (buyer: any) => {
-    const defaultMatches = {
-      temperature: false,
-      atmosphere: false,
-      water: false,
-      gravity: false,
-      radiation: false
-    };
-
-    if (!currentPlanet) return { compatibility: 0, matches: defaultMatches };
-
-    let score = 0;
+  const calculateCompatibility = (b: Alien) => {
     const matches = {
-      temperature: currentPlanet.temperature >= (buyer.tempRange?.[0] || 0) && currentPlanet.temperature <= (buyer.tempRange?.[1] || 0),
-      atmosphere: currentPlanet.atmosphere >= (buyer.atmoRange?.[0] || 0) && currentPlanet.atmosphere <= (buyer.atmoRange?.[1] || 0),
-      water: currentPlanet.water >= (buyer.waterRange?.[0] || 0) && currentPlanet.water <= (buyer.waterRange?.[1] || 0),
-      gravity: currentPlanet.gravity >= (buyer.gravRange?.[0] || 0) && currentPlanet.gravity <= (buyer.gravRange?.[1] || 0),
-      radiation: currentPlanet.radiation >= (buyer.radRange?.[0] || 0) && currentPlanet.radiation <= (buyer.radRange?.[1] || 0)
+      temperature: currentPlanet.temperature >= (b.tempRange?.[0] ?? 0) && currentPlanet.temperature <= (b.tempRange?.[1] ?? 0),
+      atmosphere: currentPlanet.atmosphere >= (b.atmoRange?.[0] ?? 0) && currentPlanet.atmosphere <= (b.atmoRange?.[1] ?? 0),
+      water: currentPlanet.water >= (b.waterRange?.[0] ?? 0) && currentPlanet.water <= (b.waterRange?.[1] ?? 0),
+      gravity: currentPlanet.gravity >= (b.gravRange?.[0] ?? 0) && currentPlanet.gravity <= (b.gravRange?.[1] ?? 0),
+      radiation: currentPlanet.radiation >= (b.radRange?.[0] ?? 0) && currentPlanet.radiation <= (b.radRange?.[1] ?? 0),
     };
 
-    score = Object.values(matches).filter(Boolean).length;
-
+    const score = Object.values(matches).filter(Boolean).length;
     const compatibility = score / 5;
-    let price = buyer.currentPrice;
-    if (compatibility >= 0.8) price = Math.floor(price * 1.2);
-    const canSell = compatibility >= 0.6;
-
-    return { compatibility, canSell, price, matches };
+    return { compatibility };
   };
 
   const { compatibility } = calculateCompatibility(buyer);
 
   return (
-    <div key={buyer.id} className="bg-gray-700 border border-gray-600 rounded-lg overflow-hidden">
-      <CompactAlienBuyerCard buyer={buyer} compatibility={compatibility} currentPlanet={currentPlanet} toggleAlienDetails={toggleAlienDetails} sellPlanet={sellPlanet} />
+    <div className="bg-gray-700 border border-gray-600 rounded-lg overflow-hidden">
+      <CompactAlienBuyerCard
+        buyer={buyer}
+        compatibility={compatibility}
+        currentPlanet={currentPlanet}
+        toggleAlienDetails={toggleAlienDetails}
+        sellPlanet={sellPlanet}
+      />
       {isExpanded && <ExpandedAlienBuyerCard buyer={buyer} currentPlanet={currentPlanet} />}
     </div>
   );
 };
 
 export default AlienBuyerCard;
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 
 const Tutorial: React.FC = () => {
   const { startGame } = useGameContext();

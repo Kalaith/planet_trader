@@ -1,9 +1,10 @@
 import React from 'react';
 import { tool_categories } from '../types/entities';
+import type { Alien, Planet } from '../types/entities';
 
 interface RequirementGridProps {
-  buyer: any;
-  currentPlanet: any;
+  buyer: Alien;
+  currentPlanet: Planet | null;
 }
 
 const RequirementGrid: React.FC<RequirementGridProps> = ({ buyer, currentPlanet }) => (

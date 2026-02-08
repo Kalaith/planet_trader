@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 import type { Planet } from '../types/entities';
 import statList from '../mocks/statList.json';
 

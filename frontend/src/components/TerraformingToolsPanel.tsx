@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 import type { Tool } from '../types/entities';
 
 const TerraformingToolsPanel: React.FC = () => {
-  const { gameData, useTool, isToolLocked, credits, currentPlanet } = useGameContext();
+  const { gameData, applyTool, isToolLocked, credits, currentPlanet } = useGameContext();
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
 
   const toggleToolDetails = (toolId: string) => {
@@ -102,7 +102,7 @@ const TerraformingToolsPanel: React.FC = () => {
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (canUse) useTool(tool);
+                          if (canUse) applyTool(tool);
                         }}
                         disabled={!canUse}
                       >
@@ -193,7 +193,7 @@ const TerraformingToolsPanel: React.FC = () => {
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (canUse) useTool(tool);
+                          if (canUse) applyTool(tool);
                         }}
                         disabled={!canUse}
                       >

@@ -1,10 +1,11 @@
 import React from 'react';
 import { tool_categories } from '../types/entities';
+import type { Alien, Planet } from '../types/entities';
 
 interface RequirementStatusCellProps {
-  buyer: any;
-  currentPlanet: any;
-  categoryId: string;
+  buyer: Alien;
+  currentPlanet: Planet;
+  categoryId: 'temperature' | 'atmosphere' | 'water' | 'gravity' | 'radiation';
 }
 
 const RequirementStatusCell: React.FC<RequirementStatusCellProps> = ({ buyer, currentPlanet, categoryId }) => {

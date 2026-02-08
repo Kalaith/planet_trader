@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 import AlienBuyerCard from './AlienBuyerCard';
 
 const AlienMarketPanel: React.FC = () => {

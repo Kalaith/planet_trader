@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 
 const PlanetInventory: React.FC = () => {
   const { planets, currentPlanet, showPlanetPurchaseModal, selectPlanet } = useGameContext();

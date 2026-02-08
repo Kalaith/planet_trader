@@ -5,7 +5,7 @@ import type { Planet, PlanetType, Tool, Species, Alien } from '../types/entities
 import { fetchGameData } from '../api/fetchGameData';
 
 // Utility functions
-export const randomItem = (arr: any[]): any => arr[Math.floor(Math.random() * arr.length)];
+export const randomItem = <T,>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 // Planet class logic as a factory function
 function createPlanet(type: PlanetType, name: string): Planet {
@@ -43,8 +43,7 @@ function generateRandomSpecies(types: Species[], count: number): Species[] {
   return shuffled.slice(0, count);
 }
 
-// Move usedPlanetNames definition to the top-level scope
-const usedPlanetNames = new Set<string>();
+// Reserved for future: track unique planet names across the session.
 
 export function useGame() {
   // Game state
@@ -61,7 +60,7 @@ export function useGame() {
     terraformingTools: [] as Tool[],
     planetNames: [],
   });
-  const [alienSpeciesTypes, setAlienSpeciesTypes] = useState([]);
+  const [alienSpeciesTypes, setAlienSpeciesTypes] = useState<Species[]>([]);
   const [planetModalOpen, setPlanetModalOpen] = useState(false);
 
   // Load game data from /api endpoints
@@ -142,7 +141,7 @@ export function useGame() {
     }
     setPlanetOptions(options);
     setPlanetModalOpen(true);
-  }, [gameStarted, gameData, usedPlanetNames, gameData.planetNames]);
+  }, [gameStarted, gameData, showMessage]);
 
   const closePlanetModal = useCallback(() => {
     setPlanetModalOpen(false);
@@ -176,7 +175,7 @@ export function useGame() {
   }, [currentPlanet]);
 
   // Apply a terraforming tool to the current planet
-  const useTool = useCallback((tool: Tool): void => {
+  const applyTool = useCallback((tool: Tool): void => {
     if (!currentPlanet) {
       showMessage('Select a planet first!', 'error');
       return;
@@ -205,13 +204,13 @@ export function useGame() {
       return updated;
     });
     showMessage(`Used ${tool.name}`, 'success');
-  }, [currentPlanet, spendCredits, showMessage, setCurrentPlanet]);
+  }, [currentPlanet, spendCredits, showMessage]);
 
   // Tool locking: a tool is locked if it has upgradeRequired and it's not in unlockedResearch
-  const isToolLocked = useCallback((tool: Tool): boolean => {
+  const isToolLocked = (tool: Tool): boolean => {
     if (tool.upgradeRequired && !unlockedResearch.includes(tool.upgradeRequired)) return true;
     return false;
-  }, [unlockedResearch]);
+  };
 
   const startGame = useCallback((): void => {
     setGameStarted(true);
@@ -235,7 +234,7 @@ export function useGame() {
     closePlanetModal,
     purchasePlanet,
     startGame,
-    useTool,
+    applyTool,
     isToolLocked,
   };
 }

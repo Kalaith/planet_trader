@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 
 const PlanetPurchaseModal: React.FC = () => {
   const { planetModalOpen, planetOptions, closePlanetModal, purchasePlanet } = useGameContext();

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 
 const GameMessages: React.FC = () => {
   const { messages } = useGameContext();

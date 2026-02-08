@@ -1,9 +1,10 @@
 import React from 'react';
 import { tool_categories } from '../types/entities';
+import type { Alien, Planet } from '../types/entities';
 
 interface RequirementIconsTableProps {
-  buyer: any;
-  currentPlanet: any;
+  buyer: Alien;
+  currentPlanet: Planet;
 }
 
 const RequirementIconsTable: React.FC<RequirementIconsTableProps> = ({ buyer, currentPlanet }) => (

@@ -23,7 +23,7 @@ export interface GameContextType {
     terraformingTools: Tool[];
     planetNames: string[];
   };
-  useTool: (tool: Tool) => void;
+  applyTool: (tool: Tool) => void;
   isToolLocked: (tool: Tool) => boolean;
   showPlanetPurchaseModal: () => void;
   closePlanetModal: () => void;

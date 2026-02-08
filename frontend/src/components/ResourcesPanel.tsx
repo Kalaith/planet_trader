@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameContext } from '../contexts/GameContext';
+import { useGameContext } from '../contexts/useGameContext';
 import UserInfo from './UserInfo';
 
 const ResourcesPanel: React.FC = () => {
