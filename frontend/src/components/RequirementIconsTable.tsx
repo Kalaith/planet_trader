@@ -1,5 +1,5 @@
 import React from 'react';
-import { tool_categories } from '../types/entities';
+import { toolCategories } from '../types/entities';
 import type { Alien, Planet } from '../types/entities';
 
 interface RequirementIconsTableProps {
@@ -12,7 +12,7 @@ const RequirementIconsTable: React.FC<RequirementIconsTableProps> = ({ buyer, cu
     <table className="text-sm">
       <tbody>
         <tr>
-          {tool_categories.map(cat => (
+          {toolCategories.map(cat => (
             <td
               key={cat.id}
               className={`px-2 py-1 text-center ${cat.colorClass || ''}`}

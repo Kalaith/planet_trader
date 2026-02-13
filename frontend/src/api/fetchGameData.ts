@@ -1,7 +1,7 @@
 import { randomItem } from '../game/useGame';
 import type { Species } from '../types/entities';
 
-const BASE_URL = 'mocks'; // Updated to remove leading slash
+const baseUrl = 'mocks'; // Updated to remove leading slash
 
 interface AlienSpeciesTypeTemplate {
   prefixes: string[];
@@ -18,11 +18,11 @@ interface AlienSpeciesTypeTemplate {
 export const fetchGameData = async () => {
   try {
     const [planetTypes, alienSpecies, terraformingTools, planetNames, alienSpeciesTypes] = await Promise.all([
-      fetch(`${BASE_URL}/planet_types.json`).then(r => r.json()),
-      fetch(`${BASE_URL}/alien_species.json`).then(r => r.json()),
-      fetch(`${BASE_URL}/terraforming_tools.json`).then(r => r.json()),
-      fetch(`${BASE_URL}/planet_names.json`).then(r => r.json()),
-      fetch(`${BASE_URL}/alien_species_types.json`).then(r => r.json()),
+      fetch(`${baseUrl}/planet_types.json`).then(r => r.json()),
+      fetch(`${baseUrl}/alien_species.json`).then(r => r.json()),
+      fetch(`${baseUrl}/terraforming_tools.json`).then(r => r.json()),
+      fetch(`${baseUrl}/planet_names.json`).then(r => r.json()),
+      fetch(`${baseUrl}/alien_species_types.json`).then(r => r.json()),
     ]);
 
     const mappedAlienSpeciesTypes: Species[] = (alienSpeciesTypes as AlienSpeciesTypeTemplate[]).map((species) => ({

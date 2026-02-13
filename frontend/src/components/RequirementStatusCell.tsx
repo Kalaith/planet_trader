@@ -1,5 +1,5 @@
 import React from 'react';
-import { tool_categories } from '../types/entities';
+import { toolCategories } from '../types/entities';
 import type { Alien, Planet } from '../types/entities';
 
 interface RequirementStatusCellProps {
@@ -9,7 +9,7 @@ interface RequirementStatusCellProps {
 }
 
 const RequirementStatusCell: React.FC<RequirementStatusCellProps> = ({ buyer, currentPlanet, categoryId }) => {
-  const cat = tool_categories.find(c => c.id === categoryId);
+  const cat = toolCategories.find(c => c.id === categoryId);
   let met = false;
   if (cat) {
     // Map categoryId to the correct buyer range and planet value keys
