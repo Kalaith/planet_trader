@@ -1,6 +1,24 @@
+
 import React from "react";
 import { toolCategories } from "../types/entities";
 import type { Alien, Planet } from "../types/entities";
+type AlienRangeKey =
+  | "tempRange"
+  | "atmoRange"
+  | "waterRange"
+  | "gravRange"
+  | "radRange";
+
+const rangeKeyByCategory: Record<
+  RequirementStatusCellProps["categoryId"],
+  AlienRangeKey
+> = {
+  temperature: "tempRange",
+  atmosphere: "atmoRange",
+  water: "waterRange",
+  gravity: "gravRange",
+  radiation: "radRange",
+};
 
 interface RequirementStatusCellProps {
   buyer: Alien;
@@ -17,13 +35,7 @@ const RequirementStatusCell: React.FC<RequirementStatusCellProps> = ({
   let met = false;
   if (cat) {
     // Map categoryId to the correct buyer range and planet value keys
-    const rangeKey = {
-      temperature: "tempRange",
-      atmosphere: "atmoRange",
-      water: "waterRange",
-      gravity: "gravRange",
-      radiation: "radRange",
-    }[categoryId];
+    const rangeKey = rangeKeyByCategory[categoryId];
     const valueKey = categoryId;
     if (
       rangeKey &&

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useGameContext } from "../contexts/useGameContext";
 import { toolCategories } from "../types/entities";
@@ -9,6 +10,20 @@ type PlanetStatCategoryId =
   | "water"
   | "gravity"
   | "radiation";
+type AlienRangeKey =
+  | "tempRange"
+  | "atmoRange"
+  | "waterRange"
+  | "gravRange"
+  | "radRange";
+
+const rangeKeyByCategory: Record<PlanetStatCategoryId, AlienRangeKey> = {
+  temperature: "tempRange",
+  atmosphere: "atmoRange",
+  water: "waterRange",
+  gravity: "gravRange",
+  radiation: "radRange",
+};
 
 const planetStatCategories = toolCategories.filter(
   (c): c is (typeof toolCategories)[number] & { id: PlanetStatCategoryId } =>
@@ -65,13 +80,7 @@ const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
           <tbody>
             <tr>
               {planetStatCategories.map((category) => {
-                const rangeKey = {
-                  temperature: "tempRange",
-                  atmosphere: "atmoRange",
-                  water: "waterRange",
-                  gravity: "gravRange",
-                  radiation: "radRange",
-                }[category.id];
+                const rangeKey = rangeKeyByCategory[category.id];
 
                 const range = buyer[rangeKey] ?? [0, 0];
                 const value = currentPlanet[category.id];
@@ -127,13 +136,7 @@ const ExpandedAlienBuyerCard: React.FC<ExpandedAlienBuyerCardProps> = ({
       </div>
       <div className="grid grid-cols-2 gap-2 text-xs">
         {planetStatCategories.map((category) => {
-          const rangeKey = {
-            temperature: "tempRange",
-            atmosphere: "atmoRange",
-            water: "waterRange",
-            gravity: "gravRange",
-            radiation: "radRange",
-          }[category.id];
+          const rangeKey = rangeKeyByCategory[category.id];
 
           const range = buyer[rangeKey] ?? [0, 0];
           const value = currentPlanet[category.id];

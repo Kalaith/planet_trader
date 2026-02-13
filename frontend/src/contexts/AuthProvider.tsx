@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, type ReactNode } from "react";
 import { AuthContext, type AuthUser } from "./authContext";
 
@@ -44,3 +45,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
