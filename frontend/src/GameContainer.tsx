@@ -1,12 +1,12 @@
-import { useGameContext } from './contexts/useGameContext';
-import ResourcesPanel from './components/ResourcesPanel';
-import TerraformingToolsPanel from './components/TerraformingToolsPanel';
-import PlanetWorkshop from './components/PlanetWorkshop';
-import AlienMarketPanel from './components/AlienMarketPanel';
-import PlanetInventory from './components/PlanetInventory';
-import GameMessages from './components/GameMessages';
-import PlanetPurchaseModal from './components/PlanetPurchaseModal';
-import Tutorial from './components/Tutorial';
+import { useGameContext } from "./contexts/useGameContext";
+import ResourcesPanel from "./components/ResourcesPanel";
+import TerraformingToolsPanel from "./components/TerraformingToolsPanel";
+import PlanetWorkshop from "./components/PlanetWorkshop";
+import AlienMarketPanel from "./components/AlienMarketPanel";
+import PlanetInventory from "./components/PlanetInventory";
+import GameMessages from "./components/GameMessages";
+import PlanetPurchaseModal from "./components/PlanetPurchaseModal";
+import Tutorial from "./components/Tutorial";
 
 const GameContainer = () => {
   const { gameStarted } = useGameContext();
@@ -21,27 +21,27 @@ const GameContainer = () => {
           <div className="lg:col-span-12">
             <ResourcesPanel />
           </div>
-          
+
           {/* Mobile: Stack all panels vertically */}
           {/* Desktop: 3-column layout with terraforming tools on left, workshop/inventory in center, market on right */}
-          
+
           {/* Left Panel - Terraforming Tools */}
           <div className="lg:col-span-3 xl:col-span-3">
             <TerraformingToolsPanel />
           </div>
-          
+
           {/* Center Panel - Main workspace */}
           <div className="space-y-3 sm:space-y-4 lg:col-span-6 xl:col-span-6">
             <PlanetWorkshop />
             <PlanetInventory />
           </div>
-          
+
           {/* Right Panel - Alien Market */}
           <div className="lg:col-span-3 xl:col-span-3">
             <AlienMarketPanel />
           </div>
         </div>
-        
+
         {/* Fixed position elements */}
         <GameMessages />
         <PlanetPurchaseModal />

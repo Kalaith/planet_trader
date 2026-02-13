@@ -44,12 +44,14 @@ frontend/
    Visit [http://localhost:3000](http://localhost:3000)
 
 ## Key Technologies
+
 - React 18+
 - TypeScript
 - Tailwind CSS (with custom scrollbar and animation tweaks)
 - Context API & custom hooks
 
 ## Gameplay Overview
+
 - Buy planets, analyze their stats, and use terraforming tools to match alien buyer requirements.
 - Each alien buyer has unique environmental needs (temperature, atmosphere, water, gravity, radiation).
 - Sell planets for profit; maximize compatibility for higher prices (perfect fit: 4,000–6,000₵).
@@ -57,11 +59,13 @@ frontend/
 - All actions provide instant feedback and animated notifications.
 
 ## Accessibility & UX
+
 - All interactive elements are keyboard and screen reader accessible.
 - Scrollable panels use custom, touch-friendly scrollbars.
 - Responsive design for desktop and mobile.
 
 ## Development Notes
+
 - All types are in `src/types/entities.ts`.
 - Utilities in `src/utils/`.
 - Mock data in `public/mocks/`.
@@ -69,4 +73,5 @@ frontend/
 - To add new tools, planets, or species, update the relevant mock JSON files.
 
 ## License
+
 MIT

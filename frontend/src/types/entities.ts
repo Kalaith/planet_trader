@@ -78,10 +78,35 @@ export interface Research {
 }
 
 export const toolCategories = [
-  { label: '🌡️ Temperature', id: 'temperature', icon: '🌡️', colorClass: 'text-orange-400' },
-  { label: '🌫️ Atmosphere', id: 'atmosphere', icon: '🌫️', colorClass: 'text-blue-400' },
-  { label: '💧 Water', id: 'water', icon: '💧', colorClass: 'text-blue-300' },
-  { label: '⚖️ Gravity', id: 'gravity', icon: '⚖️', colorClass: 'text-purple-400' },
-  { label: '☢️ Radiation', id: 'radiation', icon: '☢️', colorClass: 'text-yellow-400' },
-  { label: '🏗️ Infrastructure', id: 'infrastructure', icon: '🏗️', colorClass: 'text-gray-400' },
+  {
+    label: "🌡️ Temperature",
+    id: "temperature",
+    icon: "🌡️",
+    colorClass: "text-orange-400",
+  },
+  {
+    label: "🌫️ Atmosphere",
+    id: "atmosphere",
+    icon: "🌫️",
+    colorClass: "text-blue-400",
+  },
+  { label: "💧 Water", id: "water", icon: "💧", colorClass: "text-blue-300" },
+  {
+    label: "⚖️ Gravity",
+    id: "gravity",
+    icon: "⚖️",
+    colorClass: "text-purple-400",
+  },
+  {
+    label: "☢️ Radiation",
+    id: "radiation",
+    icon: "☢️",
+    colorClass: "text-yellow-400",
+  },
+  {
+    label: "🏗️ Infrastructure",
+    id: "infrastructure",
+    icon: "🏗️",
+    colorClass: "text-gray-400",
+  },
 ];

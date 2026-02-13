@@ -1,6 +1,6 @@
-import React, { type ReactNode } from 'react';
-import { useGame } from '../game/useGame';
-import { GameContext } from './gameContext';
+import React, { type ReactNode } from "react";
+import { useGame } from "../game/useGame";
+import { GameContext } from "./gameContext";
 
 interface GameProviderProps {
   children: ReactNode;
@@ -9,6 +9,7 @@ interface GameProviderProps {
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const gameState = useGame();
 
-  return <GameContext.Provider value={gameState}>{children}</GameContext.Provider>;
+  return (
+    <GameContext.Provider value={gameState}>{children}</GameContext.Provider>
+  );
 };
-

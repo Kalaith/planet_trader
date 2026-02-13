@@ -3,7 +3,7 @@
 /* Custom Scrollbar Styles - Touch Friendly */
 .scrollbar-custom {
   scrollbar-width: thin;
-  scrollbar-color: #4B5563 #1F2937;
+  scrollbar-color: #4b5563 #1f2937;
 }
 
 .scrollbar-custom::-webkit-scrollbar {
@@ -12,28 +12,28 @@
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: #1F2937;
+  background: #1f2937;
   border-radius: 6px;
   margin: 4px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: #4B5563;
+  background: #4b5563;
   border-radius: 6px;
-  border: 2px solid #1F2937;
+  border: 2px solid #1f2937;
   min-height: 40px; /* Minimum thumb size for touch */
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
+  background: #6b7280;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:active {
-  background: #9CA3AF;
+  background: #9ca3af;
 }
 
 .scrollbar-custom::-webkit-scrollbar-corner {
-  background: #1F2937;
+  background: #1f2937;
 }
 
 /* For mobile devices - larger touch targets */
@@ -41,9 +41,9 @@
   .scrollbar-custom::-webkit-scrollbar {
     width: 16px;
   }
-  
+
   .scrollbar-custom::-webkit-scrollbar-thumb {
-    border: 3px solid #1F2937;
+    border: 3px solid #1f2937;
     min-height: 50px;
   }
 }
