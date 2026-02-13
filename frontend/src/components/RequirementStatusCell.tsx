@@ -1,4 +1,3 @@
-
 import React from "react";
 import { toolCategories } from "../types/entities";
 import type { Alien, Planet } from "../types/entities";

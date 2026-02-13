@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useGameContext } from "../contexts/useGameContext";
 import { toolCategories } from "../types/entities";
