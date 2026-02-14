@@ -1,7 +1,7 @@
 class AuthService {
   getToken(): string | null {
     try {
-      const storedAuth = localStorage.getItem("auth-storage");
+      const storedAuth = localStorage.getItem('auth-storage');
       if (!storedAuth) return null;
       const parsed = JSON.parse(storedAuth) as {
         state?: { token?: string | null };

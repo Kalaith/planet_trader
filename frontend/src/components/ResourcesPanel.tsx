@@ -1,6 +1,6 @@
-import React from "react";
-import { useGameContext } from "../contexts/useGameContext";
-import UserInfo from "./UserInfo";
+import React from 'react';
+import { useGameContext } from '../contexts/useGameContext';
+import UserInfo from './UserInfo';
 
 const ResourcesPanel: React.FC = () => {
   const { credits, currentPlanet, showPlanetPurchaseModal } = useGameContext();
@@ -9,9 +9,7 @@ const ResourcesPanel: React.FC = () => {
     <header className="bg-gray-800 border border-gray-700 rounded-lg p-3 sm:p-6 shadow-lg">
       <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
         <div className="company-logo text-center sm:text-left">
-          <h1 className="text-xl sm:text-2xl font-bold text-blue-400">
-            🪐 Terraforming Co.
-          </h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-blue-400">🪐 Terraforming Co.</h1>
         </div>
         <div className="resources-info flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-4 sm:items-center">
           <div className="resource-item flex items-center justify-between sm:justify-start gap-2">
@@ -21,11 +19,9 @@ const ResourcesPanel: React.FC = () => {
             </span>
           </div>
           <div className="resource-item flex items-center justify-between sm:justify-start gap-2">
-            <span className="text-gray-300 text-xs sm:text-sm">
-              Current Planet:
-            </span>
+            <span className="text-gray-300 text-xs sm:text-sm">Current Planet:</span>
             <span className="text-blue-300 font-semibold text-sm truncate max-w-32 sm:max-w-none">
-              {currentPlanet ? currentPlanet.name : "None"}
+              {currentPlanet ? currentPlanet.name : 'None'}
             </span>
           </div>
           <button

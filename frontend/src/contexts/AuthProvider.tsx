@@ -1,5 +1,5 @@
-import React, { useEffect, useState, type ReactNode } from "react";
-import { AuthContext, type AuthUser } from "./authContext";
+import React, { useEffect, useState, type ReactNode } from 'react';
+import { AuthContext, type AuthUser } from './authContext';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -12,7 +12,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initUser = () => {
       try {
-        const storedAuth = localStorage.getItem("auth-storage");
+        const storedAuth = localStorage.getItem('auth-storage');
         if (!storedAuth) {
           setUser(null);
           return;
@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
         setUser(parsed.state?.user ?? null);
       } catch (err) {
-        console.error("User initialization error:", err);
+        console.error('User initialization error:', err);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -37,9 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, isLoading, logout }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );

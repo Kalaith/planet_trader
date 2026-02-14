@@ -1,5 +1,5 @@
-import React from "react";
-import { useGameContext } from "../contexts/useGameContext";
+import React from 'react';
+import { useGameContext } from '../contexts/useGameContext';
 
 const Tutorial: React.FC = () => {
   const { startGame } = useGameContext();
@@ -10,9 +10,7 @@ const Tutorial: React.FC = () => {
       <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-md w-full relative z-[10000]">
         <div className="p-6">
           <div className="border-b border-gray-700 pb-4 mb-6">
-            <h3 className="text-xl font-bold text-blue-400">
-              🎓 Welcome to Terraforming Co!
-            </h3>
+            <h3 className="text-xl font-bold text-blue-400">🎓 Welcome to Terraforming Co!</h3>
           </div>
           <div className="space-y-4">
             <p className="text-gray-300">

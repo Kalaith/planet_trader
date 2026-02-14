@@ -1,9 +1,7 @@
-import React from "react";
-import { useAuth } from "./useAuth";
+import React from 'react';
+import { useAuth } from './useAuth';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <div>Loading...</div>;

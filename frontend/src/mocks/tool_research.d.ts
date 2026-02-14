@@ -1,5 +1,5 @@
 // Correct type declaration for tool_research.json
-declare module "../mocks/tool_research.json" {
+declare module '../mocks/tool_research.json' {
   export interface ToolResearch {
     name: string;
     category: string;

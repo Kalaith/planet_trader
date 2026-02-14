@@ -1,16 +1,10 @@
-import type {
-  Alien,
-  Planet,
-  PlanetType,
-  Species,
-  Tool,
-} from "../types/entities";
+import type { Alien, Planet, PlanetType, Species, Tool } from '../types/entities';
 
 // Define StatusMessage type
 export type StatusMessage = {
   id: string;
   msg: string;
-  type: "info" | "success" | "error";
+  type: 'info' | 'success' | 'error';
 };
 
 // Create the context type based on what useGame returns

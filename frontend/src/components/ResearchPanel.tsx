@@ -29,19 +29,16 @@ const ResearchPanel: React.FC<ResearchPanelProps> = ({
           {researchList.length === 0 ? (
             <div>No research available.</div>
           ) : (
-            researchList.map((research) => {
+            researchList.map(research => {
               const unlocked = unlockedResearch.includes(research.name);
               return (
                 <div
                   key={research.id || research.name}
-                  className={`research-item${unlocked ? " unlocked" : ""}`}
+                  className={`research-item${unlocked ? ' unlocked' : ''}`}
                 >
                   <span>{research.name}</span>
-                  <button
-                    onClick={() => onResearch(research)}
-                    disabled={unlocked}
-                  >
-                    {unlocked ? "Unlocked" : "Research (10 RP)"}
+                  <button onClick={() => onResearch(research)} disabled={unlocked}>
+                    {unlocked ? 'Unlocked' : 'Research (10 RP)'}
                   </button>
                 </div>
               );

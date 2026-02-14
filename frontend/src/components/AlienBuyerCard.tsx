@@ -1,34 +1,24 @@
-import React from "react";
-import { useGameContext } from "../contexts/useGameContext";
-import { toolCategories } from "../types/entities";
-import type { Alien, Planet } from "../types/entities";
+import React from 'react';
+import { useGameContext } from '../contexts/useGameContext';
+import { toolCategories } from '../types/entities';
+import type { Alien, Planet } from '../types/entities';
 
-type PlanetStatCategoryId =
-  | "temperature"
-  | "atmosphere"
-  | "water"
-  | "gravity"
-  | "radiation";
-type AlienRangeKey =
-  | "tempRange"
-  | "atmoRange"
-  | "waterRange"
-  | "gravRange"
-  | "radRange";
+type PlanetStatCategoryId = 'temperature' | 'atmosphere' | 'water' | 'gravity' | 'radiation';
+type AlienRangeKey = 'tempRange' | 'atmoRange' | 'waterRange' | 'gravRange' | 'radRange';
 
 const rangeKeyByCategory: Record<PlanetStatCategoryId, AlienRangeKey> = {
-  temperature: "tempRange",
-  atmosphere: "atmoRange",
-  water: "waterRange",
-  gravity: "gravRange",
-  radiation: "radRange",
+  temperature: 'tempRange',
+  atmosphere: 'atmoRange',
+  water: 'waterRange',
+  gravity: 'gravRange',
+  radiation: 'radRange',
 };
 
 const planetStatCategories = toolCategories.filter(
   (c): c is (typeof toolCategories)[number] & { id: PlanetStatCategoryId } =>
-    (
-      ["temperature", "atmosphere", "water", "gravity", "radiation"] as const
-    ).includes(c.id as PlanetStatCategoryId),
+    (['temperature', 'atmosphere', 'water', 'gravity', 'radiation'] as const).includes(
+      c.id as PlanetStatCategoryId
+    )
 );
 
 interface CompactAlienBuyerCardProps {
@@ -57,10 +47,10 @@ const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
           <span
             className={`text-xs font-medium ${
               compatibility >= 0.8
-                ? "text-green-400"
+                ? 'text-green-400'
                 : compatibility >= 0.6
-                  ? "text-yellow-400"
-                  : "text-red-400"
+                  ? 'text-yellow-400'
+                  : 'text-red-400'
             }`}
           >
             {Math.round(compatibility * 100)}%
@@ -69,7 +59,7 @@ const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
         <table className="text-xs">
           <thead>
             <tr>
-              {planetStatCategories.map((category) => (
+              {planetStatCategories.map(category => (
                 <th key={category.id} className="px-2 py-1 text-center">
                   {category.icon}
                 </th>
@@ -78,7 +68,7 @@ const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
           </thead>
           <tbody>
             <tr>
-              {planetStatCategories.map((category) => {
+              {planetStatCategories.map(category => {
                 const rangeKey = rangeKeyByCategory[category.id];
 
                 const range = buyer[rangeKey] ?? [0, 0];
@@ -88,9 +78,9 @@ const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
                 return (
                   <td
                     key={category.id}
-                    className={`px-2 py-1 text-center ${met ? "text-green-400" : "text-red-400"}`}
+                    className={`px-2 py-1 text-center ${met ? 'text-green-400' : 'text-red-400'}`}
                   >
-                    {met ? "✓" : "✗"}
+                    {met ? '✓' : '✗'}
                   </td>
                 );
               })}
@@ -102,10 +92,10 @@ const CompactAlienBuyerCard: React.FC<CompactAlienBuyerCardProps> = ({
         <button
           className={`py-1 px-2 rounded text-sm font-semibold ${
             compatibility >= 0.6
-              ? "bg-green-600 hover:bg-green-700 text-white"
-              : "bg-gray-600 text-gray-400 cursor-not-allowed"
+              ? 'bg-green-600 hover:bg-green-700 text-white'
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
           }`}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             if (compatibility >= 0.6) sellPlanet(buyer);
           }}
@@ -130,11 +120,9 @@ const ExpandedAlienBuyerCard: React.FC<ExpandedAlienBuyerCardProps> = ({
 }) => (
   <div className="px-3 pb-3 border-t border-gray-600">
     <div className="pt-3 space-y-3">
-      <div className="text-gray-300 text-sm leading-relaxed">
-        {buyer.description}
-      </div>
+      <div className="text-gray-300 text-sm leading-relaxed">{buyer.description}</div>
       <div className="grid grid-cols-2 gap-2 text-xs">
-        {planetStatCategories.map((category) => {
+        {planetStatCategories.map(category => {
           const rangeKey = rangeKeyByCategory[category.id];
 
           const range = buyer[rangeKey] ?? [0, 0];
@@ -145,9 +133,7 @@ const ExpandedAlienBuyerCard: React.FC<ExpandedAlienBuyerCardProps> = ({
             <div
               key={category.id}
               className={`rounded p-2 border ${
-                met
-                  ? "bg-green-900/30 border-green-500"
-                  : "bg-red-900/30 border-red-500"
+                met ? 'bg-green-900/30 border-green-500' : 'bg-red-900/30 border-red-500'
               }`}
             >
               <div className="text-gray-400">{category.label}</div>
@@ -212,9 +198,7 @@ const AlienBuyerCard: React.FC<AlienBuyerCardProps> = ({
         toggleAlienDetails={toggleAlienDetails}
         sellPlanet={sellPlanet}
       />
-      {isExpanded && (
-        <ExpandedAlienBuyerCard buyer={buyer} currentPlanet={currentPlanet} />
-      )}
+      {isExpanded && <ExpandedAlienBuyerCard buyer={buyer} currentPlanet={currentPlanet} />}
     </div>
   );
 };

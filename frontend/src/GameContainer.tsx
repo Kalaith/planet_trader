@@ -1,12 +1,12 @@
-import { useGameContext } from "./contexts/useGameContext";
-import ResourcesPanel from "./components/ResourcesPanel";
-import TerraformingToolsPanel from "./components/TerraformingToolsPanel";
-import PlanetWorkshop from "./components/PlanetWorkshop";
-import AlienMarketPanel from "./components/AlienMarketPanel";
-import PlanetInventory from "./components/PlanetInventory";
-import GameMessages from "./components/GameMessages";
-import PlanetPurchaseModal from "./components/PlanetPurchaseModal";
-import Tutorial from "./components/Tutorial";
+import { useGameContext } from './contexts/useGameContext';
+import ResourcesPanel from './components/ResourcesPanel';
+import TerraformingToolsPanel from './components/TerraformingToolsPanel';
+import PlanetWorkshop from './components/PlanetWorkshop';
+import AlienMarketPanel from './components/AlienMarketPanel';
+import PlanetInventory from './components/PlanetInventory';
+import GameMessages from './components/GameMessages';
+import PlanetPurchaseModal from './components/PlanetPurchaseModal';
+import Tutorial from './components/Tutorial';
 
 const GameContainer = () => {
   const { gameStarted } = useGameContext();

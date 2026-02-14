@@ -2,30 +2,22 @@
 
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
   // Handle undefined, null, or empty hex values
-  if (!hex || typeof hex !== "string") {
-    console.warn(
-      "hexToRgb received invalid hex value:",
-      hex,
-      "using default gray color",
-    );
-    hex = "#808080"; // Default gray color
+  if (!hex || typeof hex !== 'string') {
+    console.warn('hexToRgb received invalid hex value:', hex, 'using default gray color');
+    hex = '#808080'; // Default gray color
   }
 
-  hex = hex.replace("#", "");
+  hex = hex.replace('#', '');
   if (hex.length === 3)
     hex = hex
-      .split("")
-      .map((x) => x + x)
-      .join("");
+      .split('')
+      .map(x => x + x)
+      .join('');
 
   // Ensure we have a valid 6-character hex string
   if (hex.length !== 6 || !/^[0-9a-fA-F]{6}$/.test(hex)) {
-    console.warn(
-      "hexToRgb received invalid hex format:",
-      hex,
-      "using default gray color",
-    );
-    hex = "808080"; // Default gray without #
+    console.warn('hexToRgb received invalid hex format:', hex, 'using default gray color');
+    hex = '808080'; // Default gray without #
   }
 
   const num = parseInt(hex, 16);
@@ -37,15 +29,11 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } {
 }
 
 export function rgbToHex(r: number, g: number, b: number): string {
-  return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 }
 
 // Ensure h is always defined in rgbToHsl
-export function rgbToHsl(
-  r: number,
-  g: number,
-  b: number,
-): { h: number; s: number; l: number } {
+export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
   r /= 255;
   g /= 255;
   b /= 255;
@@ -75,11 +63,7 @@ export function rgbToHsl(
   return { h, s, l };
 }
 
-export function hslToRgb(
-  h: number,
-  s: number,
-  l: number,
-): { r: number; g: number; b: number } {
+export function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
   let r, g, b;
   h /= 360;
   if (s === 0) {
