@@ -1,7 +1,9 @@
 import { randomItem } from '../game/useGame';
 import type { Species } from '../types/entities';
+import { apiClient } from './apiClient';
+import { ApiResponse, ApiError } from './types';
 
-const baseUrl = 'mocks'; // Updated to remove leading slash
+const baseUrl = 'mocks';
 
 interface AlienSpeciesTypeTemplate {
   prefixes: string[];
@@ -17,14 +19,25 @@ interface AlienSpeciesTypeTemplate {
 
 export const fetchGameData = async () => {
   try {
-    const [planetTypes, alienSpecies, terraformingTools, planetNames, alienSpeciesTypes] =
-      await Promise.all([
-        fetch(`${baseUrl}/planet_types.json`).then(r => r.json()),
-        fetch(`${baseUrl}/alien_species.json`).then(r => r.json()),
-        fetch(`${baseUrl}/terraforming_tools.json`).then(r => r.json()),
-        fetch(`${baseUrl}/planet_names.json`).then(r => r.json()),
-        fetch(`${baseUrl}/alien_species_types.json`).then(r => r.json()),
-      ]);
+    const [
+      planetTypesRes,
+      alienSpeciesRes,
+      terraformingToolsRes,
+      planetNamesRes,
+      alienSpeciesTypesRes
+    ] = await Promise.all([
+      apiClient.get(`${baseUrl}/planet_types.json`),
+      apiClient.get(`${baseUrl}/alien_species.json`),
+      apiClient.get(`${baseUrl}/terraforming_tools.json`),
+      apiClient.get(`${baseUrl}/planet_names.json`),
+      apiClient.get(`${baseUrl}/alien_species_types.json`),
+    ]);
+
+    const planetTypes = planetTypesRes.data;
+    const alienSpecies = alienSpeciesRes.data;
+    const terraformingTools = terraformingToolsRes.data;
+    const planetNames = planetNamesRes.data;
+    const alienSpeciesTypes = alienSpeciesTypesRes.data;
 
     const mappedAlienSpeciesTypes: Species[] = (
       alienSpeciesTypes as AlienSpeciesTypeTemplate[]
@@ -40,15 +53,18 @@ export const fetchGameData = async () => {
       color: randomItem(species.colors),
     }));
 
-    return {
-      planetTypes,
-      alienSpecies,
-      terraformingTools,
-      planetNames,
-      alienSpeciesTypes: mappedAlienSpeciesTypes,
-    };
+    return new ApiResponse({
+      success: true,
+      data: {
+        planetTypes,
+        alienSpecies,
+        terraformingTools,
+        planetNames,
+        alienSpeciesTypes: mappedAlienSpeciesTypes,
+      }
+    });
   } catch (error) {
     console.error('Failed to fetch game data:', error);
-    throw error;
+    throw new ApiError('Failed to fetch game data', 500);
   }
 };

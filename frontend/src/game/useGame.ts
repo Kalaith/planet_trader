@@ -68,14 +68,16 @@ export function useGame() {
   // Load game data from /api endpoints
   useEffect(() => {
     fetchGameData()
-      .then(({ planetTypes, alienSpecies, terraformingTools, planetNames, alienSpeciesTypes }) => {
+      .then((gameDataResponse) => {
+        const data = gameDataResponse.data;
+        if (!data) throw new Error('No game data returned');
         setGameData({
-          planetTypes,
-          alienSpecies,
-          terraformingTools,
-          planetNames,
+          planetTypes: data.planetTypes,
+          alienSpecies: data.alienSpecies,
+          terraformingTools: data.terraformingTools,
+          planetNames: data.planetNames,
         }); // Removed researchList
-        setAlienSpeciesTypes(alienSpeciesTypes);
+        setAlienSpeciesTypes(data.alienSpeciesTypes);
       })
       .catch(err => console.error('Failed to load game data:', err));
   }, []);

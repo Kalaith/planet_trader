@@ -1,0 +1,10 @@
+
+> frontend@0.0.0 type-check
+> tsc --noEmit
+
+src/api/apiClient.ts(1,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/api/apiClient.ts(2,30): error TS2307: Cannot find module '../stores/authStore' or its corresponding type declarations.
+src/api/apiClient.ts(20,6): error TS7006: Parameter 'config' implicitly has an 'any' type.
+src/api/apiClient.ts(39,6): error TS7006: Parameter 'error' implicitly has an 'any' type.
+src/api/apiClient.ts(46,6): error TS7006: Parameter 'response' implicitly has an 'any' type.
+src/api/apiClient.ts(49,6): error TS7006: Parameter 'error' implicitly has an 'any' type.
