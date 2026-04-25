@@ -44,7 +44,7 @@ abstract class BaseController
     }
 
     /**
-     * Get session ID from request headers or query params
+     * Get the authenticated session owner id.
      */
     protected function getSessionId(Request $request): string
     {
@@ -53,34 +53,7 @@ abstract class BaseController
             return (string) $authUser['id'];
         }
 
-        // Try to get from header first
-        $sessionHeader = $request->getHeaderLine('X-Session-ID');
-        if (!empty($sessionHeader)) {
-            return $sessionHeader;
-        }
-
-        // Try to get from query parameters
-        $queryParams = $request->getQueryParams();
-        if (isset($queryParams['session_id'])) {
-            return $queryParams['session_id'];
-        }
-
-        // Try to get from cookies
-        $cookies = $request->getCookieParams();
-        if (isset($cookies['session_id'])) {
-            return $cookies['session_id'];
-        }
-
-        // Generate new session ID if none found
-        return $this->generateSessionId();
-    }
-
-    /**
-     * Generate a new session ID
-     */
-    protected function generateSessionId(): string
-    {
-        return 'session_' . time() . '_' . bin2hex(random_bytes(8));
+        throw new \RuntimeException('Authenticated user context is required');
     }
 
     /**
@@ -123,7 +96,7 @@ abstract class BaseController
         return $response
             ->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Session-ID')
+            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
             ->withHeader('Access-Control-Max-Age', '3600');
     }
 

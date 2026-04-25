@@ -17,11 +17,12 @@ return function (
 ): void {
     $api = '/api';
 
-    // Auth session
     $router->get($api . '/auth/session', [AuthController::class, 'session'], [WebHatcheryJwtMiddleware::class]);
+    $router->get($api . '/auth/current-user', [AuthController::class, 'currentUser'], [WebHatcheryJwtMiddleware::class]);
+    $router->post($api . '/auth/guest-session', [AuthController::class, 'createGuestSession']);
+    $router->post($api . '/auth/link-guest', [AuthController::class, 'linkGuestAccount'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/me', [AuthController::class, 'session'], [WebHatcheryJwtMiddleware::class]);
 
-    // Status + health (public)
     $router->get($api . '/status', function ($request, $response) {
         $response->getBody()->write(json_encode([
             'status' => 'OK',
@@ -40,7 +41,6 @@ return function (
         return $response->withHeader('Content-Type', 'application/json');
     });
 
-    // Game routes (protected)
     $router->get($api . '/game/status', [$gameController, 'getStatus'], [WebHatcheryJwtMiddleware::class]);
     $router->post($api . '/game/start', [$gameController, 'startGame'], [WebHatcheryJwtMiddleware::class]);
     $router->post($api . '/game/end', [$gameController, 'endGame'], [WebHatcheryJwtMiddleware::class]);
@@ -48,7 +48,6 @@ return function (
     $router->get($api . '/game/stats', [$gameController, 'getStats'], [WebHatcheryJwtMiddleware::class]);
     $router->put($api . '/game/credits', [$gameController, 'updateCredits'], [WebHatcheryJwtMiddleware::class]);
 
-    // Planet routes (protected)
     $router->post($api . '/planets', [$planetController, 'generatePlanets'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/planets/owned', [$planetController, 'getOwnedPlanets'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/planets/current', [$planetController, 'getCurrentPlanet'], [WebHatcheryJwtMiddleware::class]);
@@ -57,7 +56,6 @@ return function (
     $router->post($api . '/planets/{id}/select', [$planetController, 'setCurrentPlanet'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/planets/{id}/analyze', [$planetController, 'analyzePlanet'], [WebHatcheryJwtMiddleware::class]);
 
-    // Trading routes (protected)
     $router->get($api . '/trading/buyers', [$tradingController, 'getBuyers'], [WebHatcheryJwtMiddleware::class]);
     $router->post($api . '/trading/sell', [$tradingController, 'sellPlanet'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/trading/profit', [$tradingController, 'calculateProfit'], [WebHatcheryJwtMiddleware::class]);
@@ -66,7 +64,6 @@ return function (
     $router->get($api . '/trading/compatibility', [$tradingController, 'getCompatibility'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/trading/history', [$tradingController, 'getTradeHistory'], [WebHatcheryJwtMiddleware::class]);
 
-    // Data routes (public)
     $router->get($api . '/planet-name', [$planetController, 'getRandomPlanetName']);
     $router->post($api . '/species/generate', [$planetController, 'generateSpecies']);
     $router->get($api . '/data/planet-types', [$dataController, 'getPlanetTypes']);
@@ -76,7 +73,6 @@ return function (
     $router->get($api . '/data/config', [$dataController, 'getGameConfig']);
     $router->post($api . '/data/planet-names/reset', [$dataController, 'resetPlanetNames']);
 
-    // Root endpoint
     $router->get('/', function ($request, $response) {
         $response->getBody()->write(json_encode([
             'name' => 'Planet Trader API',

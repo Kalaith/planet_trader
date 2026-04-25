@@ -2,10 +2,10 @@
 
 namespace App\Middleware;
 
+use App\Http\Request;
+use App\Http\Response;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use App\Http\Response;
-use App\Http\Request;
 
 class WebHatcheryJwtMiddleware
 {
@@ -16,7 +16,7 @@ class WebHatcheryJwtMiddleware
             return $this->unauthorized($response, 'Authorization header missing or invalid');
         }
 
-        $token = $matches[1];
+        $token = trim((string) $matches[1]);
         $secret = $_ENV['JWT_SECRET']
             ?? $_SERVER['JWT_SECRET']
             ?? getenv('JWT_SECRET')
@@ -47,17 +47,41 @@ class WebHatcheryJwtMiddleware
                 return $this->unauthorized($response, 'Token missing user identifier');
             }
 
+            $isGuest = $this->extractBool($decoded->is_guest ?? false) || (($decoded->auth_type ?? null) === 'guest');
+            $role = $isGuest ? 'guest' : 'player';
+            if (isset($decoded->role) && is_string($decoded->role) && trim($decoded->role) !== '') {
+                $role = $isGuest ? 'guest' : trim($decoded->role);
+            }
+
             $request = $request->withAttribute('auth_user', [
-                'id' => (int) $userId,
+                'id' => (string) $userId,
                 'email' => $decoded->email ?? null,
                 'username' => $decoded->username ?? null,
-                'roles' => $decoded->roles ?? [],
+                'display_name' => $decoded->display_name ?? ($decoded->username ?? null),
+                'roles' => $decoded->roles ?? ($isGuest ? ['guest'] : []),
+                'role' => $role,
+                'is_guest' => $isGuest,
+                'auth_type' => $isGuest ? 'guest' : 'frontpage',
             ]);
 
             return $request;
         } catch (\Exception $e) {
             return $this->unauthorized($response, 'Invalid token');
         }
+    }
+
+    private function extractBool(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_numeric($value)) {
+            return (int) $value === 1;
+        }
+        if (is_string($value)) {
+            return in_array(strtolower(trim($value)), ['1', 'true', 'yes'], true);
+        }
+        return false;
     }
 
     private function unauthorized(Response $response, string $message): Response
