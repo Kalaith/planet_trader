@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameContext } from '../contexts/useGameContext';
 import type { Planet } from '../types/entities';
+import { getPlanetAtmosphereClass, getPlanetSurfaceClass, getPlanetWaterClass } from '../utils/planetVisualClasses';
 import statList from '../mocks/statList.json';
 
 // Ensure stat.id is properly typed as keyof Planet
@@ -44,27 +45,13 @@ const PlanetWorkshop: React.FC = () => {
           {/* Planet Visual */}
           <div className="flex-shrink-0 flex justify-center">
             <div className="relative">
-              <div
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full shadow-lg relative overflow-hidden"
-                style={{ backgroundColor: '#222' }}
-              >
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full shadow-lg relative overflow-hidden bg-neutral-900">
+                <div className={`absolute inset-0 rounded-full ${getPlanetSurfaceClass(currentPlanet)}`}></div>
                 <div
-                  className="absolute inset-0 rounded-full"
-                  style={{ backgroundColor: currentPlanet.color }}
+                  className={`absolute inset-0 rounded-full bg-indigo-200 transition-opacity ${getPlanetAtmosphereClass(currentPlanet)}`}
                 ></div>
                 <div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    backgroundColor: '#aaf6',
-                    opacity: Math.min(currentPlanet.atmosphere || 0, 1),
-                  }}
-                ></div>
-                <div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    backgroundColor: '#4fd1c5cc',
-                    opacity: currentPlanet.water || 0,
-                  }}
+                  className={`absolute inset-0 rounded-full bg-teal-300 transition-opacity ${getPlanetWaterClass(currentPlanet)}`}
                 ></div>
               </div>
             </div>

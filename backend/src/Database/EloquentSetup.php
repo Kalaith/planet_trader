@@ -2,6 +2,7 @@
 
 namespace App\Database;
 
+use App\Core\Environment;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class EloquentSetup
@@ -22,11 +23,11 @@ class EloquentSetup
         // Configure the database connection
         $capsule->addConnection([
             'driver' => 'mysql',
-            'host' => $_ENV['DB_HOST'] ?? 'localhost',
-            'port' => $_ENV['DB_PORT'] ?? 3306,
-            'database' => $_ENV['DB_NAME'] ?? 'planet_trader',
-            'username' => $_ENV['DB_USER'] ?? 'root',
-            'password' => $_ENV['DB_PASSWORD'] ?? '',
+            'host' => Environment::required('DB_HOST'),
+            'port' => (int) Environment::required('DB_PORT'),
+            'database' => Environment::required('DB_NAME'),
+            'username' => Environment::required('DB_USER'),
+            'password' => Environment::required('DB_PASSWORD'),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',

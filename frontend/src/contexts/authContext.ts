@@ -1,5 +1,3 @@
-import { createContext } from 'react';
-
 export type AuthMode = 'frontpage' | 'guest' | null;
 
 export interface AuthUser {
@@ -25,5 +23,3 @@ export interface AuthContextType {
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);

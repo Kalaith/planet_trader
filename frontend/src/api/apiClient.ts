@@ -1,32 +1,21 @@
 import axios from 'axios';
+import { frontpageAuthStorage } from '../stores/authStorage';
+import { useAuthStore } from '../stores/authStore';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 if (!BASE_URL) {
   throw new Error('VITE_API_BASE_URL is required.');
 }
 
-const GUEST_AUTH_STORAGE_KEY = 'planet-trader-guest-session';
-
 const readToken = (): string | null => {
   try {
-    const frontpageRaw = localStorage.getItem('auth-storage');
-    if (frontpageRaw) {
-      const frontpageParsed = JSON.parse(frontpageRaw);
-      const frontpageToken = frontpageParsed?.state?.token;
-      const frontpageUser = frontpageParsed?.state?.user;
-      const isGuestUser = Boolean(frontpageUser?.is_guest || frontpageUser?.auth_type === 'guest');
-      if (!isGuestUser && typeof frontpageToken === 'string' && frontpageToken.trim() !== '') {
-        return frontpageToken;
-      }
+    const frontpageToken = frontpageAuthStorage.readToken();
+
+    if (frontpageToken) {
+      return frontpageToken;
     }
 
-    const guestRaw = localStorage.getItem(GUEST_AUTH_STORAGE_KEY);
-    if (guestRaw) {
-      const guestParsed = JSON.parse(guestRaw) as { token?: string | null };
-      if (typeof guestParsed?.token === 'string' && guestParsed.token.trim() !== '') {
-        return guestParsed.token;
-      }
-    }
+    return useAuthStore.getState().guestSession?.token ?? null;
   } catch (error) {
     console.warn('Failed to parse auth token from local storage', error);
   }
@@ -60,17 +49,7 @@ apiClient.interceptors.response.use(
 
       if (loginUrl) {
         try {
-          const raw = localStorage.getItem('auth-storage');
-          const parsed = raw ? JSON.parse(raw) : {};
-          const state = parsed?.state ?? {};
-          const next = {
-            ...parsed,
-            state: {
-              ...state,
-              loginUrl,
-            },
-          };
-          localStorage.setItem('auth-storage', JSON.stringify(next));
+          frontpageAuthStorage.setLoginUrl(loginUrl);
           window.dispatchEvent(new CustomEvent('webhatchery:login-required', { detail: { loginUrl } }));
         } catch (storageError) {
           console.warn('Failed to persist login URL to auth storage', storageError);

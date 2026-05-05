@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGameContext } from '../contexts/useGameContext';
+import { getPlanetSurfaceClass } from '../utils/planetVisualClasses';
 
 const PlanetInventory: React.FC = () => {
   const { planets, currentPlanet, showPlanetPurchaseModal, selectPlanet } = useGameContext();
@@ -39,8 +40,7 @@ const PlanetInventory: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-gray-500 flex-shrink-0"
-                      style={{ backgroundColor: planet.color }}
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-gray-500 flex-shrink-0 ${getPlanetSurfaceClass(planet)}`}
                     ></div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-white text-sm truncate">{planet.name}</div>

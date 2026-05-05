@@ -44,6 +44,7 @@ use App\Core\Environment;
 use App\Core\Router;
 use App\Database\Connection;
 use App\Repositories\RepositoryManager;
+use App\Repositories\LegacyGameStateRepository;
 use App\Services\PlanetNameService;
 use App\Services\PlanetGeneratorService;
 use App\Services\PricingService;
@@ -92,7 +93,7 @@ $repositories = new RepositoryManager($pdo);
 $planetNameService = new PlanetNameService();
 $planetGeneratorService = new PlanetGeneratorService($planetNameService);
 $gameStateServiceEnhanced = new GameStateServiceEnhanced($repositories, $planetGeneratorService);
-$gameStateService = new GameStateService($pdo);
+$gameStateService = new GameStateService(new LegacyGameStateRepository($pdo));
 $pricingService = new PricingService();
 $tradingService = new TradingService($gameStateService, $pricingService);
 

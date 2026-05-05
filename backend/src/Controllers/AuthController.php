@@ -6,6 +6,7 @@ use App\Core\Environment;
 use App\Database\Connection;
 use App\Http\Request;
 use App\Http\Response;
+use App\Repositories\GuestLinkRepository;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -206,40 +207,10 @@ class AuthController
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
-        $pdo = Connection::getInstance()->getPdo();
-        $movedByTable = [];
-        $totalMoved = 0;
-
         try {
-            $pdo->beginTransaction();
-
-            $guestPlayer = self::findPlayerForUser($pdo, $guestUserId);
-            $currentPlayer = self::findPlayerForUser($pdo, $currentUserId);
-
-            if ($guestPlayer && $currentPlayer && isset($guestPlayer['id'], $currentPlayer['id']) && (string) $guestPlayer['id'] !== (string) $currentPlayer['id']) {
-                $movedByTable['players.session_id'] = self::updateIfPossible($pdo, 'players', 'session_id', $guestUserId, $currentUserId);
-                $movedByTable['planets.owner_id'] = self::updateIfPossible($pdo, 'planets', 'owner_id', (string) $guestPlayer['id'], (string) $currentPlayer['id']);
-                $movedByTable['game_sessions.player_id'] = self::updateIfPossible($pdo, 'game_sessions', 'player_id', (string) $guestPlayer['id'], (string) $currentPlayer['id']);
-            } elseif ($guestPlayer) {
-                $movedByTable['players.session_id'] = self::updateIfPossible($pdo, 'players', 'session_id', $guestUserId, $currentUserId);
-            } else {
-                $movedByTable['players.session_id'] = 0;
-            }
-
-            $movedByTable['planets.session_id'] = self::updateIfPossible($pdo, 'planets', 'session_id', $guestUserId, $currentUserId);
-            $movedByTable['game_sessions.id'] = self::updateIfPossible($pdo, 'game_sessions', 'id', $guestUserId, $currentUserId, true);
-            $movedByTable['transactions.session_id'] = self::updateIfPossible($pdo, 'transactions', 'session_id', $guestUserId, $currentUserId);
-
-            foreach ($movedByTable as $count) {
-                $totalMoved += (int) $count;
-            }
-
-            $pdo->commit();
+            $linkResult = (new GuestLinkRepository(Connection::getInstance()->getPdo()))
+                ->transferGuestData($guestUserId, $currentUserId);
         } catch (\Throwable $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-
             $response->getBody()->write(json_encode([
                 'success' => false,
                 'message' => 'Failed to link guest data',
@@ -255,86 +226,11 @@ class AuthController
             'data' => [
                 'guest_user_id' => $guestUserId,
                 'linked_to_user_id' => $currentUserId,
-                'moved_rows_by_table' => $movedByTable,
-                'total_moved_rows' => $totalMoved,
+                'moved_rows_by_table' => $linkResult['moved_rows_by_table'],
+                'total_moved_rows' => $linkResult['total_moved_rows'],
             ],
         ]));
 
         return $response->withHeader('Content-Type', 'application/json');
-    }
-
-    private static function findPlayerForUser(\PDO $pdo, string $userId): ?array
-    {
-        if (!self::tableExists($pdo, 'players')) {
-            return null;
-        }
-
-        $sql = 'SELECT * FROM players WHERE session_id = :user_id';
-        if (self::columnExists($pdo, 'players', 'id')) {
-            $sql .= ' OR id = :id_match';
-        }
-
-        $stmt = $pdo->prepare($sql . ' LIMIT 1');
-        $stmt->bindValue(':user_id', $userId);
-        if (str_contains($sql, ':id_match')) {
-            $stmt->bindValue(':id_match', $userId);
-        }
-        $stmt->execute();
-
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $result ?: null;
-    }
-
-    private static function updateIfPossible(\PDO $pdo, string $table, string $column, string $fromValue, string $toValue, bool $skipOnTargetExists = false): int
-    {
-        if ($fromValue === $toValue || !self::tableExists($pdo, $table) || !self::columnExists($pdo, $table, $column)) {
-            return 0;
-        }
-
-        if ($skipOnTargetExists) {
-            $check = $pdo->prepare("SELECT COUNT(*) FROM {$table} WHERE {$column} = ?");
-            $check->execute([$toValue]);
-            if ((int) $check->fetchColumn() > 0) {
-                return 0;
-            }
-        }
-
-        $stmt = $pdo->prepare("UPDATE {$table} SET {$column} = ? WHERE {$column} = ?");
-        $stmt->execute([$toValue, $fromValue]);
-
-        return (int) $stmt->rowCount();
-    }
-
-    private static function tableExists(\PDO $pdo, string $table): bool
-    {
-        $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        if ($driver === 'sqlite') {
-            $stmt = $pdo->prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?");
-            $stmt->execute([$table]);
-            return (bool) $stmt->fetchColumn();
-        }
-
-        $stmt = $pdo->prepare('SHOW TABLES LIKE ?');
-        $stmt->execute([$table]);
-        return (bool) $stmt->fetchColumn();
-    }
-
-    private static function columnExists(\PDO $pdo, string $table, string $column): bool
-    {
-        $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        if ($driver === 'sqlite') {
-            $stmt = $pdo->query("PRAGMA table_info({$table})");
-            $columns = $stmt ? $stmt->fetchAll(\PDO::FETCH_ASSOC) : [];
-            foreach ($columns as $definition) {
-                if (($definition['name'] ?? null) === $column) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        $stmt = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE ?");
-        $stmt->execute([$column]);
-        return (bool) $stmt->fetchColumn();
     }
 }
