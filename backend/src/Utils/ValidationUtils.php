@@ -86,9 +86,9 @@ class ValidationUtils
         foreach ($validations as $property => $range) {
             if (isset($properties[$property])) {
                 self::validateRange(
-                    $properties[$property], 
-                    $range[0], 
-                    $range[1], 
+                    $properties[$property],
+                    $range[0],
+                    $range[1],
                     ucfirst($property)
                 );
             }

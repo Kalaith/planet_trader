@@ -24,11 +24,11 @@ class GameSession
         $session->playerId = $data['player_id'] ?? '';
         $session->finalCredits = isset($data['final_credits']) ? (int) $data['final_credits'] : null;
         $session->planetsTraded = (int) ($data['planets_traded'] ?? 0);
-        
+
         if (isset($data['started_at'])) {
             $session->startedAt = new \DateTime($data['started_at']);
         }
-        
+
         if (isset($data['ended_at'])) {
             $session->endedAt = new \DateTime($data['ended_at']);
         }

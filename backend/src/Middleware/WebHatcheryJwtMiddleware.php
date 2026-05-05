@@ -2,6 +2,7 @@
 
 namespace App\Middleware;
 
+use App\Core\Environment;
 use App\Http\Request;
 use App\Http\Response;
 use Firebase\JWT\JWT;
@@ -17,23 +18,17 @@ class WebHatcheryJwtMiddleware
         }
 
         $token = trim((string) $matches[1]);
-        $secret = $_ENV['JWT_SECRET']
-            ?? $_SERVER['JWT_SECRET']
-            ?? getenv('JWT_SECRET')
-            ?: '';
-        if ($secret === '') {
-            return $this->unauthorized($response, 'JWT secret not configured');
-        }
+        $secret = Environment::required('JWT_SECRET');
 
         try {
             $decoded = JWT::decode($token, new Key($secret, 'HS256'));
 
-            $expectedIssuer = $_ENV['JWT_ISSUER'] ?? 'webhatchery';
-            if (isset($decoded->iss) && $decoded->iss !== $expectedIssuer) {
+            $expectedIssuer = Environment::optional('JWT_ISSUER');
+            if ($expectedIssuer !== null && isset($decoded->iss) && $decoded->iss !== $expectedIssuer) {
                 return $this->unauthorized($response, 'Invalid token issuer');
             }
 
-            $expectedAudience = $_ENV['JWT_AUDIENCE'] ?? ($_ENV['APP_URL'] ?? null);
+            $expectedAudience = Environment::optional('JWT_AUDIENCE');
             if ($expectedAudience && isset($decoded->aud)) {
                 $aud = $decoded->aud;
                 $isValidAudience = is_array($aud) ? in_array($expectedAudience, $aud, true) : $aud === $expectedAudience;
@@ -86,7 +81,7 @@ class WebHatcheryJwtMiddleware
 
     private function unauthorized(Response $response, string $message): Response
     {
-        $loginUrl = $_ENV['WEB_HATCHERY_LOGIN_URL'] ?? '';
+        $loginUrl = Environment::required('WEB_HATCHERY_LOGIN_URL');
         $payload = [
             'success' => false,
             'error' => 'Authentication required',

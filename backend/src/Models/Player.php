@@ -28,11 +28,11 @@ class Player
         $player->credits = (int) ($data['credits'] ?? 10000);
         $player->currentPlanetId = $data['current_planet_id'] ?? null;
         $player->gameStarted = (bool) ($data['game_started'] ?? false);
-        
+
         if (isset($data['created_at'])) {
             $player->createdAt = new \DateTime($data['created_at']);
         }
-        
+
         if (isset($data['last_activity'])) {
             $player->lastActivity = new \DateTime($data['last_activity']);
         }
@@ -68,7 +68,7 @@ class Player
         if (!$this->canAfford($amount)) {
             return false;
         }
-        
+
         $this->credits -= $amount;
         $this->updateActivity();
         return true;

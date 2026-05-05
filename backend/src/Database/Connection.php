@@ -2,6 +2,8 @@
 
 namespace App\Database;
 
+use App\Core\Environment;
+
 class Connection
 {
     private static ?Connection $instance = null;
@@ -29,26 +31,26 @@ class Connection
     {
         // Load .env file if it exists
         $this->loadEnvironmentFile();
-        
+
         // Load configuration
         $configPath = __DIR__ . '/../../config/database.php';
-        
+
         if (file_exists($configPath)) {
             $config = require $configPath;
             $db = $config['database'];
         } else {
-            // Default MySQL configuration using environment variables
+// MySQL configuration using explicitly configured environment variables.
             $db = [
                 'driver' => 'mysql',
-                'host' => $_ENV['DB_HOST'] ?? 'localhost',
-                'port' => $_ENV['DB_PORT'] ?? 3306,
-                'database' => $_ENV['DB_NAME'] ?? $_ENV['DB_DATABASE'] ?? 'planet_trader',
-                'username' => $_ENV['DB_USER'] ?? $_ENV['DB_USERNAME'] ?? 'root',
-                'password' => $_ENV['DB_PASSWORD'] ?? '',
+                'host' => Environment::required('DB_HOST'),
+                'port' => Environment::required('DB_PORT'),
+                'database' => Environment::required('DB_NAME'),
+                'username' => Environment::required('DB_USER'),
+                'password' => Environment::required('DB_PASSWORD'),
                 'charset' => 'utf8mb4',
             ];
         }
-        
+
         // Build DSN based on driver
         switch ($db['driver']) {
             case 'mysql':
@@ -60,7 +62,7 @@ class Connection
                     $db['charset']
                 );
                 break;
-                
+
             case 'sqlite':
                 $dbPath = $db['database'] ?? __DIR__ . '/../../storage/database.sqlite';
                 $storageDir = dirname($dbPath);
@@ -69,11 +71,11 @@ class Connection
                 }
                 $dsn = "sqlite:" . $dbPath;
                 break;
-                
+
             default:
                 throw new \Exception("Unsupported database driver: {$db['driver']}");
         }
-        
+
         $options = [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
@@ -82,55 +84,54 @@ class Connection
 
         try {
             $this->pdo = new \PDO(
-                $dsn, 
-                $db['username'] ?? null, 
-                $db['password'] ?? null, 
+                $dsn,
+                $db['username'] ?? null,
+                $db['password'] ?? null,
                 $options
             );
-            
+
             // Set charset for MySQL
             if ($db['driver'] === 'mysql') {
                 $this->pdo->exec("SET NAMES {$db['charset']}");
             }
-            
+
             // Skip automatic table initialization for migration scripts
             if (!defined('MIGRATION_SCRIPT')) {
                 $this->initializeTables();
             }
-            
         } catch (\PDOException $e) {
             throw new \Exception("Connection failed: " . $e->getMessage());
         }
     }
-    
+
     /**
      * Load environment variables from .env file
      */
     private function loadEnvironmentFile(): void
     {
         $envPath = __DIR__ . '/../../.env';
-        
+
         if (!file_exists($envPath)) {
             return;
         }
-        
+
         $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        
+
         foreach ($lines as $line) {
             // Skip comments
             if (strpos(trim($line), '#') === 0) {
                 continue;
             }
-            
+
             // Parse key=value pairs
             if (strpos($line, '=') !== false) {
                 list($key, $value) = explode('=', $line, 2);
                 $key = trim($key);
                 $value = trim($value);
-                
+
                 // Remove quotes if present
                 $value = trim($value, '"\'');
-                
+
                 // Set environment variable if not already set
                 if (!isset($_ENV[$key])) {
                     $_ENV[$key] = $value;
@@ -163,7 +164,7 @@ class Connection
             base_rad DECIMAL(3,2),
             color VARCHAR(7)
         )";
-        
+
         $this->pdo->exec($sql);
     }
 
@@ -186,7 +187,7 @@ class Connection
             base_price INTEGER,
             color VARCHAR(7)
         )";
-        
+
         $this->pdo->exec($sql);
     }
 
@@ -204,7 +205,7 @@ class Connection
             effects TEXT, -- JSON string
             side_effects TEXT -- JSON string
         )";
-        
+
         $this->pdo->exec($sql);
     }
 
@@ -219,7 +220,7 @@ class Connection
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )";
-        
+
         $this->pdo->exec($sql);
     }
 
@@ -242,7 +243,7 @@ class Connection
             FOREIGN KEY (type_id) REFERENCES planet_types(id),
             FOREIGN KEY (owner_id) REFERENCES players(id)
         )";
-        
+
         $this->pdo->exec($sql);
     }
 
@@ -257,7 +258,7 @@ class Connection
             planets_traded INTEGER DEFAULT 0,
             FOREIGN KEY (player_id) REFERENCES players(id)
         )";
-        
+
         $this->pdo->exec($sql);
     }
 

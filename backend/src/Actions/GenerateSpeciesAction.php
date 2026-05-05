@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Services\SpeciesGeneratorService;
@@ -6,7 +7,6 @@ use App\Services\SpeciesGeneratorService;
 class GenerateSpeciesAction
 {
     private SpeciesGeneratorService $speciesGeneratorService;
-
     public function __construct(SpeciesGeneratorService $speciesGeneratorService)
     {
         $this->speciesGeneratorService = $speciesGeneratorService;

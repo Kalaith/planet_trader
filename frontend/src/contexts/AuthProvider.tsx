@@ -40,10 +40,12 @@ const GUEST_AUTH_STORAGE_KEY = 'planet-trader-guest-session';
 const trimTrailingSlash = (value: string): string => value.replace(/\/+$/, '');
 
 const buildApiUrl = (path: string): string => {
-  const base = trimTrailingSlash(import.meta.env.VITE_API_BASE_URL || '');
-  if (!base) {
-    return path;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  if (!baseUrl) {
+    throw new Error('VITE_API_BASE_URL is required.');
   }
+
+  const base = trimTrailingSlash(baseUrl);
   return `${base}${path}`;
 };
 
@@ -55,6 +57,11 @@ const readFrontpageToken = (): string | null => {
 
   try {
     const parsed = JSON.parse(authStorage) as { state?: { token?: string | null } };
+    const user = (parsed as { state?: { user?: AuthUser | null } })?.state?.user;
+    if (user?.is_guest || user?.auth_type === 'guest') {
+      return null;
+    }
+
     const token = parsed?.state?.token;
     return typeof token === 'string' && token.trim() !== '' ? token : null;
   } catch {
@@ -111,37 +118,17 @@ const withRedirectParam = (basePath: string): string => {
   }
 };
 
-const appendQueryParam = (urlValue: string, key: string, value: string): string => {
-  try {
-    const url = new URL(urlValue, window.location.origin);
-    url.searchParams.set(key, value);
-    return url.toString();
-  } catch {
-    return urlValue;
+const requiredEnv = (key: 'VITE_WEB_HATCHERY_LOGIN_URL' | 'VITE_WEB_HATCHERY_SIGNUP_URL'): string => {
+  const value = import.meta.env[key];
+  if (!value) {
+    throw new Error(`${key} is required.`);
   }
+
+  return value;
 };
 
-const getLoginUrl = (): string => withRedirectParam(import.meta.env.VITE_WEB_HATCHERY_LOGIN_URL || '/login');
-const getSignupUrl = (): string => withRedirectParam(import.meta.env.VITE_WEB_HATCHERY_SIGNUP_URL || '/signup');
-
-const readGuestUserIdFromUrl = (): string | null => {
-  try {
-    const value = new URL(window.location.href).searchParams.get('guest_user_id') || '';
-    return value.trim() || null;
-  } catch {
-    return null;
-  }
-};
-
-const removeGuestUserIdFromUrl = (): void => {
-  try {
-    const url = new URL(window.location.href);
-    url.searchParams.delete('guest_user_id');
-    window.history.replaceState({}, '', url.toString());
-  } catch {
-    // ignore
-  }
-};
+const getLoginUrl = (): string => withRedirectParam(requiredEnv('VITE_WEB_HATCHERY_LOGIN_URL'));
+const getSignupUrl = (): string => withRedirectParam(requiredEnv('VITE_WEB_HATCHERY_SIGNUP_URL'));
 
 const getStoredAuth = (): { token: string | null; mode: AuthMode; guestUser: AuthUser | null } => {
   const frontpageToken = readFrontpageToken();
@@ -188,12 +175,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const getLinkAccountUrl = useCallback((): string => {
-    const base = getSignupUrl();
-    if (user?.is_guest && user.id) {
-      return appendQueryParam(base, 'guest_user_id', String(user.id));
-    }
-    return base;
-  }, [user]);
+    return getSignupUrl();
+  }, []);
 
   const continueAsGuest = useCallback(async (): Promise<void> => {
     setIsLoading(true);
@@ -333,8 +316,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [syncTokenFromStorage]);
 
   useEffect(() => {
-    const guestUserId = readGuestUserIdFromUrl();
-    if (!guestUserId || hasAttemptedGuestLinkRef.current) {
+    const guestSession = readGuestSession();
+    if (!guestSession?.token || hasAttemptedGuestLinkRef.current) {
       return;
     }
 
@@ -352,7 +335,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ guest_user_id: guestUserId }),
+          body: JSON.stringify({ guest_token: guestSession.token }),
         });
 
         const result = (await response.json()) as ApiEnvelope<unknown>;
@@ -363,8 +346,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         clearGuestSession();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to link guest account data');
-      } finally {
-        removeGuestUserIdFromUrl();
       }
     })();
   }, [authMode, token, user]);

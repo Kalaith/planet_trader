@@ -17,7 +17,7 @@ class EloquentSetup
         // Load .env file
         self::loadEnvironmentFile();
 
-        $capsule = new Capsule;
+        $capsule = new Capsule();
 
         // Configure the database connection
         $capsule->addConnection([
@@ -33,7 +33,7 @@ class EloquentSetup
         ]);
 
         // Set the event dispatcher used by Eloquent models
-        $capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher(new \Illuminate\Container\Container));
+        $capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher(new \Illuminate\Container\Container()));
 
         // Make this Capsule instance available globally via static methods
         $capsule->setAsGlobal();
@@ -47,7 +47,7 @@ class EloquentSetup
     private static function loadEnvironmentFile(): void
     {
         $envPath = __DIR__ . '/../../.env';
-        
+
         if (file_exists($envPath)) {
             $dotenv = \Dotenv\Dotenv::createImmutable(dirname($envPath));
             $dotenv->load();

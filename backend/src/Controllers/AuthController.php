@@ -2,13 +2,27 @@
 
 namespace App\Controllers;
 
+use App\Core\Environment;
 use App\Database\Connection;
 use App\Http\Request;
 use App\Http\Response;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthController
 {
+    public static function loginInfo(Request $request, Response $response): Response
+    {
+        $response->getBody()->write(json_encode([
+            'success' => true,
+            'data' => [
+                'login_url' => Environment::required('WEB_HATCHERY_LOGIN_URL'),
+            ],
+        ]));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public static function session(Request $request, Response $response): Response
     {
         $authUser = $request->getAttribute('auth_user');
@@ -17,7 +31,7 @@ class AuthController
                 'success' => false,
                 'error' => 'Authentication required',
                 'message' => 'Unauthorized',
-                'login_url' => $_ENV['WEB_HATCHERY_LOGIN_URL'] ?? ''
+                'login_url' => Environment::required('WEB_HATCHERY_LOGIN_URL')
             ]));
             return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
         }
@@ -49,16 +63,7 @@ class AuthController
 
     public static function createGuestSession(Request $request, Response $response): Response
     {
-        $jwtSecret = trim((string) ($_ENV['JWT_SECRET'] ?? $_SERVER['JWT_SECRET'] ?? getenv('JWT_SECRET') ?: ''));
-        if ($jwtSecret === '') {
-            $response->getBody()->write(json_encode([
-                'success' => false,
-                'message' => 'Guest session is unavailable',
-                'error' => 'JWT secret is not configured',
-            ]));
-
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
-        }
+        $jwtSecret = Environment::required('JWT_SECRET');
 
         $now = time();
         $guestId = 'guest_' . bin2hex(random_bytes(16));
@@ -66,8 +71,6 @@ class AuthController
         $username = 'guest_' . $guestTag;
 
         $claims = [
-            'iss' => $_ENV['JWT_ISSUER'] ?? 'webhatchery',
-            'aud' => $_ENV['JWT_AUDIENCE'] ?? ($_ENV['APP_URL'] ?? 'planet-trader-app'),
             'iat' => $now,
             'nbf' => $now - 5,
             'exp' => $now + (60 * 60 * 24 * 365),
@@ -78,6 +81,7 @@ class AuthController
             'display_name' => 'Guest Trader',
             'email' => '',
             'role' => 'guest',
+            'roles' => ['guest'],
             'auth_type' => 'guest',
             'is_guest' => true,
         ];
@@ -147,12 +151,46 @@ class AuthController
             $payload = json_decode((string) $request->getBody(), true);
         }
 
-        $guestUserId = trim((string) ($payload['guest_user_id'] ?? ''));
+        $guestToken = trim((string) ($payload['guest_token'] ?? ''));
+        if ($guestToken === '') {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'guest_token is required',
+                'error' => 'Missing guest token',
+            ]));
+
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $guestClaims = (array) JWT::decode($guestToken, new Key(Environment::required('JWT_SECRET'), 'HS256'));
+        } catch (\Throwable $exception) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Invalid guest token',
+                'error' => 'Guest token could not be validated',
+            ]));
+
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        $isGuestToken = (bool) ($guestClaims['is_guest'] ?? false) || (($guestClaims['auth_type'] ?? null) === 'guest');
+        $guestUserId = trim((string) ($guestClaims['sub'] ?? $guestClaims['user_id'] ?? ''));
         if ($guestUserId === '' || !str_starts_with($guestUserId, 'guest_')) {
             $response->getBody()->write(json_encode([
                 'success' => false,
-                'message' => 'guest_user_id must be a guest account id',
-                'error' => 'Invalid guest_user_id',
+                'message' => 'guest_token must identify a guest account',
+                'error' => 'Invalid guest token',
+            ]));
+
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        if (!$isGuestToken) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'message' => 'Guest token is not a guest session',
+                'error' => 'Invalid guest token',
             ]));
 
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);

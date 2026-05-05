@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Environment;
+
 // Load .env file if it exists
 $envPath = __DIR__ . '/../.env';
 if (file_exists($envPath)) {
@@ -22,11 +24,11 @@ if (file_exists($envPath)) {
 return [
     'database' => [
         'driver' => 'mysql',
-        'host' => $_ENV['DB_HOST'] ?? 'localhost',
-        'port' => (int)($_ENV['DB_PORT'] ?? 3306),
-        'database' => $_ENV['DB_NAME'] ?? $_ENV['DB_DATABASE'] ?? 'planet_trader',
-        'username' => $_ENV['DB_USER'] ?? $_ENV['DB_USERNAME'] ?? 'root',
-        'password' => $_ENV['DB_PASSWORD'] ?? '',
+        'host' => Environment::required('DB_HOST'),
+        'port' => (int) Environment::required('DB_PORT'),
+        'database' => Environment::required('DB_NAME'),
+        'username' => Environment::required('DB_USER'),
+        'password' => Environment::required('DB_PASSWORD'),
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
         'options' => [

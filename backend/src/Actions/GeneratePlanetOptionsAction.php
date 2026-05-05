@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Repositories\PlanetRepository;
@@ -9,11 +10,8 @@ class GeneratePlanetOptionsAction
 {
     private PlanetTypeRepository $planetTypeRepository;
     private CreatePlanetAction $createPlanetAction;
-
-    public function __construct(
-        PlanetTypeRepository $planetTypeRepository,
-        CreatePlanetAction $createPlanetAction
-    ) {
+    public function __construct(PlanetTypeRepository $planetTypeRepository, CreatePlanetAction $createPlanetAction)
+    {
         $this->planetTypeRepository = $planetTypeRepository;
         $this->createPlanetAction = $createPlanetAction;
     }

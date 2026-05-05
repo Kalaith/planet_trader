@@ -22,13 +22,12 @@ class DataController extends BaseController
     {
         try {
             $planetTypes = $this->repositories->planetTypes()->getAll();
-            
+
             $typesData = array_map(fn($type) => $type->toArray(), $planetTypes);
 
             return $this->successResponse($response, [
                 'planetTypes' => $typesData
             ], 'Planet types retrieved');
-
         } catch (\Exception $e) {
             $this->logAction('planet_types_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to get planet types: ' . $e->getMessage(), 500);
@@ -42,13 +41,12 @@ class DataController extends BaseController
     {
         try {
             $species = $this->repositories->species()->getAll();
-            
+
             $speciesData = array_map(fn($spec) => $spec->toArray(), $species);
 
             return $this->successResponse($response, [
                 'species' => $speciesData
             ], 'Species retrieved');
-
         } catch (\Exception $e) {
             $this->logAction('species_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to get species: ' . $e->getMessage(), 500);
@@ -62,13 +60,12 @@ class DataController extends BaseController
     {
         try {
             $tools = $this->repositories->tools()->getAll();
-            
+
             $toolsData = array_map(fn($tool) => $tool->toArray(), $tools);
 
             return $this->successResponse($response, [
                 'tools' => $toolsData
             ], 'Tools retrieved');
-
         } catch (\Exception $e) {
             $this->logAction('tools_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to get tools: ' . $e->getMessage(), 500);
@@ -95,7 +92,6 @@ class DataController extends BaseController
                 'names' => $names,
                 'count' => count($names)
             ], 'Planet names retrieved');
-
         } catch (\Exception $e) {
             $this->logAction('planet_names_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to get planet names: ' . $e->getMessage(), 500);
@@ -118,7 +114,6 @@ class DataController extends BaseController
             ];
 
             return $this->successResponse($response, $config, 'Game configuration retrieved');
-
         } catch (\Exception $e) {
             $this->logAction('config_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to get game config: ' . $e->getMessage(), 500);
@@ -132,7 +127,7 @@ class DataController extends BaseController
     {
         try {
             $success = $this->repositories->planetNames()->resetAllToUnused();
-            
+
             if ($success) {
                 $this->logAction('planet_names_reset', []);
                 return $this->successResponse($response, [
@@ -141,7 +136,6 @@ class DataController extends BaseController
             } else {
                 return $this->errorResponse($response, 'Failed to reset planet names', 500);
             }
-
         } catch (\Exception $e) {
             $this->logAction('planet_names_reset_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to reset planet names: ' . $e->getMessage(), 500);

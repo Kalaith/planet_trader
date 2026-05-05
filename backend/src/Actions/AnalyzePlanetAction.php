@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Repositories\PlanetRepository;
@@ -6,7 +7,6 @@ use App\Repositories\PlanetRepository;
 class AnalyzePlanetAction
 {
     private PlanetRepository $planetRepository;
-
     public function __construct(PlanetRepository $planetRepository)
     {
         $this->planetRepository = $planetRepository;
@@ -18,7 +18,8 @@ class AnalyzePlanetAction
         if (!$planet) {
             return ['success' => false, 'message' => 'Planet not found'];
         }
-        $value = $planet->purchasePrice * 1.2; // Example: estimated value
+        $value = $planet->purchasePrice * 1.2;
+// Example: estimated value
         $rarity = ($planet->water > 0.7 && $planet->radiation < 0.1) ? 'Rare' : 'Common';
         $analysis = [
             'planet' => $planet->toArray(),

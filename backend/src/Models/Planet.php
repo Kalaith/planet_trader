@@ -36,11 +36,11 @@ class Planet
         $planet->purchasePrice = (int) ($data['purchase_price'] ?? 0);
         $planet->color = $data['color'] ?? '#808080';
         $planet->ownerId = $data['owner_id'] ?? null;
-        
+
         if (isset($data['created_at'])) {
             $planet->createdAt = new \DateTime($data['created_at']);
         }
-        
+
         if (isset($data['sold_at'])) {
             $planet->soldAt = new \DateTime($data['sold_at']);
         }

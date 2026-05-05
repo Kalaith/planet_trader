@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Repositories\GameSessionRepository;
@@ -10,11 +11,8 @@ class StartGameAction
 {
     private GameSessionRepository $sessionRepository;
     private PlayerRepository $playerRepository;
-
-    public function __construct(
-        GameSessionRepository $sessionRepository,
-        PlayerRepository $playerRepository
-    ) {
+    public function __construct(GameSessionRepository $sessionRepository, PlayerRepository $playerRepository)
+    {
         $this->sessionRepository = $sessionRepository;
         $this->playerRepository = $playerRepository;
     }

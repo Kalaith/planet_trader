@@ -5,35 +5,35 @@ namespace App\Database;
 /**
  * Simple Database Connection for Migration Scripts
  */
-class Connection 
+class Connection
 {
     private static ?Connection $instance = null;
     private \PDO $pdo;
     private array $config;
-    
-    private function __construct() 
+
+    private function __construct()
     {
         $this->loadConfig();
         $this->connect();
     }
-    
-    public static function getInstance(): Connection 
+
+    public static function getInstance(): Connection
     {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
-    
-    public function getPdo(): \PDO 
+
+    public function getPdo(): \PDO
     {
         return $this->pdo;
     }
-    
-    private function loadConfig(): void 
+
+    private function loadConfig(): void
     {
         $configPath = __DIR__ . '/../../config/database.php';
-        
+
         if (!file_exists($configPath)) {
             // Fallback configuration
             $this->config = [
@@ -52,18 +52,18 @@ class Connection
                     ]
                 ]
             ];
-            
+
             echo "⚠️  Config file not found, using default MySQL settings\n";
             echo "💡 Create config/database.php to customize database settings\n";
         } else {
             $this->config = require $configPath;
         }
     }
-    
-    private function connect(): void 
+
+    private function connect(): void
     {
         $db = $this->config['database'];
-        
+
         switch ($db['driver']) {
             case 'mysql':
                 $dsn = sprintf(
@@ -74,12 +74,12 @@ class Connection
                     $db['charset']
                 );
                 break;
-                
+
             case 'sqlite':
                 $dbPath = $db['database'] ?? __DIR__ . '/../../storage/database.sqlite';
                 $dsn = 'sqlite:' . $dbPath;
                 break;
-                
+
             case 'pgsql':
                 $dsn = sprintf(
                     'pgsql:host=%s;port=%d;dbname=%s',
@@ -88,11 +88,11 @@ class Connection
                     $db['database']
                 );
                 break;
-                
+
             default:
                 throw new \Exception("Unsupported database driver: {$db['driver']}");
         }
-        
+
         try {
             $this->pdo = new \PDO(
                 $dsn,
@@ -100,21 +100,20 @@ class Connection
                 $db['password'] ?? null,
                 $db['options'] ?? []
             );
-            
+
             // Set charset for MySQL
             if ($db['driver'] === 'mysql') {
                 $this->pdo->exec("SET NAMES {$db['charset']} COLLATE {$db['collation']}");
             }
-            
         } catch (\PDOException $e) {
             throw new \Exception("Database connection failed: " . $e->getMessage());
         }
     }
-    
+
     /**
      * Test database connection
      */
-    public function testConnection(): bool 
+    public function testConnection(): bool
     {
         try {
             $this->pdo->query('SELECT 1');
@@ -123,14 +122,14 @@ class Connection
             return false;
         }
     }
-    
+
     /**
      * Get database information
      */
-    public function getDatabaseInfo(): array 
+    public function getDatabaseInfo(): array
     {
         $db = $this->config['database'];
-        
+
         return [
             'driver' => $db['driver'],
             'host' => $db['host'] ?? 'N/A',

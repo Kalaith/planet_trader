@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Services\PricingService;
@@ -6,7 +7,6 @@ use App\Services\PricingService;
 class GetBuyersAction
 {
     private PricingService $pricingService;
-
     public function __construct(PricingService $pricingService)
     {
         $this->pricingService = $pricingService;

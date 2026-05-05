@@ -54,24 +54,23 @@ class PlanetController extends BaseController
             $sessionId = $this->getSessionId($request);
             $queryParams = $request->getQueryParams();
             $count = max(1, min(10, (int) ($queryParams['count'] ?? 3))); // Between 1-10 planets
-            
+
             // Use Action instead of service for business logic
             $planets = $this->generatePlanetOptionsAction->execute($count);
-            
+
             // Convert to array format for JSON response
             $planetsData = array_map(fn($planet) => $planet->toArray(), $planets);
-            
+
             $this->logAction('planets_generated', [
                 'session_id' => $sessionId,
                 'count' => $count,
                 'planet_ids' => array_column($planetsData, 'id')
             ]);
-            
+
             return $this->successResponse($response, [
                 'planets' => $planetsData,
                 'count' => count($planetsData)
             ], 'Planet options generated');
-
         } catch (\Exception $e) {
             $this->logAction('planet_generation_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to generate planets: ' . $e->getMessage(), 500);

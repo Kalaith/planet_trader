@@ -25,11 +25,11 @@ class GameStateService
         $stmt = $this->db->prepare("SELECT * FROM players WHERE session_id = ?");
         $stmt->execute([$sessionId]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
+
         if (!$data) {
             return null;
         }
-        
+
         return Player::fromArray($data);
     }
 
@@ -41,12 +41,12 @@ class GameStateService
         $player = new Player();
         $player->id = RandomUtils::generateId('player');
         $player->sessionId = $sessionId;
-        
+
         $stmt = $this->db->prepare("
             INSERT INTO players (id, session_id, credits, game_started, created_at, last_activity)
             VALUES (?, ?, ?, ?, ?, ?)
         ");
-        
+
         $stmt->execute([
             $player->id,
             $player->sessionId,
@@ -55,7 +55,7 @@ class GameStateService
             $player->createdAt->format('Y-m-d H:i:s'),
             $player->lastActivity->format('Y-m-d H:i:s')
         ]);
-        
+
         return $player;
     }
 
@@ -69,7 +69,7 @@ class GameStateService
             SET credits = ?, current_planet_id = ?, game_started = ?, last_activity = ?
             WHERE id = ?
         ");
-        
+
         return $stmt->execute([
             $player->credits,
             $player->currentPlanetId,
@@ -91,14 +91,14 @@ class GameStateService
             JOIN planet_types pt ON p.type_id = pt.id
             WHERE p.id = ?
         ");
-        
+
         $stmt->execute([$planetId]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
+
         if (!$data) {
             return null;
         }
-        
+
         return $this->hydratePlanetFromData($data);
     }
 
@@ -115,15 +115,15 @@ class GameStateService
             WHERE p.owner_id = ?
             ORDER BY p.created_at DESC
         ");
-        
+
         $stmt->execute([$playerId]);
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        
+
         $planets = [];
         foreach ($results as $data) {
             $planets[] = $this->hydratePlanetFromData($data);
         }
-        
+
         return $planets;
     }
 
@@ -136,7 +136,7 @@ class GameStateService
             INSERT INTO planets (id, type_id, name, temperature, atmosphere, water, gravity, radiation, purchase_price, color, owner_id, created_at, sold_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        
+
         return $stmt->execute([
             $planet->id,
             $planet->type->id,
@@ -164,7 +164,7 @@ class GameStateService
             SET owner_id = ?, sold_at = ?, temperature = ?, atmosphere = ?, water = ?, gravity = ?, radiation = ?
             WHERE id = ?
         ");
-        
+
         return $stmt->execute([
             $planet->ownerId,
             $planet->soldAt?->format('Y-m-d H:i:s'),
@@ -185,11 +185,11 @@ class GameStateService
         $stmt = $this->db->prepare("SELECT * FROM species WHERE id = ?");
         $stmt->execute([$speciesId]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
+
         if (!$data) {
             return null;
         }
-        
+
         return Species::fromArray($data);
     }
 
@@ -200,12 +200,12 @@ class GameStateService
     {
         $stmt = $this->db->query("SELECT * FROM species ORDER BY name");
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        
+
         $species = [];
         foreach ($results as $data) {
             $species[] = Species::fromArray($data);
         }
-        
+
         return $species;
     }
 
@@ -218,21 +218,21 @@ class GameStateService
         if (!$player) {
             return null;
         }
-        
+
         $stmt = $this->db->prepare("
             SELECT * FROM game_sessions 
             WHERE player_id = ? AND ended_at IS NULL 
             ORDER BY started_at DESC 
             LIMIT 1
         ");
-        
+
         $stmt->execute([$player->id]);
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
+
         if (!$data) {
             return null;
         }
-        
+
         return GameSession::fromArray($data);
     }
 
@@ -245,33 +245,33 @@ class GameStateService
         if (!$player) {
             throw new \Exception('Player not found');
         }
-        
+
         // End any existing active session
         $existingSession = $this->getCurrentGameSession($sessionId);
         if ($existingSession) {
             $this->endGameSession($sessionId, $player->credits);
         }
-        
+
         $gameSession = new GameSession();
         $gameSession->id = RandomUtils::generateId('session');
         $gameSession->playerId = $player->id;
-        
+
         $stmt = $this->db->prepare("
             INSERT INTO game_sessions (id, player_id, started_at, planets_traded)
             VALUES (?, ?, ?, ?)
         ");
-        
+
         $stmt->execute([
             $gameSession->id,
             $gameSession->playerId,
             $gameSession->startedAt->format('Y-m-d H:i:s'),
             $gameSession->planetsTraded
         ]);
-        
+
         // Update player game started status
         $player->gameStarted = true;
         $this->updatePlayer($player);
-        
+
         return $gameSession;
     }
 
@@ -284,13 +284,13 @@ class GameStateService
         if (!$session) {
             return false;
         }
-        
+
         $stmt = $this->db->prepare("
             UPDATE game_sessions 
             SET ended_at = ?, final_credits = ?
             WHERE id = ?
         ");
-        
+
         return $stmt->execute([
             (new \DateTime())->format('Y-m-d H:i:s'),
             $finalCredits,
@@ -307,13 +307,13 @@ class GameStateService
         if (!$session) {
             return false;
         }
-        
+
         $stmt = $this->db->prepare("
             UPDATE game_sessions 
             SET planets_traded = planets_traded + 1
             WHERE id = ?
         ");
-        
+
         return $stmt->execute([$session->id]);
     }
 
@@ -326,15 +326,15 @@ class GameStateService
         if (!$player) {
             throw new \Exception('Player not found');
         }
-        
+
         $currentPlanet = null;
         if ($player->currentPlanetId) {
             $currentPlanet = $this->getPlanetById($player->currentPlanetId);
         }
-        
+
         $ownedPlanets = $this->getPlanetsByOwner($player->id);
         $session = $this->getCurrentGameSession($sessionId);
-        
+
         return [
             'player' => $player->toArray(),
             'currentPlanet' => $currentPlanet?->toArray(),
@@ -350,7 +350,7 @@ class GameStateService
     private function hydratePlanetFromData(array $data): Planet
     {
         $planet = Planet::fromArray($data);
-        
+
         // Create and attach planet type
         $planetType = new \App\Models\PlanetType();
         $planetType->id = $data['type_id'];
@@ -361,9 +361,9 @@ class GameStateService
         $planetType->baseGrav = $data['base_grav'];
         $planetType->baseRad = $data['base_rad'];
         $planetType->color = $data['type_color'];
-        
+
         $planet->type = $planetType;
-        
+
         return $planet;
     }
 }

@@ -26,20 +26,20 @@ class PlanetGeneratorService
         $planet->id = $this->generatePlanetId();
         $planet->type = $type;
         $planet->name = $name;
-        
+
         // Generate planet properties with variance from base type
         $planet->temperature = RandomUtils::randomRange($type->baseTemp, 20);
         $planet->atmosphere = max(0, RandomUtils::randomRange($type->baseAtmo, 0.4));
         $planet->water = max(0, min(1, RandomUtils::randomRange($type->baseWater, 0.3)));
         $planet->gravity = max(0.1, RandomUtils::randomRange($type->baseGrav, 0.4));
         $planet->radiation = max(0, RandomUtils::randomRange($type->baseRad, 0.3));
-        
+
         // Generate purchase price
         $planet->purchasePrice = (int) floor(1000 + RandomUtils::randomFloat() * 2000);
-        
+
         // Set color
         $planet->color = $type->color;
-        
+
         return $planet;
     }
 
@@ -53,14 +53,14 @@ class PlanetGeneratorService
         }
 
         $planets = [];
-        
+
         for ($i = 0; $i < $count; $i++) {
             $planetType = RandomUtils::randomItem($planetTypes);
             $name = $this->nameService->getRandomPlanetName();
             $planet = $this->createPlanet($planetType, $name);
             $planets[] = $planet;
         }
-        
+
         return $planets;
     }
 
@@ -72,7 +72,7 @@ class PlanetGeneratorService
         do {
             $id = RandomUtils::generateId('planet');
         } while (in_array($id, $this->usedPlanetIds));
-        
+
         $this->usedPlanetIds[] = $id;
         return $id;
     }
@@ -83,17 +83,17 @@ class PlanetGeneratorService
     public function calculatePlanetValue(Planet $planet): int
     {
         $baseValue = $planet->purchasePrice;
-        
+
         // Factors that affect value
         $temperatureBonus = $this->getTemperatureBonus($planet->temperature);
         $atmosphereBonus = $planet->atmosphere * 100;
         $waterBonus = $planet->water * 200;
         $gravityBonus = $this->getGravityBonus($planet->gravity);
         $radiationPenalty = $planet->radiation * -50;
-        
-        $totalValue = $baseValue + $temperatureBonus + $atmosphereBonus + 
+
+        $totalValue = $baseValue + $temperatureBonus + $atmosphereBonus +
                      $waterBonus + $gravityBonus + $radiationPenalty;
-        
+
         return max(500, (int) $totalValue); // Minimum value of 500
     }
 
@@ -106,7 +106,7 @@ class PlanetGeneratorService
         if ($temperature >= 0 && $temperature <= 30) {
             return 150; // Bonus for habitable temperature
         }
-        
+
         // Penalty for extreme temperatures
         $deviation = min(abs($temperature), abs($temperature - 30));
         return -$deviation * 2;
@@ -119,11 +119,11 @@ class PlanetGeneratorService
     {
         // Ideal gravity is around 1.0 (Earth-like)
         $deviation = abs($gravity - 1.0);
-        
+
         if ($deviation <= 0.2) {
             return 100; // Bonus for Earth-like gravity
         }
-        
+
         return -$deviation * 50; // Penalty for extreme gravity
     }
 
@@ -131,18 +131,18 @@ class PlanetGeneratorService
      * Generate planet with specific characteristics
      */
     public function generatePlanetWithCharacteristics(
-        PlanetType $type, 
+        PlanetType $type,
         array $characteristics = []
     ): Planet {
         $planet = $this->createPlanet($type, $this->nameService->getRandomPlanetName());
-        
+
         // Apply specific characteristics
         foreach ($characteristics as $property => $value) {
             if (property_exists($planet, $property)) {
                 $planet->$property = $value;
             }
         }
-        
+
         return $planet;
     }
 
@@ -152,15 +152,25 @@ class PlanetGeneratorService
     public function getPlanetRarity(Planet $planet): string
     {
         $score = 0;
-        
+
         // Score based on ideal conditions
-        if ($planet->temperature >= 0 && $planet->temperature <= 30) $score++;
-        if ($planet->atmosphere >= 0.8 && $planet->atmosphere <= 1.2) $score++;
-        if ($planet->water >= 0.3 && $planet->water <= 0.7) $score++;
-        if ($planet->gravity >= 0.8 && $planet->gravity <= 1.2) $score++;
-        if ($planet->radiation <= 0.1) $score++;
-        
-        return match($score) {
+        if ($planet->temperature >= 0 && $planet->temperature <= 30) {
+            $score++;
+        }
+        if ($planet->atmosphere >= 0.8 && $planet->atmosphere <= 1.2) {
+            $score++;
+        }
+        if ($planet->water >= 0.3 && $planet->water <= 0.7) {
+            $score++;
+        }
+        if ($planet->gravity >= 0.8 && $planet->gravity <= 1.2) {
+            $score++;
+        }
+        if ($planet->radiation <= 0.1) {
+            $score++;
+        }
+
+        return match ($score) {
             5 => 'Legendary',
             4 => 'Epic',
             3 => 'Rare',

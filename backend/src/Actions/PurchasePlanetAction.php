@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Repositories\PlanetRepository;
@@ -12,12 +13,8 @@ class PurchasePlanetAction
     private PlanetRepository $planetRepository;
     private PlayerRepository $playerRepository;
     private GameSessionRepository $sessionRepository;
-
-    public function __construct(
-        PlanetRepository $planetRepository,
-        PlayerRepository $playerRepository,
-        GameSessionRepository $sessionRepository
-    ) {
+    public function __construct(PlanetRepository $planetRepository, PlayerRepository $playerRepository, GameSessionRepository $sessionRepository)
+    {
         $this->planetRepository = $planetRepository;
         $this->playerRepository = $playerRepository;
         $this->sessionRepository = $sessionRepository;

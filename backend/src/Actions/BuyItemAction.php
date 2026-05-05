@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Services\TradingService;
@@ -6,7 +7,6 @@ use App\Services\TradingService;
 class BuyItemAction
 {
     private TradingService $tradingService;
-
     public function __construct(TradingService $tradingService)
     {
         $this->tradingService = $tradingService;

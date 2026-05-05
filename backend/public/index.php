@@ -1,8 +1,46 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+declare(strict_types=1);
+
+$autoloader = null;
+$searchPaths = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../vendor/autoload.php',
+    __DIR__ . '/../../../vendor/autoload.php',
+    __DIR__ . '/../../../../vendor/autoload.php',
+    __DIR__ . '/../../../../../vendor/autoload.php',
+];
+
+foreach ($searchPaths as $path) {
+    if (file_exists($path)) {
+        $autoloader = $path;
+        break;
+    }
+}
+
+if ($autoloader === null) {
+    throw new RuntimeException('Autoloader not found. Please run composer install.');
+}
+
+require $autoloader;
+
+spl_autoload_register(static function (string $class): void {
+    $prefix = 'App\\';
+    $baseDir = __DIR__ . '/../src/';
+
+    if (strncmp($class, $prefix, strlen($prefix)) !== 0) {
+        return;
+    }
+
+    $relative = substr($class, strlen($prefix));
+    $file = $baseDir . str_replace('\\', '/', $relative) . '.php';
+    if (file_exists($file)) {
+        require $file;
+    }
+}, true, true);
 
 use Dotenv\Dotenv;
+use App\Core\Environment;
 use App\Core\Router;
 use App\Database\Connection;
 use App\Repositories\RepositoryManager;
@@ -27,7 +65,21 @@ use App\Actions\AnalyzePlanetAction;
 
 // Load environment variables first
 $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->safeLoad();
+$dotenv->load();
+
+$requiredEnvVars = [
+    'DB_HOST',
+    'DB_PORT',
+    'DB_NAME',
+    'DB_USER',
+    'DB_PASSWORD',
+    'JWT_SECRET',
+    'WEB_HATCHERY_LOGIN_URL',
+    'WEB_HATCHERY_REGISTER_URL',
+];
+foreach ($requiredEnvVars as $envVar) {
+    Environment::required($envVar);
+}
 
 // Initialize database connection
 $connection = Connection::getInstance();
@@ -86,7 +138,7 @@ $dataController = new DataController($repositories);
 $router = new Router();
 
 // Set base path for subdirectory deployment (preview environment)
-if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'preview') {
+if (Environment::optional('APP_ENV') === 'preview') {
     $router->setBasePath('/planet_trader');
 } else {
     $requestPath = $_SERVER['REQUEST_URI'] ?? '';

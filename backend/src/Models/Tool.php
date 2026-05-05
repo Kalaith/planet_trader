@@ -34,17 +34,17 @@ class Tool
         $tool->tier = (int) ($data['tier'] ?? 1);
         $tool->unlocked = (bool) ($data['unlocked'] ?? true);
         $tool->upgradeRequired = $data['upgrade_required'] ?? null;
-        
+
         // Parse JSON effects
         if (isset($data['effects'])) {
-            $tool->effects = is_string($data['effects']) ? 
-                json_decode($data['effects'], true) ?? [] : 
+            $tool->effects = is_string($data['effects']) ?
+                json_decode($data['effects'], true) ?? [] :
                 $data['effects'];
         }
-        
+
         if (isset($data['side_effects'])) {
-            $tool->sideEffects = is_string($data['side_effects']) ? 
-                json_decode($data['side_effects'], true) ?? [] : 
+            $tool->sideEffects = is_string($data['side_effects']) ?
+                json_decode($data['side_effects'], true) ?? [] :
                 $data['side_effects'];
         }
 

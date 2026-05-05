@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Services\PlanetNameService;
@@ -6,7 +7,6 @@ use App\Services\PlanetNameService;
 class GetRandomPlanetNameAction
 {
     private PlanetNameService $planetNameService;
-
     public function __construct(PlanetNameService $planetNameService)
     {
         $this->planetNameService = $planetNameService;

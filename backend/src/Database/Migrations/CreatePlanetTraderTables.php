@@ -5,16 +5,16 @@ namespace App\Database\Migrations;
 /**
  * Migration for creating all Planet Trader database tables
  */
-class CreatePlanetTraderTables 
+class CreatePlanetTraderTables
 {
     private $pdo;
-    
-    public function __construct($pdo) 
+
+    public function __construct($pdo)
     {
         $this->pdo = $pdo;
     }
-    
-    public function up(): void 
+
+    public function up(): void
     {
         // Create planet_types table
         $this->pdo->exec("
@@ -30,7 +30,7 @@ class CreatePlanetTraderTables
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ");
-        
+
         // Create species table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS species (
@@ -46,7 +46,7 @@ class CreatePlanetTraderTables
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ");
-        
+
         // Create tools table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS tools (
@@ -63,7 +63,7 @@ class CreatePlanetTraderTables
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ");
-        
+
         // Create users table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS users (
@@ -82,7 +82,7 @@ class CreatePlanetTraderTables
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ");
-        
+
         // Create players table (legacy compatibility - references users)
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS players (
@@ -98,7 +98,7 @@ class CreatePlanetTraderTables
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
             )
         ");
-        
+
         // Create game_sessions table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS game_sessions (
@@ -115,7 +115,7 @@ class CreatePlanetTraderTables
                 FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE SET NULL
             )
         ");
-        
+
         // Create planets table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS planets (
@@ -141,7 +141,7 @@ class CreatePlanetTraderTables
                 FOREIGN KEY (species_id) REFERENCES species(id) ON DELETE SET NULL
             )
         ");
-        
+
         // Create player_tools table (many-to-many for owned tools)
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS player_tools (
@@ -155,7 +155,7 @@ class CreatePlanetTraderTables
                 UNIQUE KEY unique_player_tool (player_id, tool_id)
             )
         ");
-        
+
         // Create planet_names table for name generation
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS planet_names (
@@ -167,7 +167,7 @@ class CreatePlanetTraderTables
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ");
-        
+
         // Create transactions table for trading history
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS transactions (
@@ -183,7 +183,7 @@ class CreatePlanetTraderTables
                 FOREIGN KEY (planet_id) REFERENCES planets(id) ON DELETE CASCADE
             )
         ");
-        
+
         // Create indexes for better performance
         $this->pdo->exec("CREATE INDEX idx_planets_session ON planets(session_id)");
         $this->pdo->exec("CREATE INDEX idx_planets_type ON planets(planet_type_id)");
@@ -192,13 +192,13 @@ class CreatePlanetTraderTables
         $this->pdo->exec("CREATE INDEX idx_game_sessions_player ON game_sessions(player_id)");
         $this->pdo->exec("CREATE INDEX idx_game_sessions_active ON game_sessions(is_active)");
     }
-    
-    public function down(): void 
+
+    public function down(): void
     {
         // Drop tables in reverse order to avoid foreign key constraints
         $tables = [
             'transactions',
-            'planet_names', 
+            'planet_names',
             'player_tools',
             'planets',
             'game_sessions',
@@ -208,7 +208,7 @@ class CreatePlanetTraderTables
             'species',
             'planet_types'
         ];
-        
+
         foreach ($tables as $table) {
             $this->pdo->exec("DROP TABLE IF EXISTS {$table}");
         }

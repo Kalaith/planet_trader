@@ -8,20 +8,20 @@ class PlanetNameService
 {
     private array $usedNames = [];
     private array $planetNames = [];
-    
+
     private const STAR_PREFIXES = [
-        "HD", "Kepler", "Gliese", "Epsilon", "Tau", "TYC", 
-        "Alpha", "Delta", "Theta", "Zeta", "Xeno", "Vesmir", 
+        "HD", "Kepler", "Gliese", "Epsilon", "Tau", "TYC",
+        "Alpha", "Delta", "Theta", "Zeta", "Xeno", "Vesmir",
         "PX", "LV", "LX", "Beta", "Gamma", "Sigma", "Omega"
     ];
-    
+
     private const ROMAN_NUMERALS = [
         "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
         "XI", "XII", "XIII", "XIV", "XV"
     ];
-    
+
     private const PLANET_SUFFIXES = [
-        "Prime", "Secundus", "Tertius", "Major", "Minor", "Nova", 
+        "Prime", "Secundus", "Tertius", "Major", "Minor", "Nova",
         "Proxima", "Ultima", "Centralis", "Australis", "Borealis"
     ];
 
@@ -40,11 +40,11 @@ class PlanetNameService
             do {
                 $name = RandomUtils::randomItem($this->planetNames);
             } while (in_array($name, $this->usedNames));
-            
+
             $this->usedNames[] = $name;
             return $name;
         }
-        
+
         // Generate procedural name
         return $this->generateProceduralName();
     }
@@ -55,7 +55,7 @@ class PlanetNameService
     private function generateProceduralName(): string
     {
         $nameType = RandomUtils::randomInt(1, 4);
-        
+
         switch ($nameType) {
             case 1:
                 return $this->generateStarSystemName();
@@ -76,9 +76,9 @@ class PlanetNameService
         $prefix = RandomUtils::randomItem(self::STAR_PREFIXES);
         $code = RandomUtils::randomInt(100, 9999);
         $suffix = RandomUtils::randomBool(0.7) ? chr(97 + RandomUtils::randomInt(0, 7)) : ''; // a-h
-        
+
         $name = trim("{$prefix}-{$code}{$suffix}");
-        
+
         // Ensure uniqueness
         $tries = 0;
         while (in_array($name, $this->usedNames) && $tries < 10) {
@@ -86,7 +86,7 @@ class PlanetNameService
             $name = trim("{$prefix}-{$code}{$suffix}");
             $tries++;
         }
-        
+
         $this->usedNames[] = $name;
         return $name;
     }
@@ -98,9 +98,9 @@ class PlanetNameService
     {
         $prefix = RandomUtils::randomItem(self::STAR_PREFIXES);
         $roman = RandomUtils::randomItem(self::ROMAN_NUMERALS);
-        
+
         $name = "{$prefix} {$roman}";
-        
+
         // Ensure uniqueness
         $tries = 0;
         while (in_array($name, $this->usedNames) && $tries < 10) {
@@ -109,7 +109,7 @@ class PlanetNameService
             $name = "{$prefix} {$roman}";
             $tries++;
         }
-        
+
         $this->usedNames[] = $name;
         return $name;
     }
@@ -121,9 +121,9 @@ class PlanetNameService
     {
         $prefix = RandomUtils::randomItem(self::STAR_PREFIXES);
         $suffix = RandomUtils::randomItem(self::PLANET_SUFFIXES);
-        
+
         $name = "{$prefix} {$suffix}";
-        
+
         // Ensure uniqueness
         $tries = 0;
         while (in_array($name, $this->usedNames) && $tries < 10) {
@@ -132,7 +132,7 @@ class PlanetNameService
             $name = "{$prefix} {$suffix}";
             $tries++;
         }
-        
+
         $this->usedNames[] = $name;
         return $name;
     }
@@ -145,9 +145,9 @@ class PlanetNameService
         $sector = RandomUtils::randomInt(1, 99);
         $grid = RandomUtils::randomInt(1, 999);
         $designation = chr(65 + RandomUtils::randomInt(0, 25)); // A-Z
-        
+
         $name = "Sector {$sector}-{$grid}{$designation}";
-        
+
         // Ensure uniqueness
         $tries = 0;
         while (in_array($name, $this->usedNames) && $tries < 10) {
@@ -156,7 +156,7 @@ class PlanetNameService
             $name = "Sector {$sector}-{$grid}{$designation}";
             $tries++;
         }
-        
+
         $this->usedNames[] = $name;
         return $name;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Repositories\PlanetRepository;
@@ -6,7 +7,6 @@ use App\Repositories\PlanetRepository;
 class SetCurrentPlanetAction
 {
     private PlanetRepository $planetRepository;
-
     public function __construct(PlanetRepository $planetRepository)
     {
         $this->planetRepository = $planetRepository;
@@ -21,7 +21,7 @@ class SetCurrentPlanetAction
                 $planet->isCurrent = true;
                 $this->planetRepository->save($planet);
                 $found = true;
-            } else if ($planet->isCurrent ?? false) {
+            } elseif ($planet->isCurrent ?? false) {
                 $planet->isCurrent = false;
                 $this->planetRepository->save($planet);
             }

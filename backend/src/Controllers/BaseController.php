@@ -55,20 +55,19 @@ abstract class BaseController
 
         throw new \RuntimeException('Authenticated user context is required');
     }
-
     /**
      * Parse JSON body from request
      */
     protected function getJsonBody(Request $request): array
     {
         $body = $request->getBody()->getContents();
-        
+
         if (empty($body)) {
             return [];
         }
 
         $data = json_decode($body, true);
-        
+
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \InvalidArgumentException('Invalid JSON in request body');
         }
@@ -99,7 +98,6 @@ abstract class BaseController
             ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
             ->withHeader('Access-Control-Max-Age', '3600');
     }
-
     /**
      * Handle OPTIONS request for CORS
      */
@@ -130,7 +128,7 @@ abstract class BaseController
         $total = count($items);
         $offset = ($page - 1) * $perPage;
         $paginatedItems = array_slice($items, $offset, $perPage);
-        
+
         return [
             'items' => $paginatedItems,
             'pagination' => [
@@ -150,10 +148,10 @@ abstract class BaseController
     protected function getPaginationParams(Request $request): array
     {
         $queryParams = $request->getQueryParams();
-        
+
         $page = max(1, (int) ($queryParams['page'] ?? 1));
         $perPage = max(1, min(100, (int) ($queryParams['per_page'] ?? 10))); // Max 100 items per page
-        
+
         return [$page, $perPage];
     }
 }

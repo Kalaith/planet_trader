@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Repositories\RepositoryManager;
@@ -6,7 +7,6 @@ use App\Repositories\RepositoryManager;
 class ActionFactory
 {
     private RepositoryManager $repositories;
-
     public function __construct(RepositoryManager $repositories)
     {
         $this->repositories = $repositories;
@@ -19,9 +19,6 @@ class ActionFactory
 
     public function generatePlanetOptionsAction(): GeneratePlanetOptionsAction
     {
-        return new GeneratePlanetOptionsAction(
-            $this->repositories->planetTypes(),
-            $this->createPlanetAction()
-        );
+        return new GeneratePlanetOptionsAction($this->repositories->planetTypes(), $this->createPlanetAction());
     }
 }

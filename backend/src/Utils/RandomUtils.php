@@ -78,7 +78,7 @@ class RandomUtils
     {
         $totalWeight = array_sum($weights);
         $randomValue = self::randomFloat() * $totalWeight;
-        
+
         $currentWeight = 0;
         foreach ($weights as $key => $weight) {
             $currentWeight += $weight;
@@ -86,7 +86,7 @@ class RandomUtils
                 return $key;
             }
         }
-        
+
         // Fallback to last item
         return array_key_last($weights);
     }
@@ -98,11 +98,11 @@ class RandomUtils
     {
         $result = '';
         $charsLength = strlen($chars);
-        
+
         for ($i = 0; $i < $length; $i++) {
             $result .= $chars[rand(0, $charsLength - 1)];
         }
-        
+
         return $result;
     }
 }

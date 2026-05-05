@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Actions;
 
 use App\Models\PlanetType;
@@ -9,7 +10,6 @@ use App\Utils\RandomUtils;
 class CreatePlanetAction
 {
     private PlanetRepository $planetRepository;
-
     public function __construct(PlanetRepository $planetRepository)
     {
         $this->planetRepository = $planetRepository;
@@ -29,9 +29,7 @@ class CreatePlanetAction
         $planet->purchasePrice = (int) floor(1000 + RandomUtils::randomFloat() * 2000);
         $planet->color = $type->color;
         $planet->createdAt = new \DateTime();
-
         $this->planetRepository->save($planet);
-
         return $planet;
     }
 }

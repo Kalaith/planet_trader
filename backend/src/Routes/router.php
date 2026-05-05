@@ -17,6 +17,7 @@ return function (
 ): void {
     $api = '/api';
 
+    $router->get($api . '/auth/login-info', [AuthController::class, 'loginInfo']);
     $router->get($api . '/auth/session', [AuthController::class, 'session'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/auth/current-user', [AuthController::class, 'currentUser'], [WebHatcheryJwtMiddleware::class]);
     $router->post($api . '/auth/guest-session', [AuthController::class, 'createGuestSession']);

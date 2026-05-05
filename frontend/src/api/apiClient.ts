@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+if (!BASE_URL) {
+  throw new Error('VITE_API_BASE_URL is required.');
+}
+
 const GUEST_AUTH_STORAGE_KEY = 'planet-trader-guest-session';
 
 const readToken = (): string | null => {
@@ -9,7 +13,9 @@ const readToken = (): string | null => {
     if (frontpageRaw) {
       const frontpageParsed = JSON.parse(frontpageRaw);
       const frontpageToken = frontpageParsed?.state?.token;
-      if (typeof frontpageToken === 'string' && frontpageToken.trim() !== '') {
+      const frontpageUser = frontpageParsed?.state?.user;
+      const isGuestUser = Boolean(frontpageUser?.is_guest || frontpageUser?.auth_type === 'guest');
+      if (!isGuestUser && typeof frontpageToken === 'string' && frontpageToken.trim() !== '') {
         return frontpageToken;
       }
     }
@@ -50,9 +56,7 @@ apiClient.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      const loginUrl =
-        error.response?.data?.login_url ||
-        import.meta.env.VITE_WEB_HATCHERY_LOGIN_URL;
+      const loginUrl = error.response?.data?.login_url;
 
       if (loginUrl) {
         try {

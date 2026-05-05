@@ -59,7 +59,7 @@ class TradingService
             // Process the purchase
             $player->spendCredits($planet->purchasePrice);
             $planet->ownerId = $player->id;
-            
+
             // Save changes
             $this->gameStateService->updatePlayer($player);
             $this->gameStateService->updatePlanet($planet);
@@ -70,7 +70,6 @@ class TradingService
                 'planet' => $planet->toArray(),
                 'remainingCredits' => $player->credits
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -111,16 +110,16 @@ class TradingService
 
             // Calculate sale price
             $salePrice = $this->pricingService->calculateSalePrice($planet, $buyer);
-            
+
             // Process the sale
             $player->addCredits($salePrice);
             $planet->ownerId = null;
             $planet->soldAt = new \DateTime();
-            
+
             // Save changes
             $this->gameStateService->updatePlayer($player);
             $this->gameStateService->updatePlanet($planet);
-            
+
             // Update game session statistics
             $this->gameStateService->incrementPlanetsTraded($sessionId);
 
@@ -131,7 +130,6 @@ class TradingService
                 'newCredits' => $player->credits,
                 'buyer' => $buyer->name
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -183,7 +181,6 @@ class TradingService
                 'message' => "Selected {$planet->name}",
                 'currentPlanet' => $planet->toArray()
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
@@ -203,7 +200,7 @@ class TradingService
         }
 
         $planet = $this->gameStateService->getPlanetById($player->currentPlanetId);
-        
+
         // Verify ownership
         if ($planet && $planet->ownerId === $player->id) {
             return $planet;
@@ -219,7 +216,7 @@ class TradingService
     {
         $planet = $this->gameStateService->getPlanetById($planetId);
         $buyer = $this->gameStateService->getSpeciesById($buyerId);
-        
+
         if (!$planet || !$buyer) {
             return [
                 'success' => false,
@@ -229,7 +226,7 @@ class TradingService
 
         $salePrice = $this->pricingService->calculateSalePrice($planet, $buyer);
         $profit = $salePrice - $planet->purchasePrice;
-        $profitPercentage = $planet->purchasePrice > 0 ? 
+        $profitPercentage = $planet->purchasePrice > 0 ?
             ($profit / $planet->purchasePrice) * 100 : 0;
 
         return [
@@ -254,9 +251,9 @@ class TradingService
 
         $session = $this->gameStateService->getCurrentGameSession($sessionId);
         $ownedPlanets = $this->getOwnedPlanets($sessionId);
-        
+
         $totalInvested = array_sum(array_map(fn($p) => $p->purchasePrice, $ownedPlanets));
-        
+
         return [
             'planetsOwned' => count($ownedPlanets),
             'planetsTraded' => $session?->planetsTraded ?? 0,
