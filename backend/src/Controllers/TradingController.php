@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Services\TradingService;
-use App\Services\GameStateServiceEnhanced;
+use App\Services\GameStateService;
 use App\Services\PricingService;
-use App\Utils\RandomUtils;
 use App\Http\Response;
 use App\Http\Request;
 
 class TradingController extends BaseController
 {
     private TradingService $tradingService;
-    private GameStateServiceEnhanced $gameStateService;
+    private GameStateService $gameStateService;
     private PricingService $pricingService;
 
     public function __construct(
         TradingService $tradingService,
-        GameStateServiceEnhanced $gameStateService,
+        GameStateService $gameStateService,
         PricingService $pricingService
     ) {
         $this->tradingService = $tradingService;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 /**
@@ -77,6 +79,16 @@ class GameSessionRepository extends BaseRepository
     public function updateCredits(string $sessionId, int $newCredits): bool
     {
         return $this->update($sessionId, ['current_credits' => $newCredits]);
+    }
+
+    /**
+     * Delete an existing session and its dependent session-owned rows.
+     */
+    public function deleteSession(string $sessionId): void
+    {
+        $this->query('DELETE FROM transactions WHERE session_id = ?', [$sessionId]);
+        $this->query('DELETE FROM planets WHERE session_id = ?', [$sessionId]);
+        $this->query('DELETE FROM game_sessions WHERE id = ?', [$sessionId]);
     }
 
     /**

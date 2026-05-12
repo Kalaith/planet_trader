@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Core\Router;
 use App\Controllers\AuthController;
 use App\Controllers\GameController;
 use App\Controllers\PlanetController;
 use App\Controllers\TradingController;
 use App\Controllers\DataController;
+use App\Middleware\AdminMiddleware;
 use App\Middleware\WebHatcheryJwtMiddleware;
 
 return function (
@@ -47,7 +50,6 @@ return function (
     $router->post($api . '/game/end', [$gameController, 'endGame'], [WebHatcheryJwtMiddleware::class]);
     $router->post($api . '/game/reset', [$gameController, 'resetGame'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/game/stats', [$gameController, 'getStats'], [WebHatcheryJwtMiddleware::class]);
-    $router->put($api . '/game/credits', [$gameController, 'updateCredits'], [WebHatcheryJwtMiddleware::class]);
 
     $router->post($api . '/planets', [$planetController, 'generatePlanets'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/planets/owned', [$planetController, 'getOwnedPlanets'], [WebHatcheryJwtMiddleware::class]);
@@ -65,14 +67,16 @@ return function (
     $router->get($api . '/trading/compatibility', [$tradingController, 'getCompatibility'], [WebHatcheryJwtMiddleware::class]);
     $router->get($api . '/trading/history', [$tradingController, 'getTradeHistory'], [WebHatcheryJwtMiddleware::class]);
 
-    $router->get($api . '/planet-name', [$planetController, 'getRandomPlanetName']);
-    $router->post($api . '/species/generate', [$planetController, 'generateSpecies']);
     $router->get($api . '/data/planet-types', [$dataController, 'getPlanetTypes']);
     $router->get($api . '/data/species', [$dataController, 'getSpecies']);
     $router->get($api . '/data/tools', [$dataController, 'getTools']);
     $router->get($api . '/data/planet-names', [$dataController, 'getPlanetNames']);
     $router->get($api . '/data/config', [$dataController, 'getGameConfig']);
-    $router->post($api . '/data/planet-names/reset', [$dataController, 'resetPlanetNames']);
+    $router->post(
+        $api . '/data/planet-names/reset',
+        [$dataController, 'resetPlanetNames'],
+        [WebHatcheryJwtMiddleware::class, AdminMiddleware::class]
+    );
 
     $router->get('/', function ($request, $response) {
         $response->getBody()->write(json_encode([

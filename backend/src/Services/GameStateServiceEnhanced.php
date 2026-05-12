@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Repositories\RepositoryManager;
@@ -10,6 +12,8 @@ use App\Utils\RandomUtils;
  */
 class GameStateServiceEnhanced
 {
+    private const STARTING_CREDITS = 10000;
+
     private RepositoryManager $repositories;
     private PlanetGeneratorService $planetGenerator;
 
@@ -24,10 +28,29 @@ class GameStateServiceEnhanced
      */
     public function createSession(?int $playerId = null, int $startingCredits = 10000): array
     {
-        $sessionId = $this->generateSessionId();
+        return $this->createSessionWithId($this->generateSessionId(), $playerId, $startingCredits);
+    }
 
+    /**
+     * Create or reset the authenticated owner's canonical session.
+     */
+    public function createSessionForOwner(string $ownerSessionId, int $startingCredits = self::STARTING_CREDITS): array
+    {
+        return $this->createSessionWithId($ownerSessionId, null, $startingCredits, true);
+    }
+
+    private function createSessionWithId(
+        string $sessionId,
+        ?int $playerId,
+        int $startingCredits,
+        bool $replaceExisting = false
+    ): array {
         try {
             $this->repositories->beginTransaction();
+
+            if ($replaceExisting) {
+                $this->repositories->sessions()->deleteSession($sessionId);
+            }
 
             // Create the session
             $this->repositories->sessions()->createSession($sessionId, $playerId, $startingCredits);

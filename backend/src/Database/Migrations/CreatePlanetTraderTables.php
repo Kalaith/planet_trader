@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Database\Migrations;
 
 /**
@@ -67,7 +69,7 @@ class CreatePlanetTraderTables
         // Create users table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS users (
-                id VARCHAR(36) PRIMARY KEY,
+                id VARCHAR(128) PRIMARY KEY,
                 email VARCHAR(100) NOT NULL,
                 username VARCHAR(50) NOT NULL,
                 display_name VARCHAR(100) NOT NULL,
@@ -87,7 +89,7 @@ class CreatePlanetTraderTables
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS players (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id VARCHAR(36),
+                user_id VARCHAR(128),
                 username VARCHAR(50) NOT NULL UNIQUE,
                 email VARCHAR(100) UNIQUE,
                 credits BIGINT DEFAULT 10000,
@@ -102,7 +104,7 @@ class CreatePlanetTraderTables
         // Create game_sessions table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS game_sessions (
-                id VARCHAR(36) PRIMARY KEY,
+                id VARCHAR(128) PRIMARY KEY,
                 player_id INT,
                 current_credits BIGINT DEFAULT 10000,
                 current_planet_id INT,
@@ -120,7 +122,7 @@ class CreatePlanetTraderTables
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS planets (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                session_id VARCHAR(36),
+                session_id VARCHAR(128),
                 name VARCHAR(100) NOT NULL,
                 planet_type_id INT NOT NULL,
                 size ENUM('small', 'medium', 'large') DEFAULT 'medium',

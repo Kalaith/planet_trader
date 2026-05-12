@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Services\GameStateServiceEnhanced;
@@ -41,26 +43,33 @@ class GameController extends BaseController
     public function startGame(Request $request, Response $response): Response
     {
         try {
-            $body = $request->getParsedBody() ?? [];
-            $startingCredits = $body['startingCredits'] ?? 10000;
+            $sessionId = $this->getSessionId($request);
 
-            // Create new session using enhanced service
-            $result = $this->gameStateService->createSession(null, $startingCredits);
+            // Credits are server-controlled. The client may request a start/reset, not a balance.
+            $result = $this->gameStateService->createSessionForOwner($sessionId);
 
             if ($result['success']) {
                 $this->logAction('game_started', [
                     'session_id' => $result['session_id'],
-                    'starting_credits' => $startingCredits
+                    'starting_credits' => $result['starting_credits'] ?? null
                 ]);
 
                 return $this->successResponse($response, $result, 'Game started successfully');
-            } else {
-                return $this->errorResponse($response, $result['message'] ?? 'Failed to start game', 400);
             }
+
+            return $this->errorResponse($response, $result['message'] ?? $result['error'] ?? 'Failed to start game', 400);
         } catch (\Exception $e) {
             $this->logAction('game_start_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to start game: ' . $e->getMessage(), 500);
         }
+    }
+
+    /**
+     * Reset the authenticated user's game to a new server-approved starting state.
+     */
+    public function resetGame(Request $request, Response $response): Response
+    {
+        return $this->startGame($request, $response);
     }
 
     /**
@@ -120,6 +129,32 @@ class GameController extends BaseController
         } catch (\Exception $e) {
             $this->logAction('game_save_error', ['error' => $e->getMessage()]);
             return $this->errorResponse($response, 'Failed to save game: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get aggregate game stats for the authenticated user's active session.
+     */
+    public function getStats(Request $request, Response $response): Response
+    {
+        try {
+            $sessionId = $this->getSessionId($request);
+            $result = $this->gameStateService->getSessionStatus($sessionId);
+
+            if (!($result['success'] ?? false)) {
+                return $this->errorResponse($response, $result['error'] ?? 'Session not found', 404);
+            }
+
+            return $this->successResponse($response, [
+                'session_id' => $sessionId,
+                'statistics' => $result['statistics'] ?? [],
+                'current_credits' => $result['current_credits'] ?? 0,
+                'planets_discovered' => $result['planets_discovered'] ?? 0,
+                'planets_unsold' => $result['planets_unsold'] ?? 0,
+            ], 'Game stats retrieved');
+        } catch (\Exception $e) {
+            $this->logAction('game_stats_error', ['error' => $e->getMessage()]);
+            return $this->errorResponse($response, 'Failed to get game stats: ' . $e->getMessage(), 500);
         }
     }
 

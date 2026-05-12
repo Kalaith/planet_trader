@@ -130,7 +130,7 @@ $planetController = new PlanetController(
 );
 $tradingController = new TradingController(
     $tradingService,
-    $gameStateServiceEnhanced,
+    $gameStateService,
     $pricingService
 );
 $dataController = new DataController($repositories);
