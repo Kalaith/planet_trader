@@ -102,7 +102,7 @@ pub(super) fn draw_header(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<Ui
 }
 
 fn draw_tools_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
-    draw_panel(TOOLS_PANEL, "Terraforming Tools");
+    draw_panel_with_left_title(TOOLS_PANEL, "Terraform Tools");
     draw_ui_text_ex(
         &format!(
             "Tap a tool to inspect it, then tap USE.   RP: {}",
@@ -114,9 +114,9 @@ fn draw_tools_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction
     );
     if button(
         Rect::new(
-            TOOLS_PANEL.right() - 150.0,
+            TOOLS_PANEL.right() - 156.0,
             TOOLS_PANEL.y + 10.0,
-            80.0,
+            78.0,
             28.0,
         ),
         "RESEARCH",
@@ -129,7 +129,7 @@ fn draw_tools_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction
 
     let max_scroll = max_tool_scroll(ctx.data, ctx.expanded_tool);
     if button(
-        Rect::new(TOOLS_PANEL.right() - 64.0, TOOLS_PANEL.y + 12.0, 22.0, 24.0),
+        Rect::new(TOOLS_PANEL.right() - 72.0, TOOLS_PANEL.y + 9.0, 32.0, 30.0),
         "UP",
         ctx.tool_scroll > 0.0,
         ButtonTone::Muted,
@@ -138,7 +138,7 @@ fn draw_tools_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction
         actions.push(UiAction::ScrollTools(-1));
     }
     if button(
-        Rect::new(TOOLS_PANEL.right() - 38.0, TOOLS_PANEL.y + 12.0, 22.0, 24.0),
+        Rect::new(TOOLS_PANEL.right() - 36.0, TOOLS_PANEL.y + 9.0, 32.0, 30.0),
         "DN",
         ctx.tool_scroll < max_scroll,
         ButtonTone::Muted,
@@ -460,7 +460,7 @@ fn draw_inventory(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>)
         actions.push(UiAction::OpenPurchase);
     }
     if button(
-        Rect::new(rect.right() - 186.0, rect.y + 12.0, 24.0, 30.0),
+        Rect::new(rect.right() - 198.0, rect.y + 9.0, 34.0, 32.0),
         "UP",
         ctx.inventory_scroll > 0,
         ButtonTone::Muted,
@@ -469,7 +469,7 @@ fn draw_inventory(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>)
         actions.push(UiAction::ScrollInventory(-1));
     }
     if button(
-        Rect::new(rect.right() - 158.0, rect.y + 12.0, 24.0, 30.0),
+        Rect::new(rect.right() - 160.0, rect.y + 9.0, 34.0, 32.0),
         "DN",
         ctx.inventory_scroll + 3 < ctx.session.planets.len(),
         ButtonTone::Muted,

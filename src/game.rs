@@ -230,11 +230,13 @@ impl Game {
             self.events.push(action);
         }
 
-        self.notifications
-            .draw_with_config(&NotificationRenderConfig {
+        self.notifications.draw_with_config_and_offset(
+            &NotificationRenderConfig {
                 anchor: NotificationAnchor::TopRight,
                 ..Default::default()
-            });
+            },
+            vec2(-490.0, 0.0),
+        );
     }
 
     fn apply_action(&mut self, action: UiAction) {

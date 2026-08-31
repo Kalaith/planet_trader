@@ -21,10 +21,10 @@ pub(super) fn draw_market_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut 
     let max_scroll = max_market_scroll(ctx);
     if button(
         Rect::new(
-            MARKET_PANEL.right() - 64.0,
-            MARKET_PANEL.y + 12.0,
-            22.0,
-            24.0,
+            MARKET_PANEL.right() - 72.0,
+            MARKET_PANEL.y + 9.0,
+            32.0,
+            30.0,
         ),
         "UP",
         ctx.market_scroll > 0.0,
@@ -35,10 +35,10 @@ pub(super) fn draw_market_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut 
     }
     if button(
         Rect::new(
-            MARKET_PANEL.right() - 38.0,
-            MARKET_PANEL.y + 12.0,
-            22.0,
-            24.0,
+            MARKET_PANEL.right() - 36.0,
+            MARKET_PANEL.y + 9.0,
+            32.0,
+            30.0,
         ),
         "DN",
         ctx.market_scroll < max_scroll,
