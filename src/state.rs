@@ -237,6 +237,7 @@ impl GameSession {
     }
 
     pub fn purchase_planet(&mut self, planet_id: &str) -> Result<String, String> {
+        self.require_started()?;
         let index = self
             .planet_options
             .iter()

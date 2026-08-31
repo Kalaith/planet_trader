@@ -438,7 +438,15 @@ fn gameplay_actions_require_a_started_session() {
         description: "Test tool".to_owned(),
     };
     let buyer_id = session.alien_buyers[0].id;
+    let offer = Planet::from_type(
+        "planet-offer".to_owned(),
+        data.planet_types[0].clone(),
+        "Offeria".to_owned(),
+    );
+    let offer_id = offer.id.clone();
+    session.planet_options.push(offer);
 
+    assert!(session.purchase_planet(&offer_id).is_err());
     assert!(session.select_planet(&planet_id).is_err());
     assert!(session.apply_tool(&tool).is_err());
     assert!(session.complete_research(&data.research[0]).is_err());
@@ -447,6 +455,7 @@ fn gameplay_actions_require_a_started_session() {
     assert_eq!(session.credits, data.config.starting_credits);
     assert!(session.completed_research.is_empty());
     assert_eq!(session.planets.len(), 1);
+    assert_eq!(session.planet_options.len(), 1);
 }
 
 #[test]
