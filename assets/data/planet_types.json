@@ -1,0 +1,17 @@
+[
+  {"name": "Rocky", "baseTemp": 15, "baseAtmo": 0.3, "baseWater": 0.1, "baseGrav": 1.0, "baseRad": 0.2},
+  {"name": "Ice World", "baseTemp": -40, "baseAtmo": 0.1, "baseWater": 0.8, "baseGrav": 0.8, "baseRad": 0.1},
+  {"name": "Volcanic", "baseTemp": 80, "baseAtmo": 0.6, "baseWater": 0.0, "baseGrav": 1.2, "baseRad": 0.4},
+  {"name": "Desert", "baseTemp": 50, "baseAtmo": 0.2, "baseWater": 0.05, "baseGrav": 0.9, "baseRad": 0.3},
+  {"name": "Gas Dwarf", "baseTemp": -20, "baseAtmo": 2.0, "baseWater": 0.3, "baseGrav": 0.6, "baseRad": 0.15},
+  {"name": "Tundra", "baseTemp": -15, "baseAtmo": 0.5, "baseWater": 0.4, "baseGrav": 1.1, "baseRad": 0.25},
+  {"name": "Ocean World", "baseTemp": 10, "baseAtmo": 0.7, "baseWater": 0.95, "baseGrav": 1.0, "baseRad": 0.2},
+  {"name": "Lava Crust", "baseTemp": 120, "baseAtmo": 0.8, "baseWater": 0.0, "baseGrav": 1.3, "baseRad": 0.5},
+  {"name": "Clouded Giant", "baseTemp": 30, "baseAtmo": 3.5, "baseWater": 0.6, "baseGrav": 2.0, "baseRad": 0.3},
+  {"name": "Crystalline", "baseTemp": -60, "baseAtmo": 0.05, "baseWater": 0.2, "baseGrav": 0.7, "baseRad": 0.4},
+  {"name": "Swamp World", "baseTemp": 35, "baseAtmo": 0.9, "baseWater": 0.7, "baseGrav": 1.0, "baseRad": 0.1},
+  {"name": "Tidally Locked", "baseTemp": 100, "baseAtmo": 0.6, "baseWater": 0.2, "baseGrav": 0.95, "baseRad": 0.35},
+  {"name": "Hollow Planet", "baseTemp": 5, "baseAtmo": 0.2, "baseWater": 0.05, "baseGrav": 0.3, "baseRad": 0.6},
+  {"name": "Bio-Waste Zone", "baseTemp": 20, "baseAtmo": 0.7, "baseWater": 0.1, "baseGrav": 1.1, "baseRad": 0.9},
+  {"name": "Irradiated Core", "baseTemp": 60, "baseAtmo": 0.4, "baseWater": 0.0, "baseGrav": 1.2, "baseRad": 1.0}
+]

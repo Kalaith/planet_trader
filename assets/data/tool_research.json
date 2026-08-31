@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Ice Comet Bombardment",
+    "category": "Hydrology",
+    "rpCost": 80,
+    "unlocksTool": true,
+    "description": "Unlocks ice-based orbital strikes to increase water and reduce temperature."
+  },
+  {
+    "name": "Gravity Intensifier",
+    "category": "Gravimetrics",
+    "rpCost": 100,
+    "unlocksTool": true,
+    "description": "Enables high-mass generation to increase planetary gravity."
+  },
+  {
+    "name": "Gravity Stabilizer",
+    "category": "Gravimetrics",
+    "rpCost": 100,
+    "unlocksTool": true,
+    "description": "Unlocks gravity reduction via planetary mass redistribution."
+  },
+  {
+    "name": "Magnetic Field Generator",
+    "category": "Radiation Management",
+    "rpCost": 90,
+    "unlocksTool": true,
+    "description": "Creates planetary-scale magnetic shielding to reduce radiation."
+  },
+  {
+    "name": "Radiation Enhancer",
+    "category": "Radiation Management",
+    "rpCost": 70,
+    "unlocksTool": true,
+    "description": "Unlocks artificial radiation emitters for exotic environmental needs."
+  },
+  {
+    "name": "Cloud Seeder",
+    "category": "Hydrology",
+    "rpCost": 70,
+    "unlocksTool": true,
+    "description": "Enables water vapor injection for cloud formation and radiation blocking."
+  },
+  {
+    "name": "Cryo-Atmos Converter",
+    "category": "Atmospheric Sciences",
+    "rpCost": 120,
+    "unlocksTool": true,
+    "description": "Unlocks tools to convert frozen gases into atmosphere."
+  },
+  {
+    "name": "Thermal Balancer",
+    "category": "Thermal Control",
+    "rpCost": 130,
+    "unlocksTool": true,
+    "description": "Enables self-regulating thermal controls to maintain temperature stability."
+  },
+  {
+    "name": "Bio-Seeder Pods",
+    "category": "Biogenesis",
+    "rpCost": 150,
+    "unlocksTool": true,
+    "description": "Unlocks advanced biological seeding for microbial and plant colonization."
+  },
+  {
+    "name": "Radiant Bloom",
+    "category": "Biogenesis",
+    "rpCost": 170,
+    "unlocksTool": true,
+    "description": "Unlocks plant life designed to thrive in radiation-rich environments."
+  }
+]

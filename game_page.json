@@ -1,0 +1,20 @@
+{
+  "title": "Planet Trader",
+  "wasm": "planet_trader",
+  "roost_slug": "rust_planet_trader",
+  "status": { "text": "Playable", "class": "playable" },
+  "canvas_rendering": "pixelated",
+  "about": [
+    "Transform barren worlds into thriving planets, tune their environments, and sell them to the alien market."
+  ],
+  "controls": [
+    { "key": "Tap / Click", "desc": "Buy, select, terraform, and sell planets" },
+    { "key": "Wheel", "desc": "Scroll long tool and market lists" },
+    { "key": "S / L", "desc": "Save / load the local game" }
+  ],
+  "details": [
+    { "label": "Genre", "value": "Simulation" },
+    { "label": "Engine", "value": "Macroquad + Toolkit" },
+    { "label": "Platform", "value": "Browser, Windows" }
+  ]
+}
