@@ -5,10 +5,10 @@
   "status": { "text": "Playable", "class": "playable" },
   "canvas_rendering": "pixelated",
   "about": [
-    "Transform barren worlds into thriving planets, tune their environments, and sell them to the alien market."
+    "Found a frontier brokerage, acquire difficult worlds, engineer them for alien life, and grow through trade and research."
   ],
   "controls": [
-    { "key": "Tap / Click", "desc": "Buy, select, terraform, and sell planets" },
+    { "key": "Tap / Click", "desc": "Navigate, buy, select, terraform, research, sell, and recover" },
     { "key": "Wheel", "desc": "Scroll long tool and market lists" },
     { "key": "S / L", "desc": "Save / load the local game" }
   ],

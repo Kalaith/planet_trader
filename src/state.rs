@@ -62,6 +62,29 @@ pub struct TradeStats {
     pub best_profit: i64,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+pub enum TutorialStep {
+    Welcome,
+    BuyPlanet,
+    ChooseOffer,
+    SelectPlanet,
+    InspectBuyer,
+    UseTool,
+    SellOrSalvage,
+    OpenResearch,
+    Complete,
+}
+
+impl TutorialStep {
+    pub fn is_complete(self) -> bool {
+        self == Self::Complete
+    }
+}
+
+fn completed_tutorial() -> TutorialStep {
+    TutorialStep::Complete
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SaveData {
     pub version: String,
@@ -79,6 +102,8 @@ pub struct SaveData {
     pub research_points: i64,
     #[serde(default)]
     pub completed_research: Vec<String>,
+    #[serde(default = "completed_tutorial")]
+    pub tutorial_step: TutorialStep,
 }
 
 #[derive(Debug, Clone)]
@@ -94,6 +119,7 @@ pub struct GameSession {
     pub trade_history: Vec<TradeRecord>,
     pub research_points: i64,
     pub completed_research: Vec<String>,
+    pub tutorial_step: TutorialStep,
     next_planet_id: u64,
     next_buyer_id: u64,
 }
@@ -112,6 +138,7 @@ impl GameSession {
             trade_history: Vec::new(),
             research_points: 0,
             completed_research: Vec::new(),
+            tutorial_step: TutorialStep::Welcome,
             next_planet_id: 1,
             next_buyer_id: 1,
         };
@@ -146,6 +173,7 @@ impl GameSession {
             }
         }
         session.completed_research = completed_research;
+        session.tutorial_step = save.tutorial_step;
         if !save.alien_buyers.is_empty() {
             session.alien_buyers = save.alien_buyers;
         }
@@ -174,6 +202,7 @@ impl GameSession {
             alien_buyers: self.alien_buyers.clone(),
             research_points: self.research_points,
             completed_research: self.completed_research.clone(),
+            tutorial_step: self.tutorial_step,
         }
     }
 
@@ -647,6 +676,7 @@ pub fn migrate_save_value(
         alien_buyers: Vec::new(),
         research_points: 0,
         completed_research: Vec::new(),
+        tutorial_step: TutorialStep::Complete,
     })
 }
 

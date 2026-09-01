@@ -20,11 +20,30 @@ pub(super) fn draw_header(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<Ui
         TextStyle::new(27.0, dark::TEXT_BRIGHT).params(),
     );
     draw_ui_text_ex(
-        "Turn barren worlds into profitable homes",
+        "Frontier planetary brokerage",
         HEADER.x + 20.0,
         HEADER.y + 51.0,
         TextStyle::new(13.0, Color::new(0.48, 0.67, 0.78, 1.0)).params(),
     );
+
+    if button(
+        Rect::new(250.0, 28.0, 68.0, 38.0),
+        "HOME",
+        true,
+        ButtonTone::Muted,
+        mouse,
+    ) {
+        actions.push(UiAction::ReturnHome);
+    }
+    if button(
+        Rect::new(324.0, 28.0, 84.0, 38.0),
+        "SETTINGS",
+        true,
+        ButtonTone::Muted,
+        mouse,
+    ) {
+        actions.push(UiAction::OpenSettings);
+    }
 
     draw_badge(
         Rect::new(414.0, 30.0, 144.0, 34.0),

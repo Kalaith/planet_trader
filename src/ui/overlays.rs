@@ -107,66 +107,6 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
     );
 }
 
-pub(super) fn draw_tutorial(mouse: Vec2, actions: &mut Vec<UiAction>) {
-    draw_rectangle(
-        0.0,
-        0.0,
-        LOGICAL_WIDTH,
-        LOGICAL_HEIGHT,
-        Color::new(0.0, 0.01, 0.02, 0.86),
-    );
-    let rect = Rect::new(300.0, 128.0, 680.0, 464.0);
-    draw_surface(
-        rect,
-        &SurfaceStyle::new(Color::new(0.045, 0.10, 0.15, 1.0))
-            .with_border(2.0, Color::new(0.20, 0.66, 0.90, 1.0))
-            .with_top_highlight(3.0, Color::new(0.36, 0.84, 1.0, 0.85)),
-    );
-    draw_ui_text_ex(
-        "Welcome to Terraforming Co!",
-        rect.x + 34.0,
-        rect.y + 56.0,
-        TextStyle::new(27.0, Color::new(0.46, 0.84, 1.0, 1.0)).params(),
-    );
-    draw_line(
-        rect.x + 34.0,
-        rect.y + 76.0,
-        rect.right() - 34.0,
-        rect.y + 76.0,
-        1.0,
-        Color::new(0.22, 0.42, 0.52, 1.0),
-    );
-    draw_text_block(
-        "Transform barren worlds into thriving planets for alien species.",
-        rect.x + 42.0,
-        rect.y + 106.0,
-        rect.w - 84.0,
-        42.0,
-        17.0,
-        2.0,
-        dark::TEXT,
-    );
-    draw_text_block(
-        "1. Tap BUY PLANET and choose a world.\n2. Tap the world in your inventory to make it active.\n3. Tap a terraforming tool to inspect it, then tap USE.\n4. Match at least 3 of 5 requirements and tap SELL.",
-        rect.x + 54.0,
-        rect.y + 176.0,
-        rect.w - 108.0,
-        126.0,
-        16.0,
-        4.0,
-        Color::new(0.74, 0.84, 0.87, 1.0),
-    );
-    if button(
-        Rect::new(rect.x + 94.0, rect.bottom() - 82.0, rect.w - 188.0, 52.0),
-        "START TERRAFORMING",
-        true,
-        ButtonTone::Primary,
-        mouse,
-    ) {
-        actions.push(UiAction::StartGame);
-    }
-}
-
 pub(super) fn draw_reset_confirmation(mouse: Vec2, actions: &mut Vec<UiAction>) {
     draw_rectangle(
         0.0,

@@ -3,17 +3,21 @@
 use crate::data::{GameData, Tool};
 use crate::state::{
     compatibility, market_trend_percent, potential_profit, sale_price, tool_is_locked, AlienBuyer,
-    GameSession, Planet,
+    GameSession, Planet, TutorialStep,
 };
 use macroquad::prelude::*;
 use macroquad_toolkit::prelude::*;
+use macroquad_toolkit::settings::GameSettings;
 use macroquad_toolkit::ui::draw_ui_text_ex;
 use macroquad_toolkit::ui::{button_rect_tone_at, RectExt, VirtualUi};
 
+mod home;
 mod market;
 mod overlays;
 mod panels;
 mod research;
+mod settings;
+mod tutorial;
 
 pub const LOGICAL_WIDTH: f32 = 1280.0;
 pub const LOGICAL_HEIGHT: f32 = 720.0;
@@ -24,9 +28,27 @@ const CENTER_PANEL: Rect = Rect::new(332.0, 96.0, 596.0, 594.0);
 const MARKET_PANEL: Rect = Rect::new(942.0, 96.0, 320.0, 594.0);
 const INVENTORY_PANEL: Rect = Rect::new(332.0, 440.0, 596.0, 250.0);
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppScreen {
+    Home,
+    Gameplay,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UiAction {
-    StartGame,
+    NewGame,
+    ConfirmNewGame,
+    CancelNewGame,
+    ContinueGame,
+    ReturnHome,
+    BeginTutorial,
+    OpenSettings,
+    CloseSettings,
+    CycleTextScale,
+    ToggleFullscreen,
+    ToggleReducedMotion,
+    ToggleFps,
+    RestartTutorial,
     OpenPurchase,
     ClosePurchase,
     PurchasePlanet(String),
@@ -63,6 +85,10 @@ pub struct UiContext<'a> {
     pub history_open: bool,
     pub research_open: bool,
     pub reset_open: bool,
+    pub screen: AppScreen,
+    pub settings_open: bool,
+    pub new_game_confirm: bool,
+    pub settings: &'a GameSettings,
     pub market_elapsed: f32,
     pub ui: &'a VirtualUi,
 }
@@ -71,32 +97,51 @@ pub fn draw_game_ui(ctx: UiContext<'_>) -> Vec<UiAction> {
     let mut actions = Vec::new();
     let mouse = ctx.ui.mouse_position();
 
-    panels::draw_panels(&ctx, mouse, &mut actions);
-    if ctx.session.planet_modal_open {
-        actions.clear();
-        overlays::draw_purchase_modal(&ctx, mouse, &mut actions);
+    match ctx.screen {
+        AppScreen::Home => home::draw_home(&ctx, mouse, &mut actions),
+        AppScreen::Gameplay => {
+            panels::draw_panels(&ctx, mouse, &mut actions);
+            if ctx.session.planet_modal_open {
+                actions.clear();
+                overlays::draw_purchase_modal(&ctx, mouse, &mut actions);
+            }
+            if ctx.history_open {
+                actions.clear();
+                overlays::draw_history_modal(&ctx, mouse, &mut actions);
+            }
+            if ctx.research_open {
+                actions.clear();
+                research::draw_research_modal(&ctx, mouse, &mut actions);
+            }
+            if !ctx.session.tutorial_step.is_complete() {
+                if ctx.session.tutorial_step == TutorialStep::Welcome {
+                    actions.clear();
+                }
+                tutorial::draw_tutorial(&ctx, mouse, &mut actions);
+            }
+        }
     }
-    if !ctx.session.game_started {
+    if ctx.settings_open {
         actions.clear();
-        overlays::draw_tutorial(mouse, &mut actions);
+        settings::draw_settings(&ctx, mouse, &mut actions);
     }
-    if ctx.history_open {
+    if ctx.new_game_confirm {
         actions.clear();
-        overlays::draw_history_modal(&ctx, mouse, &mut actions);
-    }
-    if ctx.research_open {
-        actions.clear();
-        research::draw_research_modal(&ctx, mouse, &mut actions);
+        home::draw_new_game_confirmation(mouse, &mut actions);
     }
     if ctx.reset_open {
         actions.clear();
         overlays::draw_reset_confirmation(mouse, &mut actions);
     }
-    if ctx.session.game_started
+    if ctx.screen == AppScreen::Gameplay
+        && ctx.session.game_started
         && !ctx.session.planet_modal_open
         && !ctx.history_open
         && !ctx.research_open
         && !ctx.reset_open
+        && !ctx.settings_open
+        && !ctx.new_game_confirm
+        && ctx.session.tutorial_step != TutorialStep::Welcome
     {
         add_wheel_scroll_action(mouse, &mut actions);
     }

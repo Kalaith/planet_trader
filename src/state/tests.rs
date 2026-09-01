@@ -391,6 +391,7 @@ fn save_round_trip_preserves_market_and_trade_state() {
     assert_eq!(loaded.alien_buyers, session.alien_buyers);
     assert_eq!(loaded.research_points, session.research_points);
     assert_eq!(loaded.completed_research, session.completed_research);
+    assert_eq!(loaded.tutorial_step, session.tutorial_step);
 }
 
 #[test]
@@ -500,6 +501,7 @@ fn legacy_save_migrates_to_current_shape() {
     assert_eq!(migrated.version, "1.0.0");
     assert_eq!(migrated.credits, 42);
     assert!(migrated.game_started);
+    assert_eq!(migrated.tutorial_step, TutorialStep::Complete);
 }
 
 #[test]

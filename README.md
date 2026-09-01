@@ -4,9 +4,11 @@ Planet Trader is the Rust + Macroquad port of the legacy Terraforming Co.
 browser game. Buy randomized worlds, tune their environments with terraforming
 tools, compare them with alien buyers, and sell a compatible planet for profit.
 
-## Ported gameplay
+## Phase 1 gameplay
 
-- Touch-first tutorial and game entry flow.
+- Branded home screen with save-aware New Company and Continue flows.
+- Persistent, action-driven orientation that follows real player actions.
+- Functional display/readability settings, tutorial restart, and save management.
 - Randomized planet offers with planet types, names, stats, colors, and prices.
 - Planet inventory with active-planet selection.
 - Fifteen terraforming tools with costs, primary effects, side effects, and
@@ -15,6 +17,9 @@ tools, compare them with alien buyers, and sell a compatible planet for profit.
   details, and compatibility-gated selling.
 - Local autosave/load/reset using the macroquad-toolkit save slots.
 - Embedded legacy data loaded through macroquad-toolkit::data_loader.
+
+The staged Phase 1 direction and delivery sequence are documented in
+`docs/PHASE_1_DESIGN.md`.
 
 ## Development
 

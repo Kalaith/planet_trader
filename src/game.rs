@@ -1,8 +1,8 @@
 //! High-level game loop, persistence, and intent handling.
 
 use crate::data::GameData;
-use crate::state::{migrate_save_value, GameSession, Planet, SaveData};
-use crate::ui::{self, UiAction, UiContext};
+use crate::state::{migrate_save_value, GameSession, Planet, SaveData, TutorialStep};
+use crate::ui::{self, AppScreen, UiAction, UiContext};
 use macroquad::prelude::*;
 use macroquad_toolkit::events::EventBus;
 use macroquad_toolkit::notifications::{
@@ -13,6 +13,8 @@ use macroquad_toolkit::persistence::{
     slot_exists,
 };
 use macroquad_toolkit::prelude::{begin_virtual_ui_frame, dark, end_virtual_ui_frame};
+use macroquad_toolkit::settings::GameSettings;
+use macroquad_toolkit::ui::set_ui_text_scale;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct CaptureSceneSeed {
@@ -23,6 +25,9 @@ struct CaptureSceneSeed {
     research_open: bool,
     planet_demo: bool,
     reset_open: bool,
+    screen: AppScreen,
+    settings_open: bool,
+    tutorial_step: TutorialStep,
 }
 
 impl CaptureSceneSeed {
@@ -36,8 +41,11 @@ impl CaptureSceneSeed {
                 research_open: true,
                 planet_demo: false,
                 reset_open: false,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::Complete,
             },
-            "title" | "tutorial" => Self {
+            "home" | "title" => Self {
                 reset_session: true,
                 game_started: false,
                 research_points: 0,
@@ -45,6 +53,57 @@ impl CaptureSceneSeed {
                 research_open: false,
                 planet_demo: false,
                 reset_open: false,
+                screen: AppScreen::Home,
+                settings_open: false,
+                tutorial_step: TutorialStep::Complete,
+            },
+            "tutorial" => Self {
+                reset_session: true,
+                game_started: true,
+                research_points: 0,
+                first_research_complete: false,
+                research_open: false,
+                planet_demo: false,
+                reset_open: false,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::Welcome,
+            },
+            "tutorial_buy" => Self {
+                reset_session: true,
+                game_started: true,
+                research_points: 0,
+                first_research_complete: false,
+                research_open: false,
+                planet_demo: false,
+                reset_open: false,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::BuyPlanet,
+            },
+            "tutorial_market" => Self {
+                reset_session: true,
+                game_started: true,
+                research_points: 0,
+                first_research_complete: false,
+                research_open: false,
+                planet_demo: true,
+                reset_open: false,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::InspectBuyer,
+            },
+            "settings" => Self {
+                reset_session: true,
+                game_started: false,
+                research_points: 0,
+                first_research_complete: false,
+                research_open: false,
+                planet_demo: false,
+                reset_open: false,
+                screen: AppScreen::Home,
+                settings_open: true,
+                tutorial_step: TutorialStep::Complete,
             },
             "biosphere" => Self {
                 reset_session: true,
@@ -54,6 +113,9 @@ impl CaptureSceneSeed {
                 research_open: false,
                 planet_demo: true,
                 reset_open: false,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::Complete,
             },
             "reset" => Self {
                 reset_session: true,
@@ -63,15 +125,21 @@ impl CaptureSceneSeed {
                 research_open: false,
                 planet_demo: false,
                 reset_open: true,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::Complete,
             },
             _ => Self {
-                reset_session: false,
-                game_started: false,
+                reset_session: true,
+                game_started: true,
                 research_points: 0,
                 first_research_complete: false,
                 research_open: false,
                 planet_demo: false,
                 reset_open: false,
+                screen: AppScreen::Gameplay,
+                settings_open: false,
+                tutorial_step: TutorialStep::Complete,
             },
         }
     }
@@ -97,6 +165,10 @@ pub struct Game {
     research_open: bool,
     reset_open: bool,
     market_elapsed: f32,
+    screen: AppScreen,
+    settings_open: bool,
+    new_game_confirm: bool,
+    settings: GameSettings,
 }
 
 impl Game {
@@ -105,6 +177,12 @@ impl Game {
             panic!("Planet Trader embedded data failed to load: {}", error);
         });
 
+        let mut settings = GameSettings::load(&data.config.game_name);
+        settings.sanitize();
+        set_ui_text_scale(settings.ui_text_scale);
+        if settings.fullscreen {
+            set_fullscreen(true);
+        }
         let mut game = Self {
             session: GameSession::new(&data),
             data,
@@ -121,6 +199,10 @@ impl Game {
             research_open: false,
             reset_open: false,
             market_elapsed: 0.0,
+            screen: AppScreen::Home,
+            settings_open: false,
+            new_game_confirm: false,
+            settings,
         };
         game.refresh_save_state();
         game.load_existing_save();
@@ -131,6 +213,11 @@ impl Game {
         let seed = CaptureSceneSeed::for_scene(scene);
         self.research_open = false;
         self.reset_open = false;
+        self.settings_open = false;
+        self.new_game_confirm = false;
+        self.settings.ui_text_scale = 1.0;
+        self.settings.reduced_motion = true;
+        set_ui_text_scale(1.0);
         self.market_elapsed = 0.0;
         if !seed.reset_session {
             return;
@@ -139,6 +226,7 @@ impl Game {
         self.session = GameSession::new(&self.data);
         self.session.game_started = seed.game_started;
         self.session.research_points = seed.research_points;
+        self.session.tutorial_step = seed.tutorial_step;
         if seed.first_research_complete {
             if let Some(research) = self.data.research.first() {
                 self.session.completed_research.push(research.name.clone());
@@ -169,11 +257,13 @@ impl Game {
         self.reset_view();
         self.research_open = seed.research_open;
         self.reset_open = seed.reset_open;
+        self.screen = seed.screen;
+        self.settings_open = seed.settings_open;
     }
 
     pub fn update(&mut self, dt: f32) {
         self.notifications.update(dt);
-        if self.session.game_started {
+        if self.screen == AppScreen::Gameplay && self.session.game_started {
             self.market_elapsed += dt.max(0.0);
             if market_refresh_due(
                 self.session.game_started,
@@ -191,10 +281,10 @@ impl Game {
             self.market_elapsed = 0.0;
         }
 
-        if is_key_pressed(KeyCode::S) {
+        if self.screen == AppScreen::Gameplay && is_key_pressed(KeyCode::S) {
             self.events.push(UiAction::Save);
         }
-        if is_key_pressed(KeyCode::L) {
+        if self.screen == AppScreen::Gameplay && is_key_pressed(KeyCode::L) {
             self.events.push(UiAction::Load);
         }
 
@@ -220,6 +310,10 @@ impl Game {
             history_open: self.history_open,
             research_open: self.research_open,
             reset_open: self.reset_open,
+            screen: self.screen,
+            settings_open: self.settings_open,
+            new_game_confirm: self.new_game_confirm,
+            settings: &self.settings,
             market_elapsed: self.market_elapsed,
             ui: &virtual_ui,
         };
@@ -237,24 +331,90 @@ impl Game {
             },
             vec2(-490.0, 0.0),
         );
+        if self.settings.show_fps {
+            let fps_label = format!("{} FPS", get_fps());
+            let fps_width = measure_text(&fps_label, None, 18, 1.0).width;
+            draw_text(
+                &fps_label,
+                (screen_width() - fps_width) * 0.5,
+                screen_height() - 16.0,
+                18.0,
+                Color::new(0.55, 0.88, 0.96, 0.9),
+            );
+        }
     }
 
     fn apply_action(&mut self, action: UiAction) {
         match action {
-            UiAction::StartGame => {
-                self.session.game_started = true;
-                self.market_elapsed = 0.0;
-                self.notifications
-                    .info("Game started! Begin terraforming planets.");
+            UiAction::NewGame => {
+                if self.save_exists {
+                    self.new_game_confirm = true;
+                } else {
+                    self.start_new_company();
+                }
+            }
+            UiAction::ConfirmNewGame => self.start_new_company(),
+            UiAction::CancelNewGame => self.new_game_confirm = false,
+            UiAction::ContinueGame => {
+                if self.save_exists {
+                    self.screen = AppScreen::Gameplay;
+                    self.reset_view();
+                }
+            }
+            UiAction::ReturnHome => {
+                self.screen = AppScreen::Home;
+                self.reset_view();
+            }
+            UiAction::BeginTutorial => {
+                self.session.tutorial_step = TutorialStep::BuyPlanet;
+                self.autosave();
+            }
+            UiAction::OpenSettings => self.settings_open = true,
+            UiAction::CloseSettings => self.settings_open = false,
+            UiAction::CycleTextScale => {
+                self.settings.ui_text_scale = if self.settings.ui_text_scale < 0.98 {
+                    1.0
+                } else if self.settings.ui_text_scale < 1.05 {
+                    1.15
+                } else {
+                    0.9
+                };
+                self.persist_settings();
+            }
+            UiAction::ToggleFullscreen => {
+                self.settings.toggle_fullscreen();
+                self.persist_settings();
+            }
+            UiAction::ToggleReducedMotion => {
+                self.settings.reduced_motion = !self.settings.reduced_motion;
+                self.persist_settings();
+            }
+            UiAction::ToggleFps => {
+                self.settings.show_fps = !self.settings.show_fps;
+                self.persist_settings();
+            }
+            UiAction::RestartTutorial => {
+                self.session.tutorial_step = TutorialStep::Welcome;
+                self.screen = AppScreen::Gameplay;
+                self.settings_open = false;
+                self.reset_view();
                 self.autosave();
             }
             UiAction::OpenPurchase => match self.session.open_purchase_modal(&self.data) {
-                Ok(()) => {}
+                Ok(()) => {
+                    if self.session.tutorial_step == TutorialStep::BuyPlanet {
+                        self.session.tutorial_step = TutorialStep::ChooseOffer;
+                        self.autosave();
+                    }
+                }
                 Err(message) => self.notifications.danger(message),
             },
             UiAction::ClosePurchase => self.session.close_purchase_modal(),
             UiAction::PurchasePlanet(id) => match self.session.purchase_planet(&id) {
                 Ok(message) => {
+                    if self.session.tutorial_step == TutorialStep::ChooseOffer {
+                        self.session.tutorial_step = TutorialStep::SelectPlanet;
+                    }
                     self.notifications.success(message);
                     self.autosave();
                 }
@@ -262,6 +422,9 @@ impl Game {
             },
             UiAction::SelectPlanet(id) => match self.session.select_planet(&id) {
                 Ok(message) => {
+                    if self.session.tutorial_step == TutorialStep::SelectPlanet {
+                        self.session.tutorial_step = TutorialStep::InspectBuyer;
+                    }
                     self.notifications.info(message);
                     self.autosave();
                 }
@@ -284,6 +447,9 @@ impl Game {
                 if let Some(tool) = tool {
                     match self.session.apply_tool(&tool) {
                         Ok(message) => {
+                            if self.session.tutorial_step == TutorialStep::UseTool {
+                                self.session.tutorial_step = TutorialStep::SellOrSalvage;
+                            }
                             self.notifications.success(message);
                             self.autosave();
                         }
@@ -297,9 +463,16 @@ impl Game {
                 } else {
                     Some(id)
                 };
+                if self.session.tutorial_step == TutorialStep::InspectBuyer {
+                    self.session.tutorial_step = TutorialStep::UseTool;
+                    self.autosave();
+                }
             }
             UiAction::SellPlanet(id) => match self.session.sell_planet(id) {
                 Ok(message) => {
+                    if self.session.tutorial_step == TutorialStep::SellOrSalvage {
+                        self.session.tutorial_step = TutorialStep::OpenResearch;
+                    }
                     self.notifications.success(message);
                     self.expanded_buyer = None;
                     self.autosave();
@@ -308,6 +481,9 @@ impl Game {
             },
             UiAction::ScrapPlanet => match self.session.salvage_current_planet() {
                 Ok(message) => {
+                    if self.session.tutorial_step == TutorialStep::SellOrSalvage {
+                        self.session.tutorial_step = TutorialStep::OpenResearch;
+                    }
                     self.notifications.info(message);
                     self.expanded_buyer = None;
                     self.autosave();
@@ -315,9 +491,20 @@ impl Game {
                 Err(message) => self.notifications.warning(message),
             },
             UiAction::ToggleHistory => self.history_open = !self.history_open,
-            UiAction::OpenResearch => self.research_open = true,
+            UiAction::OpenResearch => {
+                self.research_open = true;
+                if self.session.tutorial_step == TutorialStep::OpenResearch {
+                    self.session.tutorial_step = TutorialStep::Complete;
+                    self.notifications
+                        .success("Orientation complete. Your company is ready.");
+                    self.autosave();
+                }
+            }
             UiAction::CloseResearch => self.research_open = false,
-            UiAction::OpenResetConfirm => self.reset_open = true,
+            UiAction::OpenResetConfirm => {
+                self.settings_open = false;
+                self.reset_open = true;
+            }
             UiAction::CancelReset => self.reset_open = false,
             UiAction::CompleteResearch(name) => {
                 let research = self
@@ -415,6 +602,7 @@ impl Game {
             Ok(()) => {
                 self.session = GameSession::new(&self.data);
                 self.reset_view();
+                self.screen = AppScreen::Home;
                 self.notifications.info("Saved progress deleted");
                 self.refresh_save_state();
             }
@@ -438,7 +626,27 @@ impl Game {
         self.history_open = false;
         self.research_open = false;
         self.reset_open = false;
+        self.settings_open = false;
+        self.new_game_confirm = false;
         self.market_elapsed = 0.0;
+    }
+
+    fn start_new_company(&mut self) {
+        self.session = GameSession::new(&self.data);
+        self.session.game_started = true;
+        self.screen = AppScreen::Gameplay;
+        self.reset_view();
+        self.notifications.info("Company charter approved");
+        self.autosave();
+    }
+
+    fn persist_settings(&mut self) {
+        self.settings.sanitize();
+        set_ui_text_scale(self.settings.ui_text_scale);
+        if let Err(error) = self.settings.save(&self.data.config.game_name) {
+            self.notifications
+                .warning(format!("Settings unavailable: {}", error));
+        }
     }
 }
 
