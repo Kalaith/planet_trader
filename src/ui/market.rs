@@ -1,5 +1,68 @@
 use super::*;
 
+pub(super) fn draw_market_mode(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
+    draw_market_brief(ctx, mouse, actions);
+    panels::draw_center_column(ctx, mouse, actions);
+    draw_market_panel(ctx, mouse, actions);
+}
+
+fn draw_market_brief(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
+    draw_panel(TOOLS_PANEL, "Deal Room");
+    draw_text_block(
+        "Select a buyer card to open its demand profile. A sale requires at least three matching environmental requirements; greener deals pay more and award more research.",
+        TOOLS_PANEL.x + 16.0,
+        TOOLS_PANEL.y + 60.0,
+        TOOLS_PANEL.w - 32.0,
+        102.0,
+        13.0,
+        4.0,
+        Color::new(0.62, 0.78, 0.84, 1.0),
+    );
+    if let Some(planet) = ctx.session.current_planet() {
+        draw_ui_text_ex(
+            "ACTIVE WORLD",
+            TOOLS_PANEL.x + 16.0,
+            TOOLS_PANEL.y + 190.0,
+            TextStyle::new(11.0, dark::TEXT_DIM).params(),
+        );
+        draw_ui_text_ex(
+            &planet.name,
+            TOOLS_PANEL.x + 16.0,
+            TOOLS_PANEL.y + 224.0,
+            TextStyle::new(22.0, dark::TEXT_BRIGHT).params(),
+        );
+        draw_planet_orb(
+            planet,
+            vec2(TOOLS_PANEL.center().x, TOOLS_PANEL.y + 334.0),
+            72.0,
+        );
+    } else {
+        draw_text_centered_in_box(
+            "No world selected",
+            TOOLS_PANEL.x + 18.0,
+            TOOLS_PANEL.y + 230.0,
+            TOOLS_PANEL.w - 36.0,
+            50.0,
+            16.0,
+            dark::TEXT_DIM,
+        );
+    }
+    if button(
+        Rect::new(
+            TOOLS_PANEL.x + 16.0,
+            TOOLS_PANEL.bottom() - 58.0,
+            TOOLS_PANEL.w - 32.0,
+            40.0,
+        ),
+        "RETURN TO WORKSHOP",
+        ctx.session.current_planet().is_some(),
+        ButtonTone::Muted,
+        mouse,
+    ) {
+        actions.push(UiAction::SetMode(GameplayMode::Workshop));
+    }
+}
+
 pub(super) fn draw_market_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     draw_panel(MARKET_PANEL, "Alien Market");
     draw_ui_text_ex(
@@ -70,7 +133,7 @@ pub(super) fn draw_market_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut 
     let mut y = list.y - ctx.market_scroll.min(max_scroll);
     for buyer in &ctx.session.alien_buyers {
         let expanded = ctx.expanded_buyer == Some(buyer.id);
-        let height = if expanded { 220.0 } else { 102.0 };
+        let height = if expanded { 210.0 } else { 92.0 };
         let rect = Rect::new(list.x, y, list.w, height);
         if rect.bottom() >= list.y && rect.y <= list.bottom() {
             draw_buyer_card(ctx, buyer, rect, mouse, actions);

@@ -3,13 +3,13 @@ use super::*;
 pub(super) fn draw_tutorial(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     match ctx.session.tutorial_step {
         TutorialStep::Welcome => draw_welcome(mouse, actions),
-        TutorialStep::BuyPlanet => draw_coach("STEP 1 / ACQUIRE", "Tap BUY PLANET to open the frontier catalogue.", Some(Rect::new(1086.0, 24.0, 156.0, 46.0))),
+        TutorialStep::BuyPlanet => draw_coach("STEP 1 / ACQUIRE", "Tap SCAN FOR PLANET CONTRACTS to open the frontier catalogue.", Some(Rect::new(938.0, 196.0, 276.0, 64.0))),
         TutorialStep::ChooseOffer => draw_coach("STEP 2 / CHOOSE", "Compare the visible worlds, then tap a green BUY button.", None),
-        TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PLANET INVENTORY to bring it into the workshop.", Some(Rect::new(344.0, 492.0, 572.0, 62.0))),
-        TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap an alien buyer card. Green requirements already match; red ones need engineering.", Some(Rect::new(950.0, 220.0, 304.0, 114.0))),
-        TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a terraforming tool to inspect its cost and side effects, then tap USE.", Some(Rect::new(26.0, 160.0, 284.0, 82.0))),
+        TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PLANET INVENTORY to bring it into the workshop.", Some(Rect::new(344.0, 548.0, 572.0, 56.0))),
+        TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap an alien buyer card. Green requirements already match; red ones need engineering.", Some(Rect::new(950.0, 278.0, 304.0, 110.0))),
+        TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a terraforming tool to inspect its cost and side effects, then tap USE.", Some(Rect::new(26.0, 218.0, 284.0, 78.0))),
         TutorialStep::SellOrSalvage => draw_coach("STEP 6 / CLOSE THE DEAL", "SELL when at least 3 requirements match. If the investment is poor, tap SALVAGE to recover credits.", None),
-        TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(158.0, 102.0, 90.0, 40.0))),
+        TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(536.0, 95.0, 160.0, 34.0))),
         TutorialStep::Complete => {}
     }
 }

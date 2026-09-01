@@ -2,15 +2,14 @@
 
 use crate::data::GameData;
 use crate::state::{migrate_save_value, GameSession, Planet, SaveData, TutorialStep};
-use crate::ui::{self, AppScreen, UiAction, UiContext};
+use crate::ui::{self, AppScreen, GameplayMode, UiAction, UiContext};
 use macroquad::prelude::*;
 use macroquad_toolkit::events::EventBus;
 use macroquad_toolkit::notifications::{
     NotificationAnchor, NotificationManager, NotificationRenderConfig,
 };
 use macroquad_toolkit::persistence::{
-    delete_slot, get_save_slots, load_from_slot_with_migration, save_to_slot_with_version,
-    slot_exists,
+    delete_slot, load_from_slot_with_migration, save_to_slot_with_version, slot_exists,
 };
 use macroquad_toolkit::prelude::{begin_virtual_ui_frame, dark, end_virtual_ui_frame};
 use macroquad_toolkit::settings::GameSettings;
@@ -38,7 +37,7 @@ impl CaptureSceneSeed {
                 game_started: true,
                 research_points: 115,
                 first_research_complete: true,
-                research_open: true,
+                research_open: false,
                 planet_demo: false,
                 reset_open: false,
                 screen: AppScreen::Gameplay,
@@ -105,7 +104,7 @@ impl CaptureSceneSeed {
                 settings_open: true,
                 tutorial_step: TutorialStep::Complete,
             },
-            "biosphere" => Self {
+            "biosphere" | "market" => Self {
                 reset_session: true,
                 game_started: true,
                 research_points: 0,
@@ -155,7 +154,6 @@ pub struct Game {
     notifications: NotificationManager,
     events: EventBus<UiAction>,
     save_exists: bool,
-    save_slots: Vec<String>,
     tool_scroll: f32,
     market_scroll: f32,
     inventory_scroll: usize,
@@ -169,6 +167,7 @@ pub struct Game {
     settings_open: bool,
     new_game_confirm: bool,
     settings: GameSettings,
+    mode: GameplayMode,
 }
 
 impl Game {
@@ -189,7 +188,6 @@ impl Game {
             notifications: NotificationManager::new(),
             events: EventBus::new(),
             save_exists: false,
-            save_slots: Vec::new(),
             tool_scroll: 0.0,
             market_scroll: 0.0,
             inventory_scroll: 0,
@@ -203,6 +201,7 @@ impl Game {
             settings_open: false,
             new_game_confirm: false,
             settings,
+            mode: GameplayMode::Acquire,
         };
         game.refresh_save_state();
         game.load_existing_save();
@@ -253,12 +252,19 @@ impl Game {
             }
         }
         self.save_exists = false;
-        self.save_slots.clear();
         self.reset_view();
         self.research_open = seed.research_open;
         self.reset_open = seed.reset_open;
         self.screen = seed.screen;
         self.settings_open = seed.settings_open;
+        self.mode = match scene {
+            "research" => GameplayMode::Research,
+            "tutorial_market" | "market" => GameplayMode::Market,
+            "biosphere" => GameplayMode::Workshop,
+            "tutorial_buy" | "tutorial" | "acquisition" => GameplayMode::Acquire,
+            "company" => GameplayMode::Company,
+            _ => GameplayMode::Workshop,
+        };
     }
 
     pub fn update(&mut self, dt: f32) {
@@ -301,7 +307,6 @@ impl Game {
             data: &self.data,
             session: &self.session,
             save_exists: self.save_exists,
-            save_slots: &self.save_slots,
             tool_scroll: self.tool_scroll,
             market_scroll: self.market_scroll,
             inventory_scroll: self.inventory_scroll,
@@ -314,6 +319,7 @@ impl Game {
             settings_open: self.settings_open,
             new_game_confirm: self.new_game_confirm,
             settings: &self.settings,
+            mode: self.mode,
             market_elapsed: self.market_elapsed,
             ui: &virtual_ui,
         };
@@ -396,9 +402,15 @@ impl Game {
             UiAction::RestartTutorial => {
                 self.session.tutorial_step = TutorialStep::Welcome;
                 self.screen = AppScreen::Gameplay;
+                self.mode = GameplayMode::Acquire;
                 self.settings_open = false;
                 self.reset_view();
                 self.autosave();
+            }
+            UiAction::SetMode(mode) => {
+                self.mode = mode;
+                self.expanded_tool = None;
+                self.expanded_buyer = None;
             }
             UiAction::OpenPurchase => match self.session.open_purchase_modal(&self.data) {
                 Ok(()) => {
@@ -415,6 +427,7 @@ impl Game {
                     if self.session.tutorial_step == TutorialStep::ChooseOffer {
                         self.session.tutorial_step = TutorialStep::SelectPlanet;
                     }
+                    self.mode = GameplayMode::Workshop;
                     self.notifications.success(message);
                     self.autosave();
                 }
@@ -424,6 +437,7 @@ impl Game {
                 Ok(message) => {
                     if self.session.tutorial_step == TutorialStep::SelectPlanet {
                         self.session.tutorial_step = TutorialStep::InspectBuyer;
+                        self.mode = GameplayMode::Market;
                     }
                     self.notifications.info(message);
                     self.autosave();
@@ -449,6 +463,7 @@ impl Game {
                         Ok(message) => {
                             if self.session.tutorial_step == TutorialStep::UseTool {
                                 self.session.tutorial_step = TutorialStep::SellOrSalvage;
+                                self.mode = GameplayMode::Market;
                             }
                             self.notifications.success(message);
                             self.autosave();
@@ -465,6 +480,7 @@ impl Game {
                 };
                 if self.session.tutorial_step == TutorialStep::InspectBuyer {
                     self.session.tutorial_step = TutorialStep::UseTool;
+                    self.mode = GameplayMode::Workshop;
                     self.autosave();
                 }
             }
@@ -472,6 +488,7 @@ impl Game {
                 Ok(message) => {
                     if self.session.tutorial_step == TutorialStep::SellOrSalvage {
                         self.session.tutorial_step = TutorialStep::OpenResearch;
+                        self.mode = GameplayMode::Research;
                     }
                     self.notifications.success(message);
                     self.expanded_buyer = None;
@@ -483,6 +500,7 @@ impl Game {
                 Ok(message) => {
                     if self.session.tutorial_step == TutorialStep::SellOrSalvage {
                         self.session.tutorial_step = TutorialStep::OpenResearch;
+                        self.mode = GameplayMode::Research;
                     }
                     self.notifications.info(message);
                     self.expanded_buyer = None;
@@ -492,7 +510,7 @@ impl Game {
             },
             UiAction::ToggleHistory => self.history_open = !self.history_open,
             UiAction::OpenResearch => {
-                self.research_open = true;
+                self.mode = GameplayMode::Research;
                 if self.session.tutorial_step == TutorialStep::OpenResearch {
                     self.session.tutorial_step = TutorialStep::Complete;
                     self.notifications
@@ -614,7 +632,6 @@ impl Game {
 
     fn refresh_save_state(&mut self) {
         self.save_exists = slot_exists(&self.data.config.game_name, &self.data.config.save_slot);
-        self.save_slots = get_save_slots(&self.data.config.game_name);
     }
 
     fn reset_view(&mut self) {
@@ -635,6 +652,7 @@ impl Game {
         self.session = GameSession::new(&self.data);
         self.session.game_started = true;
         self.screen = AppScreen::Gameplay;
+        self.mode = GameplayMode::Acquire;
         self.reset_view();
         self.notifications.info("Company charter approved");
         self.autosave();

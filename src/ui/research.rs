@@ -9,7 +9,32 @@ pub(super) fn draw_research_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
         Color::new(0.0, 0.015, 0.03, 0.86),
     );
 
-    let rect = Rect::new(170.0, 42.0, 940.0, 636.0);
+    draw_research_lab(
+        ctx,
+        mouse,
+        actions,
+        Rect::new(170.0, 42.0, 940.0, 636.0),
+        true,
+    );
+}
+
+pub(super) fn draw_research_page(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
+    draw_research_lab(
+        ctx,
+        mouse,
+        actions,
+        Rect::new(18.0, 150.0, 1244.0, 540.0),
+        false,
+    );
+}
+
+fn draw_research_lab(
+    ctx: &UiContext<'_>,
+    mouse: Vec2,
+    actions: &mut Vec<UiAction>,
+    rect: Rect,
+    close_button: bool,
+) {
     draw_surface(
         rect,
         &SurfaceStyle::new(Color::new(0.045, 0.09, 0.13, 1.0))
@@ -34,13 +59,15 @@ pub(super) fn draw_research_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
         Color::new(0.14, 0.19, 0.34, 1.0),
         Color::new(0.66, 0.76, 1.0, 1.0),
     );
-    if button(
-        Rect::new(rect.right() - 54.0, rect.y + 16.0, 34.0, 34.0),
-        "X",
-        true,
-        ButtonTone::Muted,
-        mouse,
-    ) {
+    if close_button
+        && button(
+            Rect::new(rect.right() - 54.0, rect.y + 16.0, 34.0, 34.0),
+            "X",
+            true,
+            ButtonTone::Muted,
+            mouse,
+        )
+    {
         actions.push(UiAction::CloseResearch);
     }
 
@@ -60,11 +87,12 @@ pub(super) fn draw_research_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
     for (index, research) in ctx.data.research.iter().enumerate() {
         let column = index % 2;
         let row = index / 2;
+        let card_width = (rect.w - 66.0) * 0.5;
         let card = Rect::new(
-            rect.x + 24.0 + column as f32 * 454.0,
-            rect.y + 88.0 + row as f32 * 104.0,
-            438.0,
-            94.0,
+            rect.x + 22.0 + column as f32 * (card_width + 22.0),
+            rect.y + 82.0 + row as f32 * 84.0,
+            card_width,
+            76.0,
         );
         draw_research_card(ctx, research, card, mouse, actions);
     }
@@ -128,9 +156,9 @@ fn draw_research_card(
     draw_text_block(
         &research.description,
         card.x + 12.0,
-        card.y + 50.0,
+        card.y + 46.0,
         card.w - 132.0,
-        30.0,
+        24.0,
         10.0,
         2.0,
         dark::TEXT_DIM,

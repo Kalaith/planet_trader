@@ -11,6 +11,9 @@ use macroquad_toolkit::settings::GameSettings;
 use macroquad_toolkit::ui::draw_ui_text_ex;
 use macroquad_toolkit::ui::{button_rect_tone_at, RectExt, VirtualUi};
 
+mod acquisition;
+mod company;
+mod deck;
 mod home;
 mod market;
 mod overlays;
@@ -23,15 +26,25 @@ pub const LOGICAL_WIDTH: f32 = 1280.0;
 pub const LOGICAL_HEIGHT: f32 = 720.0;
 
 const HEADER: Rect = Rect::new(18.0, 16.0, 1244.0, 64.0);
-const TOOLS_PANEL: Rect = Rect::new(18.0, 96.0, 300.0, 594.0);
-const CENTER_PANEL: Rect = Rect::new(332.0, 96.0, 596.0, 594.0);
-const MARKET_PANEL: Rect = Rect::new(942.0, 96.0, 320.0, 594.0);
+const MODE_BAR: Rect = Rect::new(18.0, 88.0, 1244.0, 48.0);
+const TOOLS_PANEL: Rect = Rect::new(18.0, 150.0, 300.0, 540.0);
+const CENTER_PANEL: Rect = Rect::new(332.0, 150.0, 596.0, 540.0);
+const MARKET_PANEL: Rect = Rect::new(942.0, 150.0, 320.0, 540.0);
 const INVENTORY_PANEL: Rect = Rect::new(332.0, 440.0, 596.0, 250.0);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppScreen {
     Home,
     Gameplay,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GameplayMode {
+    Acquire,
+    Workshop,
+    Market,
+    Research,
+    Company,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -49,6 +62,7 @@ pub enum UiAction {
     ToggleReducedMotion,
     ToggleFps,
     RestartTutorial,
+    SetMode(GameplayMode),
     OpenPurchase,
     ClosePurchase,
     PurchasePlanet(String),
@@ -76,7 +90,6 @@ pub struct UiContext<'a> {
     pub data: &'a GameData,
     pub session: &'a GameSession,
     pub save_exists: bool,
-    pub save_slots: &'a [String],
     pub tool_scroll: f32,
     pub market_scroll: f32,
     pub inventory_scroll: usize,
@@ -89,6 +102,7 @@ pub struct UiContext<'a> {
     pub settings_open: bool,
     pub new_game_confirm: bool,
     pub settings: &'a GameSettings,
+    pub mode: GameplayMode,
     pub market_elapsed: f32,
     pub ui: &'a VirtualUi,
 }
@@ -100,7 +114,7 @@ pub fn draw_game_ui(ctx: UiContext<'_>) -> Vec<UiAction> {
     match ctx.screen {
         AppScreen::Home => home::draw_home(&ctx, mouse, &mut actions),
         AppScreen::Gameplay => {
-            panels::draw_panels(&ctx, mouse, &mut actions);
+            deck::draw_deck(&ctx, mouse, &mut actions);
             if ctx.session.planet_modal_open {
                 actions.clear();
                 overlays::draw_purchase_modal(&ctx, mouse, &mut actions);
@@ -227,13 +241,13 @@ fn max_market_scroll(ctx: &UiContext<'_>) -> f32 {
         .iter()
         .map(|buyer| {
             (if ctx.expanded_buyer == Some(buyer.id) {
-                220.0
+                210.0
             } else {
-                102.0
+                92.0
             }) + 8.0
         })
         .sum();
-    (total - (MARKET_PANEL.h - 144.0)).max(0.0)
+    ((total - 8.0).max(0.0) - (MARKET_PANEL.h - 144.0)).max(0.0)
 }
 
 fn draw_scroll_hint(rect: Rect, can_scroll: bool) {

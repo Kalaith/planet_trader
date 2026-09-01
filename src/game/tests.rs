@@ -41,7 +41,7 @@ fn research_seed_shows_mixed_progression_states() {
     assert!(seed.game_started);
     assert_eq!(seed.research_points, 115);
     assert!(seed.first_research_complete);
-    assert!(seed.research_open);
+    assert!(!seed.research_open);
     assert_eq!(seed.tutorial_step, TutorialStep::Complete);
 }
 

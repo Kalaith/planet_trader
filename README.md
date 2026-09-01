@@ -7,13 +7,15 @@ tools, compare them with alien buyers, and sell a compatible planet for profit.
 ## Phase 1 gameplay
 
 - Branded home screen with save-aware New Company and Continue flows.
+- Focused command-deck navigation for Acquisition, Workshop, Alien Market,
+  Research, and Company instead of one overloaded dashboard.
 - Persistent, action-driven orientation that follows real player actions.
 - Functional display/readability settings, tutorial restart, and save management.
 - Randomized planet offers with planet types, names, stats, colors, and prices.
 - Planet inventory with active-planet selection.
 - Fifteen terraforming tools with costs, primary effects, side effects, and
   locked research requirements.
-- Alien market with four rotating buyers, five-stat compatibility checks, buyer
+- Alien market with a dedicated Deal Room, four rotating buyers, five-stat compatibility checks, buyer
   details, and compatibility-gated selling.
 - Local autosave/load/reset using the macroquad-toolkit save slots.
 - Embedded legacy data loaded through macroquad-toolkit::data_loader.

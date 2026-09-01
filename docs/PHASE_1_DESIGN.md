@@ -57,3 +57,10 @@ feedback.
 Each step must end in a player-visible vertical slice that passes tests,
 Clippy, `publish.ps1`, and interactive WebGL checks before it is committed and
 pushed. Internal hardening supports a slice but is never the slice itself.
+
+## Delivery status
+
+- Front door and onboarding: shipped.
+- Navigation and visual language: command-deck modes implemented; responsive
+  browser verification and final polish remain part of the current slice.
+- Acquisition/workshop, market/biosphere, and company/research depth: next.

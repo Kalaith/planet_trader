@@ -1,122 +1,82 @@
 use super::*;
 
-pub(super) fn draw_panels(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
-    draw_header(ctx, mouse, actions);
+pub(super) fn draw_workshop_mode(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     draw_tools_panel(ctx, mouse, actions);
     draw_center_column(ctx, mouse, actions);
-    market::draw_market_panel(ctx, mouse, actions);
+    draw_workshop_brief(ctx, mouse, actions);
 }
 
-pub(super) fn draw_header(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
-    let style = SurfaceStyle::new(Color::new(0.055, 0.08, 0.12, 0.98))
-        .with_border(1.0, Color::new(0.20, 0.60, 0.86, 0.85))
-        .with_top_highlight(2.0, Color::new(0.45, 0.83, 1.0, 0.8));
-    draw_surface(HEADER, &style);
-
-    draw_ui_text_ex(
-        "Terraforming Co.",
-        HEADER.x + 18.0,
-        HEADER.y + 30.0,
-        TextStyle::new(27.0, dark::TEXT_BRIGHT).params(),
+fn draw_workshop_brief(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
+    draw_panel(MARKET_PANEL, "Workshop Brief");
+    let body = Rect::new(
+        MARKET_PANEL.x + 14.0,
+        MARKET_PANEL.y + 58.0,
+        MARKET_PANEL.w - 28.0,
+        112.0,
     );
-    draw_ui_text_ex(
-        "Frontier planetary brokerage",
-        HEADER.x + 20.0,
-        HEADER.y + 51.0,
-        TextStyle::new(13.0, Color::new(0.48, 0.67, 0.78, 1.0)).params(),
+    draw_text_block(
+        "Engineer one stat at a time. Every tool spends credits and may create side effects, so compare the active world against live demand before committing.",
+        body.x,
+        body.y,
+        body.w,
+        body.h,
+        13.0,
+        4.0,
+        Color::new(0.62, 0.78, 0.84, 1.0),
     );
-
-    if button(
-        Rect::new(250.0, 28.0, 68.0, 38.0),
-        "HOME",
-        true,
-        ButtonTone::Muted,
-        mouse,
-    ) {
-        actions.push(UiAction::ReturnHome);
+    if let Some(planet) = ctx.session.current_planet() {
+        draw_ui_text_ex(
+            "ACTIVE INVESTMENT",
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.y + 196.0,
+            TextStyle::new(11.0, dark::TEXT_DIM).params(),
+        );
+        draw_ui_text_ex(
+            &format!("{} CR", planet.invested_cost),
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.y + 232.0,
+            TextStyle::new(28.0, dark::TEXT_BRIGHT).params(),
+        );
+        draw_ui_text_ex(
+            "BIOSPHERE",
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.y + 274.0,
+            TextStyle::new(11.0, dark::TEXT_DIM).params(),
+        );
+        draw_ui_text_ex(
+            &format!("{:.1} / 3.0", planet.biosphere),
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.y + 308.0,
+            TextStyle::new(24.0, Color::new(0.45, 0.92, 0.62, 1.0)).params(),
+        );
     }
     if button(
-        Rect::new(324.0, 28.0, 84.0, 38.0),
-        "SETTINGS",
-        true,
-        ButtonTone::Muted,
-        mouse,
-    ) {
-        actions.push(UiAction::OpenSettings);
-    }
-
-    draw_badge(
-        Rect::new(414.0, 30.0, 144.0, 34.0),
-        &format!("Credits: {} CR", ctx.session.credits),
-        Color::new(0.08, 0.27, 0.18, 1.0),
-        Color::new(0.53, 1.0, 0.66, 1.0),
-    );
-    let planet_label = ctx
-        .session
-        .current_planet()
-        .map(|planet| planet.name.as_str())
-        .unwrap_or("None");
-    draw_badge(
-        Rect::new(568.0, 30.0, 176.0, 34.0),
-        &format!("Active: {}", planet_label),
-        Color::new(0.08, 0.18, 0.28, 1.0),
-        Color::new(0.50, 0.82, 1.0, 1.0),
-    );
-
-    let save_status = if ctx.save_exists {
-        format!("SAVE {}", ctx.save_slots.len())
-    } else {
-        "NO SAVE".to_owned()
-    };
-    draw_badge(
-        Rect::new(760.0, 30.0, 80.0, 34.0),
-        &save_status,
-        if ctx.save_exists {
-            Color::new(0.08, 0.27, 0.18, 1.0)
-        } else {
-            Color::new(0.22, 0.12, 0.14, 1.0)
-        },
-        if ctx.save_exists {
-            Color::new(0.53, 1.0, 0.66, 1.0)
-        } else {
-            Color::new(0.96, 0.52, 0.48, 1.0)
-        },
-    );
-    if button(
-        Rect::new(846.0, 28.0, 74.0, 38.0),
-        "Save",
-        ctx.session.game_started,
-        ButtonTone::Positive,
-        mouse,
-    ) {
-        actions.push(UiAction::Save);
-    }
-    if button(
-        Rect::new(926.0, 28.0, 74.0, 38.0),
-        "Load",
-        ctx.save_exists,
+        Rect::new(
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.bottom() - 116.0,
+            MARKET_PANEL.w - 32.0,
+            42.0,
+        ),
+        "COMPARE ALIEN DEMAND",
+        ctx.session.current_planet().is_some(),
         ButtonTone::Primary,
         mouse,
     ) {
-        actions.push(UiAction::Load);
+        actions.push(UiAction::SetMode(GameplayMode::Market));
     }
     if button(
-        Rect::new(1006.0, 28.0, 78.0, 38.0),
-        "Reset",
-        ctx.session.game_started,
+        Rect::new(
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.bottom() - 62.0,
+            MARKET_PANEL.w - 32.0,
+            42.0,
+        ),
+        "SALVAGE WORLD",
+        ctx.session.current_planet().is_some(),
         ButtonTone::Secondary,
         mouse,
     ) {
-        actions.push(UiAction::OpenResetConfirm);
-    }
-    if button(
-        Rect::new(1090.0, 28.0, 148.0, 38.0),
-        "Buy Planet",
-        ctx.session.game_started,
-        ButtonTone::Primary,
-        mouse,
-    ) {
-        actions.push(UiAction::OpenPurchase);
+        actions.push(UiAction::ScrapPlanet);
     }
 }
 
@@ -329,7 +289,7 @@ fn draw_tool_card(
     );
 }
 
-fn draw_center_column(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
+pub(super) fn draw_center_column(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     draw_workshop(ctx, mouse, actions);
     draw_inventory(ctx, mouse, actions);
 }
@@ -466,7 +426,7 @@ fn draw_inventory(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>)
         CENTER_PANEL.x,
         CENTER_PANEL.y + 344.0,
         CENTER_PANEL.w,
-        250.0,
+        196.0,
     );
     draw_panel(rect, "Planet Inventory");
     if button(
@@ -490,7 +450,7 @@ fn draw_inventory(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>)
     if button(
         Rect::new(rect.right() - 160.0, rect.y + 9.0, 34.0, 32.0),
         "DN",
-        ctx.inventory_scroll + 3 < ctx.session.planets.len(),
+        ctx.inventory_scroll + 2 < ctx.session.planets.len(),
         ButtonTone::Muted,
         mouse,
     ) {
@@ -513,7 +473,7 @@ fn draw_inventory(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>)
     let start = ctx
         .inventory_scroll
         .min(ctx.session.planets.len().saturating_sub(1));
-    for (row, planet) in ctx.session.planets.iter().skip(start).take(3).enumerate() {
+    for (row, planet) in ctx.session.planets.iter().skip(start).take(2).enumerate() {
         let card = Rect::new(
             rect.x + 16.0,
             rect.y + 58.0 + row as f32 * 54.0,
