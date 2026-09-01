@@ -16,7 +16,7 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
             .with_top_highlight(3.0, Color::new(0.40, 0.86, 1.0, 0.9)),
     );
     draw_ui_text_ex(
-        "Buy New Planet",
+        "Frontier Contract Scan",
         rect.x + 24.0,
         rect.y + 40.0,
         TextStyle::new(24.0, Color::new(0.48, 0.84, 1.0, 1.0)).params(),
@@ -37,12 +37,17 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
         actions.push(UiAction::ClosePurchase);
     }
 
+    let offer_count = ctx.session.planet_options.len().max(1);
+    let card_gap = 8.0;
+    let card_height = ((530.0 - card_gap * (offer_count.saturating_sub(1)) as f32)
+        / offer_count as f32)
+        .clamp(94.0, 148.0);
     for (index, planet) in ctx.session.planet_options.iter().enumerate() {
         let card = Rect::new(
             rect.x + 24.0,
-            rect.y + 82.0 + index as f32 * 136.0,
+            rect.y + 82.0 + index as f32 * (card_height + card_gap),
             rect.w - 48.0,
-            118.0,
+            card_height,
         );
         draw_surface(
             card,
@@ -52,20 +57,20 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
         draw_circle(
             card.x + 48.0,
             card.center().y,
-            31.0,
+            27.0,
             hex_to_color(&planet.color),
         );
-        draw_circle_lines(card.x + 48.0, card.center().y, 31.0, 2.0, dark::TEXT);
+        draw_circle_lines(card.x + 48.0, card.center().y, 27.0, 2.0, dark::TEXT);
         draw_ui_text_ex(
             &planet.name,
             card.x + 94.0,
-            card.y + 28.0,
+            card.y + 24.0,
             TextStyle::new(18.0, dark::TEXT).params(),
         );
         draw_ui_text_ex(
             &format!("Type: {}", planet.planet_type.name),
             card.x + 94.0,
-            card.y + 49.0,
+            card.y + 43.0,
             TextStyle::new(12.0, dark::TEXT_DIM).params(),
         );
         draw_ui_text_ex(
@@ -79,18 +84,42 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
                 planet.biosphere
             ),
             card.x + 94.0,
-            card.y + 76.0,
+            card.y + 63.0,
             TextStyle::new(12.0, Color::new(0.60, 0.78, 0.82, 1.0)).params(),
         );
+        if let Some((buyer, score, estimate, profit)) =
+            best_market_route(planet, &ctx.session.alien_buyers)
+        {
+            draw_ui_text_ex(
+                &format!(
+                    "Best route: {}  |  {:.0}%  |  {} CR  |  {:+} CR",
+                    buyer.name,
+                    score * 100.0,
+                    estimate,
+                    profit
+                ),
+                card.x + 94.0,
+                card.y + 84.0,
+                TextStyle::new(
+                    11.0,
+                    if score >= 0.6 {
+                        Color::new(0.46, 0.94, 0.62, 1.0)
+                    } else {
+                        Color::new(1.0, 0.72, 0.36, 1.0)
+                    },
+                )
+                .params(),
+            );
+        }
         let affordable = ctx.session.credits >= planet.purchase_price;
         draw_text_right(
             &format!("{} CR", planet.purchase_price),
             card.right() - 116.0,
-            card.y + 32.0,
+            card.y + 28.0,
             TextStyle::new(18.0, Color::new(0.48, 1.0, 0.62, 1.0)),
         );
         if button(
-            Rect::new(card.right() - 106.0, card.y + 52.0, 90.0, 38.0),
+            Rect::new(card.right() - 106.0, card.y + 46.0, 90.0, 36.0),
             if affordable { "BUY" } else { "TOO EXPENSIVE" },
             affordable,
             ButtonTone::Positive,
@@ -100,7 +129,7 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
         }
     }
     draw_ui_text_ex(
-        "Each offer is a randomly generated world. Buy it, select it from inventory, and match a buyer.",
+        "Routes compare the unmodified world against today's buyers. Orange routes need engineering before they can sell.",
         rect.x + 26.0,
         rect.bottom() - 20.0,
         TextStyle::new(12.0, dark::TEXT_DIM).params(),

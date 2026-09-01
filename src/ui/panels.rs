@@ -26,28 +26,51 @@ fn draw_workshop_brief(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAct
     );
     if let Some(planet) = ctx.session.current_planet() {
         draw_ui_text_ex(
+            "BEST LIVE OPPORTUNITY",
+            MARKET_PANEL.x + 16.0,
+            MARKET_PANEL.y + 190.0,
+            TextStyle::new(11.0, dark::TEXT_DIM).params(),
+        );
+        if let Some((buyer, score, estimate, profit)) =
+            best_market_route(planet, &ctx.session.alien_buyers)
+        {
+            draw_ui_text_ex(
+                &buyer.name,
+                MARKET_PANEL.x + 16.0,
+                MARKET_PANEL.y + 222.0,
+                TextStyle::new(19.0, dark::TEXT_BRIGHT).params(),
+            );
+            draw_text_block(
+                &format!(
+                    "{:.0}% compatible  //  {} CR sale\n{:+} CR projected margin",
+                    score * 100.0,
+                    estimate,
+                    profit
+                ),
+                MARKET_PANEL.x + 16.0,
+                MARKET_PANEL.y + 238.0,
+                MARKET_PANEL.w - 32.0,
+                54.0,
+                12.0,
+                3.0,
+                if score >= 0.6 {
+                    Color::new(0.46, 0.94, 0.62, 1.0)
+                } else {
+                    Color::new(1.0, 0.72, 0.36, 1.0)
+                },
+            );
+        }
+        draw_ui_text_ex(
             "ACTIVE INVESTMENT",
             MARKET_PANEL.x + 16.0,
-            MARKET_PANEL.y + 196.0,
+            MARKET_PANEL.y + 312.0,
             TextStyle::new(11.0, dark::TEXT_DIM).params(),
         );
         draw_ui_text_ex(
             &format!("{} CR", planet.invested_cost),
             MARKET_PANEL.x + 16.0,
-            MARKET_PANEL.y + 232.0,
-            TextStyle::new(28.0, dark::TEXT_BRIGHT).params(),
-        );
-        draw_ui_text_ex(
-            "BIOSPHERE",
-            MARKET_PANEL.x + 16.0,
-            MARKET_PANEL.y + 274.0,
-            TextStyle::new(11.0, dark::TEXT_DIM).params(),
-        );
-        draw_ui_text_ex(
-            &format!("{:.1} / 3.0", planet.biosphere),
-            MARKET_PANEL.x + 16.0,
-            MARKET_PANEL.y + 308.0,
-            TextStyle::new(24.0, Color::new(0.45, 0.92, 0.62, 1.0)).params(),
+            MARKET_PANEL.y + 346.0,
+            TextStyle::new(27.0, dark::TEXT_BRIGHT).params(),
         );
     }
     if button(
@@ -71,7 +94,10 @@ fn draw_workshop_brief(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAct
             MARKET_PANEL.w - 32.0,
             42.0,
         ),
-        "SALVAGE WORLD",
+        &ctx.session
+            .current_planet()
+            .map(|planet| format!("SALVAGE FOR {} CR", salvage_value(planet)))
+            .unwrap_or_else(|| "SALVAGE WORLD".to_owned()),
         ctx.session.current_planet().is_some(),
         ButtonTone::Secondary,
         mouse,
@@ -354,7 +380,10 @@ fn draw_workshop(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) 
         TextStyle::new(18.0, Color::new(0.47, 0.82, 1.0, 1.0)).params(),
     );
     draw_ui_text_ex(
-        "Tune the world to match an alien buyer.",
+        &format!(
+            "Invested {} CR  //  tune toward alien demand",
+            planet.invested_cost
+        ),
         rect.x + 188.0,
         rect.y + 98.0,
         TextStyle::new(12.0, dark::TEXT_DIM).params(),
@@ -366,13 +395,14 @@ fn draw_workshop(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) 
         ("W  Water", format!("{:.0}%", planet.water * 100.0)),
         ("G  Gravity", format!("{:.2}x", planet.gravity)),
         ("R  Radiation", format!("{:.2}x", planet.radiation)),
+        ("B  Biosphere", format!("{:.1}", planet.biosphere)),
     ];
     for (index, (label, value)) in stats.iter().enumerate() {
         let row = Rect::new(
             rect.x + 188.0,
-            rect.y + 116.0 + index as f32 * 34.0,
+            rect.y + 128.0 + index as f32 * 25.0,
             382.0,
-            27.0,
+            21.0,
         );
         draw_surface(
             row,
@@ -382,27 +412,18 @@ fn draw_workshop(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) 
         draw_ui_text_ex(
             label,
             row.x + 10.0,
-            row.y + 18.0,
+            row.y + 15.0,
             TextStyle::new(12.0, dark::TEXT_DIM).params(),
         );
         draw_text_right(
             value,
             row.right() - 10.0,
-            row.y + 18.0,
+            row.y + 15.0,
             TextStyle::new(13.0, dark::TEXT_BRIGHT),
         );
     }
-    draw_ui_text_ex(
-        &format!(
-            "Invested: {} CR | B Biosphere: {:.1}",
-            planet.invested_cost, planet.biosphere
-        ),
-        rect.x + 188.0,
-        rect.bottom() - 22.0,
-        TextStyle::new(11.0, dark::TEXT_DIM).params(),
-    );
     if button(
-        Rect::new(rect.right() - 224.0, rect.bottom() - 50.0, 100.0, 32.0),
+        Rect::new(rect.right() - 246.0, rect.bottom() - 50.0, 84.0, 32.0),
         "History",
         !ctx.session.trade_history.is_empty(),
         ButtonTone::Muted,
@@ -411,8 +432,8 @@ fn draw_workshop(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) 
         actions.push(UiAction::ToggleHistory);
     }
     if button(
-        Rect::new(rect.right() - 116.0, rect.bottom() - 50.0, 100.0, 32.0),
-        "SALVAGE",
+        Rect::new(rect.right() - 154.0, rect.bottom() - 50.0, 138.0, 32.0),
+        &format!("SALVAGE {} CR", salvage_value(planet)),
         true,
         ButtonTone::Secondary,
         mouse,

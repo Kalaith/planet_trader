@@ -457,7 +457,7 @@ impl GameSession {
                 investment_cost(planet),
             )
         };
-        let salvage_price = ((invested_cost as f32) * 0.25).round().max(100.0) as i64;
+        let salvage_price = salvage_value_for_investment(invested_cost);
         let profit = salvage_price - invested_cost;
         self.credits += salvage_price;
         self.stats.planets_salvaged += 1;
@@ -583,6 +583,10 @@ pub fn potential_profit(planet: &Planet, buyer: &AlienBuyer) -> i64 {
     sale_price(planet, buyer) - investment_cost(planet)
 }
 
+pub fn salvage_value(planet: &Planet) -> i64 {
+    salvage_value_for_investment(investment_cost(planet))
+}
+
 pub fn market_trend_percent(buyer: &AlienBuyer) -> f32 {
     if buyer.base_price <= 0 {
         0.0
@@ -645,6 +649,10 @@ fn reputation_for_sale(profit: i64, compatibility_score: f32) -> i64 {
     let quality = (compatibility_score.clamp(0.0, 1.0) * 10.0).round() as i64;
     let profit_bonus = (profit.max(0) / 2_000).min(8);
     4 + quality + profit_bonus
+}
+
+fn salvage_value_for_investment(invested_cost: i64) -> i64 {
+    ((invested_cost.max(0) as f32) * 0.25).round().max(100.0) as i64
 }
 
 fn investment_cost(planet: &Planet) -> i64 {

@@ -3,8 +3,8 @@
 use crate::data::{GameData, Tool};
 use crate::state::{
     company_rank, compatibility, contract_option_count, market_trend_percent, potential_profit,
-    projected_research_points, sale_price, tool_is_locked, AlienBuyer, GameSession, Planet,
-    TutorialStep,
+    projected_research_points, sale_price, salvage_value, tool_is_locked, AlienBuyer, GameSession,
+    Planet, TutorialStep,
 };
 use macroquad::prelude::*;
 use macroquad_toolkit::prelude::*;
@@ -328,6 +328,24 @@ fn effect_summary(effects: &std::collections::HashMap<String, f32>) -> String {
             .collect::<Vec<_>>()
             .join(", ")
     }
+}
+
+fn best_market_route<'a>(
+    planet: &Planet,
+    buyers: &'a [AlienBuyer],
+) -> Option<(&'a AlienBuyer, f32, i64, i64)> {
+    buyers
+        .iter()
+        .map(|buyer| {
+            let score = compatibility(planet, buyer);
+            let price = sale_price(planet, buyer);
+            (buyer, score, price, price - planet.invested_cost)
+        })
+        .max_by(|left, right| {
+            left.1
+                .total_cmp(&right.1)
+                .then_with(|| left.3.cmp(&right.3))
+        })
 }
 
 fn hex_to_color(value: &str) -> Color {

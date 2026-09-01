@@ -64,4 +64,6 @@ pushed. Internal hardening supports a slice but is never the slice itself.
 - Navigation and visual language: command-deck modes shipped and verified.
 - Market/biosphere and company/research depth: six-axis demand, attainable RP,
   reputation ranks, and expanding contract reach shipped.
-- Acquisition/workshop decision previews and final finish/proof: next.
+- Acquisition/workshop decision previews: live buyer routes, best-deal margins,
+  six-stat workshop hierarchy, and disclosed salvage recovery shipped.
+- Final finish/proof: next.

@@ -284,6 +284,10 @@ impl Game {
                 },
             ];
         }
+        if scene == "contracts" {
+            self.session.reputation = 60;
+            let _ = self.session.open_purchase_modal(&self.data);
+        }
         self.save_exists = false;
         self.reset_view();
         self.research_open = seed.research_open;
@@ -294,7 +298,7 @@ impl Game {
             "research" => GameplayMode::Research,
             "tutorial_market" | "market" => GameplayMode::Market,
             "biosphere" => GameplayMode::Workshop,
-            "tutorial_buy" | "tutorial" | "acquisition" => GameplayMode::Acquire,
+            "tutorial_buy" | "tutorial" | "acquisition" | "contracts" => GameplayMode::Acquire,
             "company" => GameplayMode::Company,
             _ => GameplayMode::Workshop,
         };
