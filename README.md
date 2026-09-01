@@ -1,45 +1,52 @@
 # Planet Trader
 
-Planet Trader is the Rust + Macroquad port of the legacy Terraforming Co.
-browser game. Buy randomized worlds, tune their environments with terraforming
-tools, compare them with alien buyers, and sell a compatible planet for profit.
+Planet Trader is a planetary trading and terraforming simulation. You run a
+frontier brokerage that buys difficult worlds, reshapes their environments for
+alien clients, and sells them for a profit.
 
-## Phase 1 gameplay
+Every world is a calculated risk. Its purchase price and starting conditions
+must be weighed against current buyer demand, the cost of terraforming, and the
+credits you need to keep in reserve. A promising planet can become a lucrative
+deal; a poor investment may need to be salvaged before it sinks the company.
 
-- Branded home screen with save-aware New Company and Continue flows.
-- Focused command-deck navigation for Acquisition, Workshop, Alien Market,
-  Research, and Company instead of one overloaded dashboard.
-- Persistent, action-driven orientation that follows real player actions.
-- Functional display/readability settings, tutorial restart, and save management.
-- Randomized planet offers with planet types, names, stats, colors, and prices.
-- Seeded procedural planet surfaces that react to temperature, water,
-  atmosphere, radiation, and biosphere: magma, ocean, barren, forest, ice,
-  and mixed worlds each get distinct terrain, craters, clouds, lighting, and
-  atmospheric rims.
-- Contract scans compare every unmodified world against the best live buyer
-  route before purchase; Workshop shows the best current deal and exact
-  salvage recovery before further investment.
-- Planet inventory with active-planet selection.
-- Fifteen terraforming tools with costs, primary effects, side effects, and
-  locked research requirements.
-- Alien market with a dedicated Deal Room, four rotating buyers, six-stat
-  compatibility including biosphere demand, exact profit/RP previews, and
-  compatibility-gated selling.
-- Attainable research costs and company reputation ranks earned through strong
-  sales; higher reputation expands each acquisition scan from three contracts
-  to as many as five.
-- Local autosave/load/reset using the macroquad-toolkit save slots.
-- Embedded legacy data loaded through macroquad-toolkit::data_loader.
+## How to play
 
-The staged Phase 1 direction and delivery sequence are documented in
-`docs/PHASE_1_DESIGN.md`. The player-visible Phase 0/Phase 1 comparison is in
-`docs/PHASE_1_COMPARISON.md`.
+1. **Scan for contracts.** Review a fresh selection of procedurally generated
+   planets, including their price, environmental conditions, and best current
+   buyer route.
+2. **Study the market.** Alien buyers seek different ranges across temperature,
+   water, atmosphere, radiation, gravity, and biosphere. A sale requires at
+   least four of the six requirements to match.
+3. **Acquire a world.** Choose a planet with a plausible route to profit while
+   keeping enough credits available for engineering.
+4. **Terraform it.** Use specialized tools to adjust the environment. Each tool
+   has a cost, a primary effect, and possible side effects, so improving one
+   condition can disrupt another.
+5. **Close the deal.** Sell to a compatible buyer for credits, research points,
+   and reputation. Better matches produce stronger rewards. If a deal becomes
+   unworkable, salvage the planet to recover part of your investment.
 
-## Development
+## Building the company
 
-Run cargo fmt --all, cargo test, cargo clippy --all-targets --all-features
--- -D warnings, and then .\publish.ps1 from the project root.
+- Invest research points in new terraforming technology and wider strategic
+  options.
+- Build reputation through successful sales to improve your company rank and
+  expand future contract scans from three worlds to as many as five.
+- Manage several owned planets and switch the active workshop project as market
+  opportunities change.
+- Track purchases, engineering costs, sales, and recoveries in the company
+  ledger.
+- Adapt to rotating alien buyers instead of relying on a single ideal planet
+  design.
 
-The capture harness is .\scripts\capture_ui.ps1 -Scenes gameplay and writes
-verification images to docs\verification\. Use -Scenes planet_gallery to
-review the complete procedural visual range in one deterministic capture.
+## Controls
+
+- **Tap or click** visible controls to navigate, buy planets, select tools,
+  terraform, research, sell, and salvage.
+- Use the **on-screen scroll controls** to browse longer lists. A mouse wheel
+  can also be used on desktop.
+- Save and load controls are available from the Company screen, and progress is
+  autosaved after important actions.
+
+The guided orientation introduces the complete trading cycle using the same
+controls as normal play.
