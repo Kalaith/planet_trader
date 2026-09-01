@@ -15,7 +15,7 @@ fn draw_workshop_brief(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAct
         112.0,
     );
     draw_text_block(
-        "Engineer one stat at a time. Every tool spends credits and may create side effects, so compare the active world against live demand before committing.",
+        "Engineer one stat at a time. Every tool spends credits and may create side effects. Biosphere is a sixth buyer requirement shaped by biological technology.",
         body.x,
         body.y,
         body.w,

@@ -9,7 +9,7 @@ pub(super) fn draw_market_mode(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut V
 fn draw_market_brief(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     draw_panel(TOOLS_PANEL, "Deal Room");
     draw_text_block(
-        "Select a buyer card to open its demand profile. A sale requires at least three matching environmental requirements; greener deals pay more and award more research.",
+        "Select a buyer card to open its demand profile. A sale requires four of six environmental requirements; greener deals pay more, award more research, and build reputation.",
         TOOLS_PANEL.x + 16.0,
         TOOLS_PANEL.y + 60.0,
         TOOLS_PANEL.w - 32.0,
@@ -210,6 +210,7 @@ fn draw_buyer_card(
         let score = score.expect("score is present with a planet");
         let estimated_sale = sale_price(planet, buyer);
         let profit = potential_profit(planet, buyer);
+        let projected_rp = projected_research_points(estimated_sale, score);
         draw_ui_text_ex(
             &format!("Compatibility: {:.0}%", score * 100.0),
             rect.x + 12.0,
@@ -234,10 +235,11 @@ fn draw_buyer_card(
         };
         draw_ui_text_ex(
             &format!(
-                "Est. sale {} CR | {}{} CR",
+                "Est. {} CR | {}{} CR | +{} RP",
                 estimated_sale,
                 if profit >= 0 { "+" } else { "" },
-                profit
+                profit,
+                projected_rp
             ),
             rect.x + 12.0,
             estimate_y,
@@ -309,6 +311,7 @@ fn draw_requirement_icons(planet: &Planet, buyer: &AlienBuyer, x: f32, y: f32) {
         (planet.water, buyer.water_range, "W"),
         (planet.gravity, buyer.grav_range, "G"),
         (planet.radiation, buyer.rad_range, "R"),
+        (planet.biosphere, buyer.bio_range, "B"),
     ];
     for (index, (value, range, icon)) in values.iter().enumerate() {
         let met = *value >= range[0] && *value <= range[1];
@@ -336,6 +339,7 @@ fn draw_requirement_grid(planet: &Planet, buyer: &AlienBuyer, rect: Rect) {
         ("Water", buyer.water_range, planet.water),
         ("Grav", buyer.grav_range, planet.gravity),
         ("Rad", buyer.rad_range, planet.radiation),
+        ("Bio", buyer.bio_range, planet.biosphere),
     ];
     for (index, (label, range, value)) in requirements.iter().enumerate() {
         let x = rect.x + 12.0 + (index % 2) as f32 * (rect.w * 0.5 - 10.0);
@@ -380,6 +384,7 @@ fn draw_range_grid(buyer: &AlienBuyer, rect: Rect) {
         ("Water", buyer.water_range),
         ("Grav", buyer.grav_range),
         ("Rad", buyer.rad_range),
+        ("Bio", buyer.bio_range),
     ];
     for (index, (label, range)) in requirements.iter().enumerate() {
         let x = rect.x + 12.0 + (index % 2) as f32 * (rect.w * 0.5 - 10.0);

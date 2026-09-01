@@ -54,6 +54,13 @@ fn draw_command_header(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAct
         Color::new(0.06, 0.15, 0.23, 1.0),
         Color::new(0.48, 0.82, 1.0, 1.0),
     );
+    let (rank, _) = company_rank(ctx.session.reputation);
+    draw_badge(
+        Rect::new(828.0, 30.0, 90.0, 34.0),
+        &format!("{} REP", ctx.session.reputation),
+        Color::new(0.22, 0.15, 0.07, 1.0),
+        Color::new(1.0, 0.78, 0.38, 1.0),
+    );
     if button(
         Rect::new(928.0, 28.0, 84.0, 38.0),
         "SAVE",
@@ -81,6 +88,12 @@ fn draw_command_header(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAct
     ) {
         actions.push(UiAction::ReturnHome);
     }
+    draw_ui_text_ex(
+        rank,
+        HEADER.x + 828.0,
+        HEADER.bottom() - 5.0,
+        TextStyle::new(8.0, Color::new(0.68, 0.60, 0.42, 1.0)).params(),
+    );
 }
 
 fn draw_mode_bar(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {

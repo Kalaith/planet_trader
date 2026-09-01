@@ -2,8 +2,9 @@
 
 use crate::data::{GameData, Tool};
 use crate::state::{
-    compatibility, market_trend_percent, potential_profit, sale_price, tool_is_locked, AlienBuyer,
-    GameSession, Planet, TutorialStep,
+    company_rank, compatibility, contract_option_count, market_trend_percent, potential_profit,
+    projected_research_points, sale_price, tool_is_locked, AlienBuyer, GameSession, Planet,
+    TutorialStep,
 };
 use macroquad::prelude::*;
 use macroquad_toolkit::prelude::*;

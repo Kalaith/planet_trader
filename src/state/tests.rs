@@ -30,6 +30,7 @@ fn test_data() -> GameData {
             water_range: [0.0, 1.0],
             grav_range: [0.0, 5.0],
             rad_range: [0.0, 2.0],
+            bio_range: [0.0, 3.0],
             base_price: 6_000,
             color: "#FFFFFF".to_owned(),
         }],
@@ -42,6 +43,7 @@ fn test_data() -> GameData {
             water: [0.0, 1.0],
             grav: [0.0, 5.0],
             rad: [0.0, 2.0],
+            bio: [0.0, 3.0],
             colors: vec!["#FFFFFF".to_owned()],
         }],
         planet_names: vec!["Testia".to_owned()],
@@ -71,6 +73,26 @@ fn purchase_spends_credits_and_selects_owned_planet() {
     assert_eq!(session.credits, starting_credits - price);
     session.select_planet(&id).unwrap();
     assert_eq!(session.current_planet_id.as_deref(), Some(id.as_str()));
+}
+
+#[test]
+fn reputation_expands_frontier_contract_reach() {
+    let data = test_data();
+    let mut session = GameSession::new(&data);
+    session.game_started = true;
+
+    session.open_purchase_modal(&data).unwrap();
+    assert_eq!(session.planet_options.len(), 3);
+    session.close_purchase_modal();
+
+    session.reputation = 25;
+    session.open_purchase_modal(&data).unwrap();
+    assert_eq!(session.planet_options.len(), 4);
+    session.close_purchase_modal();
+
+    session.reputation = 60;
+    session.open_purchase_modal(&data).unwrap();
+    assert_eq!(session.planet_options.len(), 5);
 }
 
 #[test]
@@ -171,8 +193,12 @@ fn biological_tool_updates_and_persists_biosphere() {
     };
 
     assert_eq!(session.current_planet().unwrap().biosphere, 0.0);
+    session.alien_buyers[0].bio_range = [0.8, 1.2];
+    let before_score = compatibility(session.current_planet().unwrap(), &session.alien_buyers[0]);
     session.apply_tool(&tool).unwrap();
     assert_eq!(session.current_planet().unwrap().biosphere, 1.0);
+    let after_score = compatibility(session.current_planet().unwrap(), &session.alien_buyers[0]);
+    assert!(after_score > before_score);
 
     let loaded = GameSession::from_save(session.to_save("1.1.0"), &data);
     assert_eq!(loaded.current_planet().unwrap().biosphere, 1.0);
@@ -263,7 +289,7 @@ fn low_credit_tool_use_preserves_planet_and_credits() {
 }
 
 #[test]
-fn sale_requires_three_matching_requirements_and_removes_planet() {
+fn sale_requires_four_matching_requirements_and_removes_planet() {
     let data = test_data();
     let mut session = GameSession::new(&data);
     session.game_started = true;
@@ -282,7 +308,8 @@ fn sale_requires_three_matching_requirements_and_removes_planet() {
     assert_eq!(session.credits, before + sale_price);
     assert_eq!(session.stats.planets_sold, 1);
     assert_eq!(session.stats.total_revenue, sale_price);
-    assert!(session.research_points > 0);
+    assert!(session.research_points >= 20);
+    assert!(session.reputation > 0);
     assert_eq!(session.trade_history.len(), 2);
     assert_eq!(session.trade_history[1].sale_price, sale_price);
 }
@@ -377,6 +404,7 @@ fn save_round_trip_preserves_market_and_trade_state() {
     session.purchase_planet(&id).unwrap();
     session.select_planet(&id).unwrap();
     session.research_points = 27;
+    session.reputation = 33;
     session
         .completed_research
         .push("Cryo Engineering".to_owned());
@@ -390,6 +418,7 @@ fn save_round_trip_preserves_market_and_trade_state() {
     assert_eq!(loaded.trade_history, session.trade_history);
     assert_eq!(loaded.alien_buyers, session.alien_buyers);
     assert_eq!(loaded.research_points, session.research_points);
+    assert_eq!(loaded.reputation, session.reputation);
     assert_eq!(loaded.completed_research, session.completed_research);
     assert_eq!(loaded.tutorial_step, session.tutorial_step);
 }

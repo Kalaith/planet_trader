@@ -48,7 +48,7 @@ fn draw_research_lab(
         TextStyle::new(24.0, Color::new(0.48, 0.84, 1.0, 1.0)).params(),
     );
     draw_ui_text_ex(
-        "Invest RP earned from successful sales to unlock advanced terraforming tools.",
+        "Sales award 5+ RP from value and compatibility, with a perfect-world bonus. Most tools unlock in 1-3 good deals.",
         rect.x + 26.0,
         rect.y + 64.0,
         TextStyle::new(12.0, dark::TEXT_DIM).params(),
@@ -98,7 +98,7 @@ fn draw_research_lab(
     }
 
     draw_ui_text_ex(
-        "Higher compatibility and sale prices award more RP.",
+        "Market previews show the exact RP award before every sale.",
         rect.x + 26.0,
         rect.bottom() - 20.0,
         TextStyle::new(11.0, dark::TEXT_DIM).params(),

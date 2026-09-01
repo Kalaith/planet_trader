@@ -54,9 +54,9 @@ pub(super) fn draw_acquisition(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut V
     );
     draw_acquisition_metric(
         Rect::new(638.0, 342.0, 294.0, 150.0),
-        "LIVE BUYERS",
-        &ctx.session.alien_buyers.len().to_string(),
-        "Buyer prices and requirements refresh while the company is active.",
+        "CONTRACT REACH",
+        &format!("{} OFFERS", contract_option_count(ctx.session.reputation)),
+        "Reputation expands each frontier scan from three worlds to as many as five.",
     );
     draw_acquisition_metric(
         Rect::new(948.0, 342.0, 314.0, 150.0),
@@ -78,7 +78,7 @@ pub(super) fn draw_acquisition(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut V
         TextStyle::new(16.0, Color::new(0.45, 0.83, 0.96, 1.0)).params(),
     );
     draw_text_block(
-        "1  Open the catalogue and compare acquisition costs.\n2  Check the Alien Market for valuable environmental targets.\n3  Buy a world with a plausible route to at least 60% compatibility.\n4  Keep a credit reserve; salvage is a safety net, not a winning strategy.",
+        "1  Open the catalogue and compare acquisition costs.\n2  Check the Alien Market for valuable environmental targets.\n3  Buy a world with a plausible route to four of six matching requirements.\n4  Keep a credit reserve; salvage is a safety net, not a winning strategy.",
         tip.x + 30.0,
         tip.y + 62.0,
         780.0,

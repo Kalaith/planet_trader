@@ -61,6 +61,7 @@ pushed. Internal hardening supports a slice but is never the slice itself.
 ## Delivery status
 
 - Front door and onboarding: shipped.
-- Navigation and visual language: command-deck modes implemented; responsive
-  browser verification and final polish remain part of the current slice.
-- Acquisition/workshop, market/biosphere, and company/research depth: next.
+- Navigation and visual language: command-deck modes shipped and verified.
+- Market/biosphere and company/research depth: six-axis demand, attainable RP,
+  reputation ranks, and expanding contract reach shipped.
+- Acquisition/workshop decision previews and final finish/proof: next.

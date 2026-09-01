@@ -15,8 +15,12 @@ tools, compare them with alien buyers, and sell a compatible planet for profit.
 - Planet inventory with active-planet selection.
 - Fifteen terraforming tools with costs, primary effects, side effects, and
   locked research requirements.
-- Alien market with a dedicated Deal Room, four rotating buyers, five-stat compatibility checks, buyer
-  details, and compatibility-gated selling.
+- Alien market with a dedicated Deal Room, four rotating buyers, six-stat
+  compatibility including biosphere demand, exact profit/RP previews, and
+  compatibility-gated selling.
+- Attainable research costs and company reputation ranks earned through strong
+  sales; higher reputation expands each acquisition scan from three contracts
+  to as many as five.
 - Local autosave/load/reset using the macroquad-toolkit save slots.
 - Embedded legacy data loaded through macroquad-toolkit::data_loader.
 

@@ -8,7 +8,7 @@ pub(super) fn draw_tutorial(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<
         TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PLANET INVENTORY to bring it into the workshop.", Some(Rect::new(344.0, 548.0, 572.0, 56.0))),
         TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap an alien buyer card. Green requirements already match; red ones need engineering.", Some(Rect::new(950.0, 278.0, 304.0, 110.0))),
         TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a terraforming tool to inspect its cost and side effects, then tap USE.", Some(Rect::new(26.0, 218.0, 284.0, 78.0))),
-        TutorialStep::SellOrSalvage => draw_coach("STEP 6 / CLOSE THE DEAL", "SELL when at least 3 requirements match. If the investment is poor, tap SALVAGE to recover credits.", None),
+        TutorialStep::SellOrSalvage => draw_coach("STEP 6 / CLOSE THE DEAL", "SELL when at least 4 of 6 requirements match. If the investment is poor, tap SALVAGE to recover credits.", None),
         TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(536.0, 95.0, 160.0, 34.0))),
         TutorialStep::Complete => {}
     }

@@ -1,7 +1,7 @@
 //! High-level game loop, persistence, and intent handling.
 
 use crate::data::GameData;
-use crate::state::{migrate_save_value, GameSession, Planet, SaveData, TutorialStep};
+use crate::state::{migrate_save_value, GameSession, Planet, SaveData, TradeRecord, TutorialStep};
 use crate::ui::{self, AppScreen, GameplayMode, UiAction, UiContext};
 use macroquad::prelude::*;
 use macroquad_toolkit::events::EventBus;
@@ -250,6 +250,39 @@ impl Game {
                 self.session.current_planet_id = Some(planet.id.clone());
                 self.session.planets.push(planet);
             }
+        }
+        if scene == "company" {
+            self.session.credits = 18_450;
+            self.session.reputation = 44;
+            self.session.research_points = 38;
+            self.session.stats.planets_purchased = 4;
+            self.session.stats.planets_sold = 3;
+            self.session.stats.total_profit = 8_450;
+            self.session.stats.best_profit = 4_100;
+            self.session.trade_history = vec![
+                TradeRecord {
+                    transaction_type: "sale".to_owned(),
+                    planet_id: "ledger-1".to_owned(),
+                    planet_name: "Cinder Accord".to_owned(),
+                    buyer_name: Some("Pyrothane Lizards".to_owned()),
+                    purchase_cost: 1_900,
+                    invested_cost: 2_600,
+                    sale_price: 6_700,
+                    profit: 4_100,
+                    compatibility: 0.83,
+                },
+                TradeRecord {
+                    transaction_type: "sale".to_owned(),
+                    planet_id: "ledger-2".to_owned(),
+                    planet_name: "Pelagic Promise".to_owned(),
+                    buyer_name: Some("Aquatic Molluscoids".to_owned()),
+                    purchase_cost: 2_100,
+                    invested_cost: 3_050,
+                    sale_price: 7_400,
+                    profit: 4_350,
+                    compatibility: 1.0,
+                },
+            ];
         }
         self.save_exists = false;
         self.reset_view();

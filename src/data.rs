@@ -79,6 +79,8 @@ pub struct Species {
     pub grav_range: [f32; 2],
     #[serde(rename = "radRange")]
     pub rad_range: [f32; 2],
+    #[serde(rename = "bioRange", default = "default_bio_range")]
+    pub bio_range: [f32; 2],
     #[serde(rename = "basePrice")]
     pub base_price: i64,
     pub color: String,
@@ -94,6 +96,8 @@ pub struct SpeciesTemplate {
     pub water: [f32; 2],
     pub grav: [f32; 2],
     pub rad: [f32; 2],
+    #[serde(default = "default_bio_range")]
+    pub bio: [f32; 2],
     pub colors: Vec<String>,
 }
 
@@ -155,6 +159,10 @@ impl GameData {
 
 fn default_true() -> bool {
     true
+}
+
+fn default_bio_range() -> [f32; 2] {
+    [0.0, 3.0]
 }
 
 pub fn slugify(value: &str) -> String {

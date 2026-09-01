@@ -3,12 +3,21 @@ use super::*;
 pub(super) fn draw_company(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     let stats = &ctx.session.stats;
     let realized = stats.total_profit;
+    let (rank, next_rank) = company_rank(ctx.session.reputation);
+    let rank_progress = if ctx.session.reputation >= 120 {
+        format!("{}  //  highest company tier", rank)
+    } else {
+        format!(
+            "{}  //  {} / {} reputation; the next tier expands contract reach",
+            rank, ctx.session.reputation, next_rank
+        )
+    };
     draw_panel(
         Rect::new(18.0, 150.0, 1244.0, 540.0),
         "Company Charter & Ledger",
     );
     draw_ui_text_ex(
-        "A brokerage is measured by resilient capital, completed worlds, and technology earned from good deals.",
+        &rank_progress,
         40.0,
         214.0,
         TextStyle::new(13.0, dark::TEXT_DIM).params(),
@@ -26,9 +35,9 @@ pub(super) fn draw_company(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<U
             "Sales and salvage after investment",
         ),
         (
-            "COMPLETED SALES",
-            stats.planets_sold.to_string(),
-            "Successful alien placements",
+            "REPUTATION",
+            format!("{} REP", ctx.session.reputation),
+            "Earned from compatible, profitable sales",
         ),
         (
             "RESEARCH",

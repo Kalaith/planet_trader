@@ -11,6 +11,10 @@ fn embedded_planet_trader_data_loads() {
     assert_eq!(data.planet_names.len(), 15);
     assert_eq!(data.research.len(), 10);
     assert!(data
+        .alien_species
+        .iter()
+        .all(|species| species.bio_range[0] >= 0.0 && species.bio_range[1] <= 3.0));
+    assert!(data
         .planet_types
         .iter()
         .all(|planet_type| !planet_type.color.is_empty()));

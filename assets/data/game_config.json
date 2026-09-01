@@ -2,7 +2,7 @@
   "game_name": "planet_trader",
   "display_name": "Terraforming Co.",
   "save_slot": "autosave",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "starting_credits": 10000,
   "buyer_refresh_seconds": 30.0
 }

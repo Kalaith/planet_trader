@@ -179,6 +179,7 @@ fn draw_hero_world(reduced_motion: bool) {
 }
 
 fn draw_company_summary(ctx: &UiContext<'_>) {
+    let (rank, _) = company_rank(ctx.session.reputation);
     let rect = Rect::new(76.0, 578.0, 470.0, 74.0);
     draw_surface(
         rect,
@@ -193,10 +194,11 @@ fn draw_company_summary(ctx: &UiContext<'_>) {
     );
     draw_ui_text_ex(
         &format!(
-            "{} CR   //   {} worlds   //   {} completed sales",
+            "{} CR   //   {} worlds   //   {} REP  {}",
             ctx.session.credits,
             ctx.session.planets.len(),
-            ctx.session.stats.planets_sold
+            ctx.session.reputation,
+            rank
         ),
         rect.x + 16.0,
         rect.y + 52.0,

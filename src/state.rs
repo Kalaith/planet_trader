@@ -33,6 +33,8 @@ pub struct AlienBuyer {
     pub water_range: [f32; 2],
     pub grav_range: [f32; 2],
     pub rad_range: [f32; 2],
+    #[serde(default = "default_bio_range")]
+    pub bio_range: [f32; 2],
     pub base_price: i64,
     pub current_price: i64,
     pub color: String,
@@ -85,6 +87,10 @@ fn completed_tutorial() -> TutorialStep {
     TutorialStep::Complete
 }
 
+fn default_bio_range() -> [f32; 2] {
+    [0.0, 3.0]
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SaveData {
     pub version: String,
@@ -102,6 +108,8 @@ pub struct SaveData {
     pub research_points: i64,
     #[serde(default)]
     pub completed_research: Vec<String>,
+    #[serde(default)]
+    pub reputation: i64,
     #[serde(default = "completed_tutorial")]
     pub tutorial_step: TutorialStep,
 }
@@ -119,6 +127,7 @@ pub struct GameSession {
     pub trade_history: Vec<TradeRecord>,
     pub research_points: i64,
     pub completed_research: Vec<String>,
+    pub reputation: i64,
     pub tutorial_step: TutorialStep,
     next_planet_id: u64,
     next_buyer_id: u64,
@@ -138,6 +147,7 @@ impl GameSession {
             trade_history: Vec::new(),
             research_points: 0,
             completed_research: Vec::new(),
+            reputation: 0,
             tutorial_step: TutorialStep::Welcome,
             next_planet_id: 1,
             next_buyer_id: 1,
@@ -173,9 +183,21 @@ impl GameSession {
             }
         }
         session.completed_research = completed_research;
+        session.reputation = save.reputation.max(0);
         session.tutorial_step = save.tutorial_step;
         if !save.alien_buyers.is_empty() {
             session.alien_buyers = save.alien_buyers;
+            for buyer in &mut session.alien_buyers {
+                if buyer.bio_range == default_bio_range() {
+                    if let Some(species) = data
+                        .alien_species
+                        .iter()
+                        .find(|species| species.name == buyer.name)
+                    {
+                        buyer.bio_range = species.bio_range;
+                    }
+                }
+            }
         }
         session.next_planet_id = next_id(&session.planets);
         session.next_buyer_id = session
@@ -202,6 +224,7 @@ impl GameSession {
             alien_buyers: self.alien_buyers.clone(),
             research_points: self.research_points,
             completed_research: self.completed_research.clone(),
+            reputation: self.reputation,
             tutorial_step: self.tutorial_step,
         }
     }
@@ -243,7 +266,7 @@ impl GameSession {
             return Err("Planet catalogue is still loading.".to_owned());
         }
 
-        let count = gen_range(3, 5) as usize;
+        let count = contract_option_count(self.reputation);
         self.planet_options = (0..count)
             .map(|_| {
                 let type_index = gen_range(0, data.planet_types.len() as i32) as usize;
@@ -391,6 +414,8 @@ impl GameSession {
         let research_award = research_points_for_sale(price, compatibility_score);
         self.credits += price;
         self.research_points = self.research_points.saturating_add(research_award);
+        let reputation_award = reputation_for_sale(profit, compatibility_score);
+        self.reputation = self.reputation.saturating_add(reputation_award);
         self.stats.planets_sold += 1;
         self.stats.total_revenue += price;
         self.stats.total_profit += profit;
@@ -409,8 +434,8 @@ impl GameSession {
         self.planets.retain(|planet| planet.id != planet_id);
         self.current_planet_id = None;
         Ok(format!(
-            "Sold {} to {} for {} CR (+{} RP)",
-            name, buyer.name, price, research_award
+            "Sold {} to {} for {} CR (+{} RP, +{} REP)",
+            name, buyer.name, price, research_award, reputation_award
         ))
     }
 
@@ -484,6 +509,7 @@ impl GameSession {
             water_range: species.water_range,
             grav_range: species.grav_range,
             rad_range: species.rad_range,
+            bio_range: species.bio_range,
             base_price,
             current_price,
             color: species.color.clone(),
@@ -507,6 +533,7 @@ impl GameSession {
             water_range: template.water,
             grav_range: template.grav,
             rad_range: template.rad,
+            bio_range: template.bio,
             base_price,
             current_price,
             color: random_string(&template.colors, "#40B8C8"),
@@ -543,8 +570,9 @@ pub fn compatibility(planet: &Planet, buyer: &AlienBuyer) -> f32 {
         within(planet.water, buyer.water_range),
         within(planet.gravity, buyer.grav_range),
         within(planet.radiation, buyer.rad_range),
+        within(planet.biosphere, buyer.bio_range),
     ];
-    matches.into_iter().filter(|matched| *matched).count() as f32 / 5.0
+    matches.into_iter().filter(|matched| *matched).count() as f32 / 6.0
 }
 
 pub fn sale_price(planet: &Planet, buyer: &AlienBuyer) -> i64 {
@@ -560,6 +588,23 @@ pub fn market_trend_percent(buyer: &AlienBuyer) -> f32 {
         0.0
     } else {
         ((buyer.current_price - buyer.base_price) as f32 / buyer.base_price as f32) * 100.0
+    }
+}
+
+pub fn company_rank(reputation: i64) -> (&'static str, i64) {
+    match reputation.max(0) {
+        0..=24 => ("Frontier Startup", 25),
+        25..=59 => ("Established Broker", 60),
+        60..=119 => ("Renowned Terraformer", 120),
+        _ => ("Stellar Institution", 120),
+    }
+}
+
+pub fn contract_option_count(reputation: i64) -> usize {
+    match reputation.max(0) {
+        0..=24 => 3,
+        25..=59 => 4,
+        _ => 5,
     }
 }
 
@@ -585,10 +630,21 @@ fn sale_price_for_score(buyer: &AlienBuyer, score: f32) -> i64 {
         .max(100.0) as i64
 }
 
+pub fn projected_research_points(price: i64, compatibility_score: f32) -> i64 {
+    let market_value = (price.max(0) as f32 / 500.0).floor() as i64;
+    let quality = (compatibility_score.clamp(0.0, 1.0) * 12.0).round() as i64;
+    let perfect_bonus = if compatibility_score >= 0.999 { 8 } else { 0 };
+    (market_value + quality + perfect_bonus).max(5)
+}
+
 fn research_points_for_sale(price: i64, compatibility_score: f32) -> i64 {
-    ((price.max(0) as f32 / 1_000.0) * compatibility_score.clamp(0.0, 1.0))
-        .floor()
-        .max(1.0) as i64
+    projected_research_points(price, compatibility_score)
+}
+
+fn reputation_for_sale(profit: i64, compatibility_score: f32) -> i64 {
+    let quality = (compatibility_score.clamp(0.0, 1.0) * 10.0).round() as i64;
+    let profit_bonus = (profit.max(0) / 2_000).min(8);
+    4 + quality + profit_bonus
 }
 
 fn investment_cost(planet: &Planet) -> i64 {
@@ -676,6 +732,7 @@ pub fn migrate_save_value(
         alien_buyers: Vec::new(),
         research_points: 0,
         completed_research: Vec::new(),
+        reputation: 0,
         tutorial_step: TutorialStep::Complete,
     })
 }
