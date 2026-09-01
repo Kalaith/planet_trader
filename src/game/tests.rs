@@ -54,6 +54,21 @@ fn biosphere_capture_scene_seeds_an_active_planet() {
 }
 
 #[test]
+fn planet_gallery_capture_has_a_complete_visual_spectrum() {
+    let seed = CaptureSceneSeed::for_scene("planet_gallery");
+    assert_eq!(seed.screen, AppScreen::Gameplay);
+    assert!(seed.game_started);
+    assert_eq!(seed.tutorial_step, TutorialStep::Complete);
+
+    let data = GameData::load().expect("embedded game data should load");
+    let planets = capture::gallery_planets(&data);
+    assert_eq!(planets.len(), 6);
+    assert_eq!(planets[0].name, "Cinder Bloom");
+    assert_eq!(planets[3].name, "Verdant Relay");
+    assert_eq!(planets[5].name, "Twilight Mosaic");
+}
+
+#[test]
 fn reset_capture_scene_opens_confirmation() {
     let seed = CaptureSceneSeed::for_scene("reset");
     assert!(seed.reset_open);

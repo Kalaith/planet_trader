@@ -521,13 +521,7 @@ fn draw_inventory(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>)
                 },
             ),
         );
-        draw_circle(
-            card.x + 25.0,
-            card.center().y,
-            13.0,
-            hex_to_color(&planet.color),
-        );
-        draw_circle_lines(card.x + 25.0, card.center().y, 13.0, 1.0, dark::TEXT);
+        draw_planet_orb(planet, vec2(card.x + 25.0, card.center().y), 13.0);
         draw_ui_text_ex(
             &planet.name,
             card.x + 50.0,

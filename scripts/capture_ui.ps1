@@ -6,8 +6,8 @@
     Thin wrapper around the shared macroquad-toolkit capture script. Builds the
     debug exe and drives it through the env-var capture hook
     (PLANET_TRADER_CAPTURE_*) provided by macroquad_toolkit::capture in
-    src/main.rs. The default scene captures gameplay; pass -Scenes title or
-    tutorial to capture the first-run screen.
+    src/main.rs. The default scene captures gameplay; pass -Scenes title,
+    tutorial, or planet_gallery to capture other verification states.
 
 .EXAMPLE
     ./scripts/capture_ui.ps1

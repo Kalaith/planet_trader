@@ -54,13 +54,7 @@ pub(super) fn draw_purchase_modal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mu
             &SurfaceStyle::new(Color::new(0.075, 0.14, 0.19, 1.0))
                 .with_border(1.0, Color::new(0.24, 0.42, 0.50, 1.0)),
         );
-        draw_circle(
-            card.x + 48.0,
-            card.center().y,
-            27.0,
-            hex_to_color(&planet.color),
-        );
-        draw_circle_lines(card.x + 48.0, card.center().y, 27.0, 2.0, dark::TEXT);
+        draw_planet_orb(planet, vec2(card.x + 48.0, card.center().y), 27.0);
         draw_ui_text_ex(
             &planet.name,
             card.x + 94.0,

@@ -12,6 +12,10 @@ tools, compare them with alien buyers, and sell a compatible planet for profit.
 - Persistent, action-driven orientation that follows real player actions.
 - Functional display/readability settings, tutorial restart, and save management.
 - Randomized planet offers with planet types, names, stats, colors, and prices.
+- Seeded procedural planet surfaces that react to temperature, water,
+  atmosphere, radiation, and biosphere: magma, ocean, barren, forest, ice,
+  and mixed worlds each get distinct terrain, craters, clouds, lighting, and
+  atmospheric rims.
 - Contract scans compare every unmodified world against the best live buyer
   route before purchase; Workshop shows the best current deal and exact
   salvage recovery before further investment.
@@ -37,4 +41,5 @@ Run cargo fmt --all, cargo test, cargo clippy --all-targets --all-features
 -- -D warnings, and then .\publish.ps1 from the project root.
 
 The capture harness is .\scripts\capture_ui.ps1 -Scenes gameplay and writes
-verification images to docs\verification\.
+verification images to docs\verification\. Use -Scenes planet_gallery to
+review the complete procedural visual range in one deterministic capture.

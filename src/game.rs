@@ -15,6 +15,8 @@ use macroquad_toolkit::prelude::{begin_virtual_ui_frame, dark, end_virtual_ui_fr
 use macroquad_toolkit::settings::GameSettings;
 use macroquad_toolkit::ui::set_ui_text_scale;
 
+mod capture;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct CaptureSceneSeed {
     reset_session: bool,
@@ -168,6 +170,7 @@ pub struct Game {
     new_game_confirm: bool,
     settings: GameSettings,
     mode: GameplayMode,
+    planet_gallery: bool,
 }
 
 impl Game {
@@ -202,6 +205,7 @@ impl Game {
             new_game_confirm: false,
             settings,
             mode: GameplayMode::Acquire,
+            planet_gallery: false,
         };
         game.refresh_save_state();
         game.load_existing_save();
@@ -210,6 +214,7 @@ impl Game {
 
     pub fn begin_capture_scene(&mut self, scene: &str) {
         let seed = CaptureSceneSeed::for_scene(scene);
+        self.planet_gallery = scene == "planet_gallery";
         self.research_open = false;
         self.reset_open = false;
         self.settings_open = false;
@@ -250,6 +255,10 @@ impl Game {
                 self.session.current_planet_id = Some(planet.id.clone());
                 self.session.planets.push(planet);
             }
+        }
+        if self.planet_gallery {
+            self.session.planets = capture::gallery_planets(&self.data);
+            self.session.current_planet_id = None;
         }
         if scene == "company" {
             self.session.credits = 18_450;
@@ -358,6 +367,7 @@ impl Game {
             settings: &self.settings,
             mode: self.mode,
             market_elapsed: self.market_elapsed,
+            planet_gallery: self.planet_gallery,
             ui: &virtual_ui,
         };
 

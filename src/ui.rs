@@ -11,6 +11,7 @@ use macroquad_toolkit::prelude::*;
 use macroquad_toolkit::settings::GameSettings;
 use macroquad_toolkit::ui::draw_ui_text_ex;
 use macroquad_toolkit::ui::{button_rect_tone_at, RectExt, VirtualUi};
+use planet_graphics::{draw_planet_gallery, draw_planet_orb};
 
 mod acquisition;
 mod company;
@@ -19,6 +20,7 @@ mod home;
 mod market;
 mod overlays;
 mod panels;
+mod planet_graphics;
 mod research;
 mod settings;
 mod tutorial;
@@ -105,12 +107,18 @@ pub struct UiContext<'a> {
     pub settings: &'a GameSettings,
     pub mode: GameplayMode,
     pub market_elapsed: f32,
+    pub planet_gallery: bool,
     pub ui: &'a VirtualUi,
 }
 
 pub fn draw_game_ui(ctx: UiContext<'_>) -> Vec<UiAction> {
     let mut actions = Vec::new();
     let mouse = ctx.ui.mouse_position();
+
+    if ctx.planet_gallery {
+        draw_planet_gallery(&ctx);
+        return actions;
+    }
 
     match ctx.screen {
         AppScreen::Home => home::draw_home(&ctx, mouse, &mut actions),
@@ -263,45 +271,6 @@ fn draw_scroll_hint(rect: Rect, can_scroll: bool) {
             Color::new(0.40, 0.62, 0.70, 0.9),
         );
     }
-}
-
-fn draw_planet_orb(planet: &Planet, center: Vec2, radius: f32) {
-    let color = hex_to_color(&planet.color);
-    draw_circle(
-        center.x,
-        center.y,
-        radius,
-        Color::new(0.02, 0.035, 0.05, 1.0),
-    );
-    draw_circle(center.x, center.y, radius - 3.0, color);
-    let atmosphere_alpha = (planet.atmosphere / 2.0).clamp(0.0, 0.9);
-    draw_circle(
-        center.x - radius * 0.12,
-        center.y - radius * 0.12,
-        radius * 0.88,
-        Color::new(0.70, 0.82, 1.0, atmosphere_alpha),
-    );
-    let water_alpha = planet.water.clamp(0.0, 0.85);
-    draw_circle(
-        center.x + radius * 0.08,
-        center.y + radius * 0.10,
-        radius * 0.78,
-        Color::new(0.08, 0.78, 0.88, water_alpha),
-    );
-    draw_circle_lines(
-        center.x,
-        center.y,
-        radius,
-        3.0,
-        Color::new(0.52, 0.82, 0.98, 1.0),
-    );
-    draw_circle_lines(
-        center.x,
-        center.y,
-        radius - 8.0,
-        1.0,
-        Color::new(1.0, 1.0, 1.0, 0.22),
-    );
 }
 
 fn tool_icon(category: &str) -> &'static str {
