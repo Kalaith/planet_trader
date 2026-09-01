@@ -66,4 +66,7 @@ pushed. Internal hardening supports a slice but is never the slice itself.
   reputation ranks, and expanding contract reach shipped.
 - Acquisition/workshop decision previews: live buyer routes, best-deal margins,
   six-stat workshop hierarchy, and disclosed salvage recovery shipped.
-- Final finish/proof: next.
+- Final finish/proof: shipped. The complete onboarding and first-sale journey
+  was exercised in the published WebGL build at 1280x720, then Research and
+  Company were checked at 1024x768. Phase 0/Phase 1 captures and the visible
+  feature comparison are preserved in `docs/PHASE_1_COMPARISON.md`.

@@ -28,7 +28,8 @@ tools, compare them with alien buyers, and sell a compatible planet for profit.
 - Embedded legacy data loaded through macroquad-toolkit::data_loader.
 
 The staged Phase 1 direction and delivery sequence are documented in
-`docs/PHASE_1_DESIGN.md`.
+`docs/PHASE_1_DESIGN.md`. The player-visible Phase 0/Phase 1 comparison is in
+`docs/PHASE_1_COMPARISON.md`.
 
 ## Development
 

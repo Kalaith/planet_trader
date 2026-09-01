@@ -448,6 +448,9 @@ impl Game {
                 self.mode = mode;
                 self.expanded_tool = None;
                 self.expanded_buyer = None;
+                if mode == GameplayMode::Research {
+                    self.complete_orientation_if_ready();
+                }
             }
             UiAction::OpenPurchase => match self.session.open_purchase_modal(&self.data) {
                 Ok(()) => {
@@ -548,12 +551,7 @@ impl Game {
             UiAction::ToggleHistory => self.history_open = !self.history_open,
             UiAction::OpenResearch => {
                 self.mode = GameplayMode::Research;
-                if self.session.tutorial_step == TutorialStep::OpenResearch {
-                    self.session.tutorial_step = TutorialStep::Complete;
-                    self.notifications
-                        .success("Orientation complete. Your company is ready.");
-                    self.autosave();
-                }
+                self.complete_orientation_if_ready();
             }
             UiAction::CloseResearch => self.research_open = false,
             UiAction::OpenResetConfirm => {
@@ -701,6 +699,15 @@ impl Game {
         if let Err(error) = self.settings.save(&self.data.config.game_name) {
             self.notifications
                 .warning(format!("Settings unavailable: {}", error));
+        }
+    }
+
+    fn complete_orientation_if_ready(&mut self) {
+        if self.session.tutorial_step == TutorialStep::OpenResearch {
+            self.session.tutorial_step = TutorialStep::Complete;
+            self.notifications
+                .success("Orientation complete. Your company is ready.");
+            self.autosave();
         }
     }
 }
