@@ -5,12 +5,12 @@ pub(super) fn draw_tutorial(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<
         TutorialStep::Welcome => draw_welcome(mouse, actions),
         TutorialStep::BuyPlanet => draw_acquire_hint(),
         TutorialStep::ChooseOffer => draw_coach("STEP 2 / CHOOSE", "Tap an offer card to inspect its scan, then tap ACQUIRE WORLD.", Some(Rect::new(898.0, 602.0, 310.0, 52.0))),
-        TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PORTFOLIO to bring it into the workshop cradle.", Some(Rect::new(414.0, 618.0, 158.0, 46.0))),
-        TutorialStep::InspectBuyer if ctx.expanded_buyer.is_some() => draw_coach("STEP 4 / READ DEMAND", "Review the six requirement rows, then tap HOLD / RETURN TO WORKSHOP to engineer this world.", Some(Rect::new(914.0, 642.0, 334.0, 34.0))),
-        TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap a LIVE BUYER OFFER. Green requirements already match; red ones need engineering.", Some(Rect::new(396.0, 226.0, 476.0, 98.0))),
-        TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a tool in TERRAFORMING ARRAY, review OUTCOME PREVIEW, then tap APPLY TOOL.", Some(Rect::new(28.0, 280.0, 340.0, 64.0))),
+        TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in OWNED WORLDS to bring it into the engineering cradle.", Some(Rect::new(368.0, 616.0, 166.0, 45.0))),
+        TutorialStep::InspectBuyer if ctx.expanded_buyer.is_some() => draw_coach("STEP 4 / READ DEMAND", "Review the six requirement rows, then tap HOLD / RETURN TO WORKSHOP to engineer this world.", Some(Rect::new(866.0, 654.0, 374.0, 32.0))),
+        TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap a buyer signal in LIVE NEGOTIATIONS. Green requirements already match; red ones need engineering.", Some(Rect::new(390.0, 240.0, 450.0, 92.0))),
+        TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a tool in TERRAFORMING ARRAY, review OUTCOME CONSOLE, then tap APPLY TOOL.", Some(Rect::new(34.0, 266.0, 294.0, 58.0))),
         TutorialStep::SellOrSalvage => draw_coach("STEP 6 / CLOSE THE DEAL", "Tap CLOSE DEAL when at least 4 of 6 requirements match, or tap SALVAGE in Workshop to recover credits.", None),
-        TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(536.0, 95.0, 160.0, 34.0))),
+        TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(536.0, 74.0, 160.0, 34.0))),
         TutorialStep::Complete => {}
     }
 }
@@ -113,7 +113,7 @@ fn draw_coach(kicker: &str, message: &str, focus: Option<Rect>) {
     }
     let coach_y = focus
         .map(|target| {
-            if target.center().y > 430.0 && target.center().x < 800.0 {
+            if target.center().y > 430.0 {
                 152.0
             } else {
                 626.0

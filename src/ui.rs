@@ -192,33 +192,6 @@ fn wheel_scroll_delta(wheel_y: f32) -> Option<i32> {
         None
     }
 }
-fn draw_panel(rect: Rect, title: &str) {
-    let style = SurfaceStyle::new(Color::new(0.045, 0.09, 0.13, 0.98))
-        .with_border(1.0, Color::new(0.20, 0.37, 0.44, 1.0))
-        .with_header(42.0, Color::new(0.065, 0.13, 0.18, 1.0))
-        .with_header_divider(1.0, Color::new(0.21, 0.40, 0.48, 0.85));
-    draw_surface_with_title(
-        rect,
-        Some(title),
-        &style,
-        TextStyle::new(18.0, Color::new(0.50, 0.82, 0.96, 1.0)),
-    );
-}
-
-fn draw_panel_with_left_title(rect: Rect, title: &str) {
-    let style = SurfaceStyle::new(Color::new(0.045, 0.09, 0.13, 0.98))
-        .with_border(1.0, Color::new(0.20, 0.37, 0.44, 1.0))
-        .with_header(42.0, Color::new(0.065, 0.13, 0.18, 1.0))
-        .with_header_divider(1.0, Color::new(0.21, 0.40, 0.48, 0.85));
-    draw_surface(rect, &style);
-    draw_ui_text_ex(
-        title,
-        rect.x + 14.0,
-        rect.y + 28.0,
-        TextStyle::new(18.0, Color::new(0.50, 0.82, 0.96, 1.0)).params(),
-    );
-}
-
 fn button(rect: Rect, text: &str, enabled: bool, tone: ButtonTone, mouse: Vec2) -> bool {
     button_rect_tone_at(rect, text, enabled, tone, mouse)
 }
