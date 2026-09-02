@@ -29,8 +29,8 @@ mod workshop;
 pub const LOGICAL_WIDTH: f32 = 1280.0;
 pub const LOGICAL_HEIGHT: f32 = 720.0;
 
-const HEADER: Rect = Rect::new(18.0, 16.0, 1244.0, 64.0);
-const MODE_BAR: Rect = Rect::new(18.0, 88.0, 1244.0, 48.0);
+const HEADER: Rect = Rect::new(18.0, 12.0, 1244.0, 52.0);
+const MODE_BAR: Rect = Rect::new(18.0, 70.0, 1244.0, 42.0);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppScreen {

@@ -3,7 +3,7 @@ use super::*;
 pub(super) fn draw_tutorial(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     match ctx.session.tutorial_step {
         TutorialStep::Welcome => draw_welcome(mouse, actions),
-        TutorialStep::BuyPlanet => draw_coach("STEP 1 / ACQUIRE", "Tap SCAN FOR PLANET CONTRACTS to open the frontier catalogue.", Some(Rect::new(232.0, 602.0, 352.0, 58.0))),
+        TutorialStep::BuyPlanet => draw_acquire_hint(),
         TutorialStep::ChooseOffer => draw_coach("STEP 2 / CHOOSE", "Tap an offer card to inspect its scan, then tap ACQUIRE WORLD.", Some(Rect::new(898.0, 602.0, 310.0, 52.0))),
         TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PORTFOLIO to bring it into the workshop cradle.", Some(Rect::new(414.0, 618.0, 158.0, 46.0))),
         TutorialStep::InspectBuyer if ctx.expanded_buyer.is_some() => draw_coach("STEP 4 / READ DEMAND", "Review the six requirement rows, then tap HOLD / RETURN TO WORKSHOP to engineer this world.", Some(Rect::new(914.0, 642.0, 334.0, 34.0))),
@@ -13,6 +13,44 @@ pub(super) fn draw_tutorial(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<
         TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(536.0, 95.0, 160.0, 34.0))),
         TutorialStep::Complete => {}
     }
+}
+
+fn draw_acquire_hint() {
+    let focus = Rect::new(214.0, 613.0, 456.0, 62.0);
+    draw_rectangle_lines(
+        focus.x - 5.0,
+        focus.y - 5.0,
+        focus.w + 10.0,
+        focus.h + 10.0,
+        3.0,
+        Color::new(0.42, 0.92, 1.0, 0.82),
+    );
+    let hint = Rect::new(252.0, 558.0, 380.0, 44.0);
+    draw_surface(
+        hint,
+        &SurfaceStyle::new(Color::new(0.025, 0.09, 0.13, 0.98))
+            .with_top_highlight(2.0, Color::new(0.42, 0.90, 1.0, 0.85)),
+    );
+    draw_ui_text_ex(
+        "FIRST CONTRACT",
+        hint.x + 14.0,
+        hint.y + 17.0,
+        TextStyle::new(9.0, Color::new(0.42, 0.88, 1.0, 1.0)).params(),
+    );
+    draw_ui_text_ex(
+        "Tap the scan control below.",
+        hint.x + 14.0,
+        hint.y + 35.0,
+        TextStyle::new(12.0, dark::TEXT_BRIGHT).params(),
+    );
+    draw_line(
+        hint.center().x,
+        hint.bottom(),
+        hint.center().x,
+        focus.y - 5.0,
+        2.0,
+        Color::new(0.42, 0.90, 1.0, 0.72),
+    );
 }
 
 fn draw_welcome(mouse: Vec2, actions: &mut Vec<UiAction>) {
