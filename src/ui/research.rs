@@ -342,9 +342,27 @@ fn draw_node_card(
             Color::new(0.04, 0.15, 0.11, 0.64),
         );
     }
+    draw_rectangle(
+        row.x,
+        row.y + 6.0,
+        56.0,
+        row.h - 12.0,
+        Color::new(accent.r, accent.g, accent.b, 0.08),
+    );
+    ctx.artwork.draw_technology_icon(
+        &node.name,
+        vec2(row.x + 28.0, row.y + row.h * 0.5),
+        row.h - 14.0,
+        if prerequisite {
+            WHITE
+        } else {
+            Color::new(0.45, 0.49, 0.52, 0.72)
+        },
+    );
+    let content_x = row.x + 66.0;
     draw_ui_text_ex(
         &format!("T{}  {}", node.tier.max(1), node.name),
-        row.x,
+        content_x,
         row.y + 24.0,
         TextStyle::new(15.0, dark::TEXT_BRIGHT).params(),
     );
@@ -355,15 +373,15 @@ fn draw_node_card(
             node.credit_cost.max(0),
             node.category
         ),
-        row.x,
+        content_x,
         row.y + 44.0,
         TextStyle::new(9.0, Color::new(0.68, 0.80, 0.92, 1.0)).params(),
     );
     draw_text_block(
         &node.description,
-        row.x,
+        content_x,
         row.y + 51.0,
-        row.w - 166.0,
+        row.w - 232.0,
         35.0,
         9.0,
         2.0,
@@ -372,7 +390,7 @@ fn draw_node_card(
     if let Some(reveal) = node.reveals.as_deref() {
         draw_ui_text_ex(
             &format!("REVEALS  {}", reveal),
-            row.x,
+            content_x,
             row.bottom() - 5.0,
             TextStyle::new(8.0, Color::new(0.42, 0.82, 0.94, 1.0)).params(),
         );

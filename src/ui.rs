@@ -1,5 +1,6 @@
 //! Shared UI types and helpers for the Planet Trader renderer.
 
+use crate::artwork::Artwork;
 use crate::data::{GameData, Tool};
 use crate::state::{
     analysis_level, company_rank, compatibility, compatibility_matches, contract_option_count,
@@ -88,6 +89,7 @@ pub enum UiAction {
 }
 
 pub struct UiContext<'a> {
+    pub artwork: &'a Artwork,
     pub data: &'a GameData,
     pub session: &'a GameSession,
     pub save_exists: bool,

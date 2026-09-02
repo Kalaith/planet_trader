@@ -1,5 +1,6 @@
 //! High-level game loop, persistence, and intent handling.
 
+use crate::artwork::Artwork;
 use crate::data::GameData;
 use crate::state::{
     migrate_save_value, sale_price, GameSession, Planet, SaveData, ToolIntensity, TradeRecord,
@@ -33,6 +34,7 @@ fn market_refresh_due(
 }
 
 pub struct Game {
+    artwork: Artwork,
     data: GameData,
     session: GameSession,
     notifications: NotificationManager,
@@ -70,6 +72,7 @@ impl Game {
             set_fullscreen(true);
         }
         let mut game = Self {
+            artwork: Artwork::load(),
             session: GameSession::new(&data),
             data,
             notifications: NotificationManager::new(),
@@ -294,6 +297,7 @@ impl Game {
         clear_background(dark::BACKGROUND);
         let virtual_ui = begin_virtual_ui_frame(ui::LOGICAL_WIDTH, ui::LOGICAL_HEIGHT);
         let ctx = UiContext {
+            artwork: &self.artwork,
             data: &self.data,
             session: &self.session,
             save_exists: self.save_exists,

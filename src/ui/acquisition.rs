@@ -319,16 +319,23 @@ fn draw_market_signals(ctx: &UiContext<'_>) {
     for (index, buyer) in buyers.into_iter().take(3).enumerate() {
         let y = 260.0 + index as f32 * 91.0;
         let accent = hex_to_color(&buyer.color);
-        draw_circle(
-            909.0,
-            y - 4.0,
-            11.0,
-            Color::new(accent.r, accent.g, accent.b, 0.14),
+        draw_rectangle(
+            900.0,
+            y - 22.0,
+            44.0,
+            64.0,
+            Color::new(accent.r, accent.g, accent.b, 0.08),
         );
-        draw_circle(909.0, y - 4.0, 5.0, accent);
+        ctx.artwork.draw_alien_portrait(
+            &buyer.name,
+            &buyer.expertise,
+            vec2(922.0, y + 10.0),
+            64.0,
+            WHITE,
+        );
         draw_ui_text_ex(
             &buyer.name,
-            932.0,
+            954.0,
             y,
             TextStyle::new(14.0, dark::TEXT_BRIGHT).params(),
         );
@@ -340,7 +347,7 @@ fn draw_market_signals(ctx: &UiContext<'_>) {
         );
         draw_ui_text_ex(
             &short_demand(&buyer.description),
-            932.0,
+            954.0,
             y + 23.0,
             TextStyle::new(10.0, dark::TEXT_DIM).params(),
         );

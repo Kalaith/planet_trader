@@ -215,16 +215,30 @@ fn draw_buyers(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
             );
         }
         let accent = hex_to_color(&buyer.color);
+        draw_rectangle(
+            row.x + 4.0,
+            row.y + 5.0,
+            58.0,
+            row.h - 10.0,
+            Color::new(accent.r, accent.g, accent.b, 0.08),
+        );
+        ctx.artwork.draw_alien_portrait(
+            &buyer.name,
+            &buyer.expertise,
+            vec2(row.x + 33.0, row.y + row.h * 0.5),
+            row.h - 8.0,
+            WHITE,
+        );
         draw_circle(
-            row.x + 12.0,
-            row.y + 20.0,
-            10.0,
+            row.x + 61.0,
+            row.y + 15.0,
+            5.0,
             Color::new(accent.r, accent.g, accent.b, 0.18),
         );
-        draw_circle(row.x + 12.0, row.y + 20.0, 5.0, accent);
+        draw_circle(row.x + 61.0, row.y + 15.0, 2.5, accent);
         draw_ui_text_ex(
             &buyer.name,
-            row.x + 34.0,
+            row.x + 72.0,
             row.y + 24.0,
             TextStyle::new(14.0, dark::TEXT_BRIGHT).params(),
         );
@@ -238,7 +252,7 @@ fn draw_buyers(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
         }
         draw_ui_text_ex(
             &format!("{}/6 MATCH", matches),
-            row.x + 34.0,
+            row.x + 72.0,
             row.y + 51.0,
             TextStyle::new(
                 12.0,
@@ -263,7 +277,7 @@ fn draw_buyers(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
                 knowledge_award_for_matches(matches),
                 buyer.expertise
             ),
-            row.x + 34.0,
+            row.x + 72.0,
             row.y + 75.0,
             TextStyle::new(9.0, dark::TEXT_DIM).params(),
         );
@@ -328,6 +342,26 @@ fn draw_deal(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
         DEAL.x,
         224.0,
         TextStyle::new(9.0, dark::TEXT_DIM).params(),
+    );
+    let portrait_accent = hex_to_color(&buyer.color);
+    draw_rectangle(
+        DEAL.right() - 72.0,
+        175.0,
+        72.0,
+        70.0,
+        Color::new(
+            portrait_accent.r,
+            portrait_accent.g,
+            portrait_accent.b,
+            0.10,
+        ),
+    );
+    ctx.artwork.draw_alien_portrait(
+        &buyer.name,
+        &buyer.expertise,
+        vec2(DEAL.right() - 36.0, 210.0),
+        70.0,
+        WHITE,
     );
     let requirements = [
         ("TEMPERATURE", planet.temperature, buyer.temp_range, "C"),

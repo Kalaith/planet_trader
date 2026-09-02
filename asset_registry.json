@@ -1,4 +1,7 @@
 {
   "version": 1,
-  "assets": []
+  "assets": [
+    "assets/art/alien_species_atlas.png",
+    "assets/art/technology_icons_atlas.png"
+  ]
 }

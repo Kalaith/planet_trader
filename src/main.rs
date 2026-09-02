@@ -3,6 +3,7 @@
 use macroquad::prelude::*;
 use macroquad_toolkit::capture;
 
+mod artwork;
 mod data;
 mod game;
 mod state;

@@ -203,9 +203,19 @@ fn draw_tool_choice(
             Color::new(0.20, 0.55, 0.64, 0.66)
         },
     );
+    ctx.artwork.draw_technology_icon(
+        &tool.name,
+        vec2(row.x + 30.0, row.y + 31.0),
+        50.0,
+        if selected {
+            WHITE
+        } else {
+            Color::new(0.68, 0.82, 0.88, 0.86)
+        },
+    );
     draw_ui_text_ex(
         &format!("{}  {}", tool_icon(&tool.category), tool.name),
-        row.x + 14.0,
+        row.x + 58.0,
         row.y + 22.0,
         TextStyle::new(13.0, dark::TEXT_BRIGHT).params(),
     );
@@ -217,16 +227,16 @@ fn draw_tool_choice(
     );
     draw_ui_text_ex(
         ctx.tool_intensity.label(),
-        row.x + 14.0,
+        row.x + 58.0,
         row.y + 43.0,
         TextStyle::new(8.0, dark::TEXT_DIM).params(),
     );
     if selected {
         draw_text_block(
             &tool.description,
-            row.x + 14.0,
+            row.x + 58.0,
             row.y + 57.0,
-            row.w - 28.0,
+            row.w - 72.0,
             32.0,
             9.0,
             2.0,
