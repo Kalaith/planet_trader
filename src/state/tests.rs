@@ -33,6 +33,7 @@ fn test_data() -> GameData {
             bio_range: [0.0, 3.0],
             base_price: 6_000,
             color: "#FFFFFF".to_owned(),
+            expertise: "hydrology".to_owned(),
         }],
         alien_species_types: vec![SpeciesTemplate {
             prefixes: vec!["Test".to_owned()],
@@ -45,6 +46,7 @@ fn test_data() -> GameData {
             rad: [0.0, 2.0],
             bio: [0.0, 3.0],
             colors: vec!["#FFFFFF".to_owned()],
+            expertise: "hydrology".to_owned(),
         }],
         planet_names: vec!["Testia".to_owned()],
         research: vec![ResearchDef {
@@ -53,6 +55,13 @@ fn test_data() -> GameData {
             rp_cost: 20,
             unlocks_tool: true,
             description: "Unlocks cryogenic tools".to_owned(),
+            branch: "frontier".to_owned(),
+            credit_cost: 0,
+            knowledge_required: 0,
+            prerequisite: None,
+            reveals: None,
+            tier: 1,
+            hint: String::new(),
         }],
     }
 }
@@ -569,4 +578,133 @@ fn research_requires_enough_points_and_cannot_repeat() {
     session.research_points = 20;
     session.complete_research(&data.research[0]).unwrap();
     assert!(session.complete_research(&data.research[0]).is_err());
+}
+
+#[test]
+fn perfect_sales_build_species_knowledge_and_reveal_hidden_fields() {
+    let data = test_data();
+    let mut session = GameSession::new(&data);
+    session.game_started = true;
+    session.open_purchase_modal(&data).unwrap();
+    let id = session.planet_options[0].id.clone();
+    session.purchase_planet(&id).unwrap();
+    session.select_planet(&id).unwrap();
+    let buyer_id = session.alien_buyers[0].id;
+
+    session.sell_planet(buyer_id).unwrap();
+
+    assert_eq!(session.knowledge("hydrology"), 3);
+    assert_eq!(session.trade_history.last().unwrap().knowledge_award, 3);
+    let hidden_node = ResearchDef {
+        name: "Ice Science".to_owned(),
+        category: "Hydrology".to_owned(),
+        rp_cost: 10,
+        unlocks_tool: false,
+        description: "Test".to_owned(),
+        branch: "hydrology".to_owned(),
+        credit_cost: 100,
+        knowledge_required: 2,
+        prerequisite: None,
+        reveals: None,
+        tier: 1,
+        hint: "Oceanic clients".to_owned(),
+    };
+    assert!(session.research_is_discovered(&hidden_node));
+}
+
+#[test]
+fn research_spends_rp_and_credits_and_honours_prerequisites() {
+    let data = test_data();
+    let mut session = GameSession::new(&data);
+    session.game_started = true;
+    session.research_points = 30;
+    session.credits = 1_000;
+    let mut node = data.research[0].clone();
+    node.rp_cost = 20;
+    node.credit_cost = 400;
+    node.prerequisite = Some("Earlier Study".to_owned());
+
+    assert!(session.complete_research(&node).is_err());
+    session.completed_research.push("Earlier Study".to_owned());
+    session.complete_research(&node).unwrap();
+
+    assert_eq!(session.research_points, 10);
+    assert_eq!(session.credits, 600);
+}
+
+#[test]
+fn tool_intensity_scales_cost_and_environmental_change() {
+    let data = test_data();
+    let mut session = GameSession::new(&data);
+    session.game_started = true;
+    session.open_purchase_modal(&data).unwrap();
+    let id = session.planet_options[0].id.clone();
+    session.purchase_planet(&id).unwrap();
+    session.select_planet(&id).unwrap();
+    let before_temp = session.current_planet().unwrap().temperature;
+    let before_credits = session.credits;
+    let tool = Tool {
+        id: "test-heat".to_owned(),
+        name: "Test Heat".to_owned(),
+        category: "temperature".to_owned(),
+        effect: HashMap::from([("temperature".to_owned(), 10.0)]),
+        side_effects: HashMap::new(),
+        cost: 100,
+        tier: 1,
+        unlocked: true,
+        upgrade_required: None,
+        description: "Test".to_owned(),
+    };
+
+    session
+        .apply_tool_with_intensity(&tool, ToolIntensity::Low)
+        .unwrap();
+
+    assert_eq!(
+        session.current_planet().unwrap().temperature,
+        before_temp + 5.0
+    );
+    assert_eq!(session.credits, before_credits - 50);
+}
+
+#[test]
+fn better_analysis_narrows_forecasts_to_exact_results() {
+    let early = forecast_range(12.0, 0);
+    let modeled = forecast_range(12.0, 2);
+    let exact = forecast_range(12.0, 3);
+
+    assert!(early.1 - early.0 > modeled.1 - modeled.0);
+    assert_eq!(exact, (12.0, 12.0));
+}
+
+#[test]
+fn one_scan_uses_distinct_contract_names() {
+    let data = GameData::load().unwrap();
+    let mut session = GameSession::new(&data);
+    session.game_started = true;
+    session.reputation = 120;
+    session.open_purchase_modal(&data).unwrap();
+    let mut names: Vec<_> = session
+        .planet_options
+        .iter()
+        .map(|planet| planet.name.as_str())
+        .collect();
+    names.sort_unstable();
+    names.dedup();
+
+    assert_eq!(names.len(), session.planet_options.len());
+}
+
+#[test]
+fn complete_research_catalogue_unlocks_every_advanced_tool() {
+    let data = GameData::load().unwrap();
+    let completed: Vec<_> = data.research.iter().map(|node| node.name.clone()).collect();
+    let locked: Vec<_> = data
+        .terraforming_tools
+        .iter()
+        .filter(|tool| tool_is_locked(tool, &completed))
+        .map(|tool| tool.name.as_str())
+        .collect();
+
+    assert!(locked.is_empty(), "still locked: {locked:?}");
 }

@@ -3,12 +3,13 @@ use super::*;
 pub(super) fn draw_tutorial(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {
     match ctx.session.tutorial_step {
         TutorialStep::Welcome => draw_welcome(mouse, actions),
-        TutorialStep::BuyPlanet => draw_coach("STEP 1 / ACQUIRE", "Tap SCAN FOR PLANET CONTRACTS to open the frontier catalogue.", Some(Rect::new(938.0, 196.0, 276.0, 64.0))),
-        TutorialStep::ChooseOffer => draw_coach("STEP 2 / CHOOSE", "Compare the visible worlds, then tap a green BUY button.", None),
-        TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PLANET INVENTORY to bring it into the workshop.", Some(Rect::new(344.0, 548.0, 572.0, 56.0))),
-        TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap an alien buyer card. Green requirements already match; red ones need engineering.", Some(Rect::new(950.0, 278.0, 304.0, 110.0))),
-        TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a terraforming tool to inspect its cost and side effects, then tap USE.", Some(Rect::new(26.0, 218.0, 284.0, 78.0))),
-        TutorialStep::SellOrSalvage => draw_coach("STEP 6 / CLOSE THE DEAL", "SELL when at least 4 of 6 requirements match. If the investment is poor, tap SALVAGE to recover credits.", None),
+        TutorialStep::BuyPlanet => draw_coach("STEP 1 / ACQUIRE", "Tap SCAN FOR PLANET CONTRACTS to open the frontier catalogue.", Some(Rect::new(232.0, 602.0, 352.0, 58.0))),
+        TutorialStep::ChooseOffer => draw_coach("STEP 2 / CHOOSE", "Tap an offer card to inspect its scan, then tap ACQUIRE WORLD.", Some(Rect::new(898.0, 602.0, 310.0, 52.0))),
+        TutorialStep::SelectPlanet => draw_coach("STEP 3 / ACTIVATE", "Tap the purchased world in PORTFOLIO to bring it into the workshop cradle.", Some(Rect::new(414.0, 618.0, 158.0, 46.0))),
+        TutorialStep::InspectBuyer if ctx.expanded_buyer.is_some() => draw_coach("STEP 4 / READ DEMAND", "Review the six requirement rows, then tap HOLD / RETURN TO WORKSHOP to engineer this world.", Some(Rect::new(914.0, 642.0, 334.0, 34.0))),
+        TutorialStep::InspectBuyer => draw_coach("STEP 4 / READ DEMAND", "Tap a LIVE BUYER OFFER. Green requirements already match; red ones need engineering.", Some(Rect::new(396.0, 226.0, 476.0, 98.0))),
+        TutorialStep::UseTool => draw_coach("STEP 5 / ENGINEER", "Tap a tool in TERRAFORMING ARRAY, review OUTCOME PREVIEW, then tap APPLY TOOL.", Some(Rect::new(28.0, 280.0, 340.0, 64.0))),
+        TutorialStep::SellOrSalvage => draw_coach("STEP 6 / CLOSE THE DEAL", "Tap CLOSE DEAL when at least 4 of 6 requirements match, or tap SALVAGE in Workshop to recover credits.", None),
         TutorialStep::OpenResearch => draw_coach("STEP 7 / GROW", "Sales award RP. Tap RESEARCH to inspect technology that opens new strategies.", Some(Rect::new(536.0, 95.0, 160.0, 34.0))),
         TutorialStep::Complete => {}
     }
@@ -72,7 +73,16 @@ fn draw_coach(kicker: &str, message: &str, focus: Option<Rect>) {
             Color::new(0.42, 0.92, 1.0, 1.0),
         );
     }
-    let rect = Rect::new(350.0, 626.0, 580.0, 76.0);
+    let coach_y = focus
+        .map(|target| {
+            if target.center().y > 430.0 && target.center().x < 800.0 {
+                152.0
+            } else {
+                626.0
+            }
+        })
+        .unwrap_or(626.0);
+    let rect = Rect::new(350.0, coach_y, 540.0, 76.0);
     draw_surface(
         rect,
         &SurfaceStyle::new(Color::new(0.025, 0.09, 0.13, 0.98))

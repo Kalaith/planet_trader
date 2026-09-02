@@ -1,72 +1,15 @@
 [
-  {
-    "name": "Ice Comet Bombardment",
-    "category": "Hydrology",
-    "rpCost": 35,
-    "unlocksTool": true,
-    "description": "Unlocks ice-based orbital strikes to increase water and reduce temperature."
-  },
-  {
-    "name": "Gravity Intensifier",
-    "category": "Gravimetrics",
-    "rpCost": 45,
-    "unlocksTool": true,
-    "description": "Enables high-mass generation to increase planetary gravity."
-  },
-  {
-    "name": "Gravity Stabilizer",
-    "category": "Gravimetrics",
-    "rpCost": 45,
-    "unlocksTool": true,
-    "description": "Unlocks gravity reduction via planetary mass redistribution."
-  },
-  {
-    "name": "Magnetic Field Generator",
-    "category": "Radiation Management",
-    "rpCost": 40,
-    "unlocksTool": true,
-    "description": "Creates planetary-scale magnetic shielding to reduce radiation."
-  },
-  {
-    "name": "Radiation Enhancer",
-    "category": "Radiation Management",
-    "rpCost": 35,
-    "unlocksTool": true,
-    "description": "Unlocks artificial radiation emitters for exotic environmental needs."
-  },
-  {
-    "name": "Cloud Seeder",
-    "category": "Hydrology",
-    "rpCost": 30,
-    "unlocksTool": true,
-    "description": "Enables water vapor injection for cloud formation and radiation blocking."
-  },
-  {
-    "name": "Cryo-Atmos Converter",
-    "category": "Atmospheric Sciences",
-    "rpCost": 50,
-    "unlocksTool": true,
-    "description": "Unlocks tools to convert frozen gases into atmosphere."
-  },
-  {
-    "name": "Thermal Balancer",
-    "category": "Thermal Control",
-    "rpCost": 55,
-    "unlocksTool": true,
-    "description": "Enables self-regulating thermal controls to maintain temperature stability."
-  },
-  {
-    "name": "Bio-Seeder Pods",
-    "category": "Biogenesis",
-    "rpCost": 60,
-    "unlocksTool": true,
-    "description": "Unlocks advanced biological seeding for microbial and plant colonization."
-  },
-  {
-    "name": "Radiant Bloom",
-    "category": "Biogenesis",
-    "rpCost": 70,
-    "unlocksTool": true,
-    "description": "Unlocks plant life designed to thrive in radiation-rich environments."
-  }
+  {"name":"Atmospheric Chemistry","category":"Analysis","branch":"frontier","rpCost":20,"creditCost":300,"knowledgeRequired":0,"tier":1,"unlocksTool":false,"reveals":"Atmospheric composition cues and improved forecast confidence","hint":"Baseline company science","description":"Separates broad pressure readings into useful atmospheric signals."},
+  {"name":"Planetary Systems Modeling","category":"Analysis","branch":"frontier","rpCost":35,"creditCost":600,"knowledgeRequired":0,"prerequisite":"Atmospheric Chemistry","tier":2,"unlocksTool":false,"reveals":"Narrow forecasts, stability analysis, and all tool intensities","hint":"Improve the company's models","description":"Models interactions between climate, water, atmosphere, and biosphere."},
+  {"name":"Precision Climate Grid","category":"Precision Control","branch":"frontier","rpCost":60,"creditCost":1800,"knowledgeRequired":0,"prerequisite":"Planetary Systems Modeling","tier":3,"unlocksTool":true,"reveals":"Exact outcome forecasts and fine one-degree climate control","hint":"Master planetary systems first","description":"Turns accumulated frontier science into precise, predictable adjustment."},
+  {"name":"Ice Comet Bombardment","category":"Ice Redistribution","branch":"hydrology","rpCost":35,"creditCost":750,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"Large water delivery with known cooling tradeoffs","hint":"Further expertise may be gained from oceanic clients.","description":"Redirects ice bodies to build oceans while sharply cooling the surface."},
+  {"name":"Cloud Seeder","category":"Cloud Formation","branch":"hydrology","rpCost":30,"creditCost":650,"knowledgeRequired":3,"prerequisite":"Ice Comet Bombardment","tier":2,"unlocksTool":true,"reveals":"Cloud cover interactions","hint":"Strong oceanic contracts reveal more.","description":"Forms reflective cloud systems for water and radiation control."},
+  {"name":"Thermal Balancer","category":"Geothermal Control","branch":"volcanology","rpCost":45,"creditCost":900,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"Side-effect-neutral thermal regulation","hint":"Further expertise may be gained from volcanic clients.","description":"Stabilises extreme climates without disturbing water or atmosphere."},
+  {"name":"Cryo-Atmos Converter","category":"Gas Separation","branch":"atmospherics","rpCost":45,"creditCost":850,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"Trace-gas handling","hint":"Atmospheric specialists can reveal this field.","description":"Extracts useful gases from frozen reserves while cooling the world."},
+  {"name":"Gravity Intensifier","category":"Gravimetrics","branch":"harsh-world","rpCost":45,"creditCost":1100,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"High-mass planetary engineering","hint":"Extreme-environment clients share gravimetric knowledge.","description":"Adds mass to create high-gravity worlds and improve gas retention."},
+  {"name":"Gravity Stabilizer","category":"Gravimetrics","branch":"harsh-world","rpCost":50,"creditCost":1200,"knowledgeRequired":3,"prerequisite":"Gravity Intensifier","tier":2,"unlocksTool":true,"reveals":"Controlled gravity reduction","hint":"Complete stronger harsh-world contracts.","description":"Redistributes planetary mass to reduce gravity predictably."},
+  {"name":"Magnetic Field Generator","category":"Radiation Shielding","branch":"harsh-world","rpCost":40,"creditCost":950,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"Efficient radiation reduction","hint":"Harsh-world clients value shielding expertise.","description":"Creates a magnetic shield that strips radiation from a world."},
+  {"name":"Radiation Enhancer","category":"Extreme Materials","branch":"harsh-world","rpCost":35,"creditCost":700,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"Controlled exotic radiation environments","hint":"Harsh-world clients can reveal this use of radiation.","description":"Creates high-energy environments for unusual industrial buyers."},
+  {"name":"Bio-Seeder Pods","category":"Biosphere Seeding","branch":"ecology","rpCost":55,"creditCost":1300,"knowledgeRequired":2,"tier":1,"unlocksTool":true,"reveals":"Directed biosphere growth","hint":"Ecological clients reveal living-world methods.","description":"Seeds tailored microbial and plant networks into viable climates."},
+  {"name":"Radiant Bloom","category":"Ecosystem Stabilisation","branch":"ecology","rpCost":70,"creditCost":1600,"knowledgeRequired":3,"prerequisite":"Bio-Seeder Pods","tier":2,"unlocksTool":true,"reveals":"Radiation-tolerant ecosystems","hint":"Perfect ecological contracts reveal deeper methods.","description":"Builds a stable biosphere from flora that absorbs radiation."}
 ]

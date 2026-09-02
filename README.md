@@ -28,8 +28,11 @@ deal; a poor investment may need to be salvaged before it sinks the company.
 
 ## Building the company
 
-- Invest research points in new terraforming technology and wider strategic
-  options.
+- Earn non-spendable species knowledge from strong and perfect contracts to
+  discover hidden scientific branches, then invest universal research points
+  and credits in the revealed capabilities.
+- Begin with uncertain, coarse interventions and progress through selectable
+  Low / Standard / Heavy intensity to exact late-game climate control.
 - Build reputation through successful sales to improve your company rank and
   expand future contract scans from three worlds to as many as five.
 - Manage several owned planets and switch the active workshop project as market
@@ -50,3 +53,7 @@ deal; a poor investment may need to be salvaged before it sinks the company.
 
 The guided orientation introduces the complete trading cycle using the same
 controls as normal play.
+
+The focused Acquire, Workshop, Alien Market, Research, and Company screens use
+progressive disclosure: they show the decision and information relevant to the
+current task, while unknown science appears only as a concise discovery hint.

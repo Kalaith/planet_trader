@@ -4,6 +4,14 @@ use crate::data::{GameConfig, GameData, PlanetType, ResearchDef, Species, Specie
 use macroquad::rand::gen_range;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::HashMap;
+
+#[path = "state/progression.rs"]
+mod progression;
+#[path = "state/terraforming.rs"]
+mod terraforming;
+pub use progression::*;
+pub use terraforming::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Planet {
@@ -38,6 +46,8 @@ pub struct AlienBuyer {
     pub base_price: i64,
     pub current_price: i64,
     pub color: String,
+    #[serde(default = "default_expertise")]
+    pub expertise: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -51,6 +61,8 @@ pub struct TradeRecord {
     pub sale_price: i64,
     pub profit: i64,
     pub compatibility: f32,
+    #[serde(default)]
+    pub knowledge_award: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -91,6 +103,10 @@ fn default_bio_range() -> [f32; 2] {
     [0.0, 3.0]
 }
 
+fn default_expertise() -> String {
+    "frontier".to_owned()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SaveData {
     pub version: String,
@@ -110,6 +126,8 @@ pub struct SaveData {
     pub completed_research: Vec<String>,
     #[serde(default)]
     pub reputation: i64,
+    #[serde(default)]
+    pub species_knowledge: HashMap<String, u32>,
     #[serde(default = "completed_tutorial")]
     pub tutorial_step: TutorialStep,
 }
@@ -128,6 +146,7 @@ pub struct GameSession {
     pub research_points: i64,
     pub completed_research: Vec<String>,
     pub reputation: i64,
+    pub species_knowledge: HashMap<String, u32>,
     pub tutorial_step: TutorialStep,
     next_planet_id: u64,
     next_buyer_id: u64,
@@ -148,6 +167,7 @@ impl GameSession {
             research_points: 0,
             completed_research: Vec::new(),
             reputation: 0,
+            species_knowledge: HashMap::new(),
             tutorial_step: TutorialStep::Welcome,
             next_planet_id: 1,
             next_buyer_id: 1,
@@ -184,6 +204,7 @@ impl GameSession {
         }
         session.completed_research = completed_research;
         session.reputation = save.reputation.max(0);
+        session.species_knowledge = save.species_knowledge;
         session.tutorial_step = save.tutorial_step;
         if !save.alien_buyers.is_empty() {
             session.alien_buyers = save.alien_buyers;
@@ -225,6 +246,7 @@ impl GameSession {
             research_points: self.research_points,
             completed_research: self.completed_research.clone(),
             reputation: self.reputation,
+            species_knowledge: self.species_knowledge.clone(),
             tutorial_step: self.tutorial_step,
         }
     }
@@ -267,10 +289,15 @@ impl GameSession {
         }
 
         let count = contract_option_count(self.reputation);
+        let name_indices =
+            unique_indices(data.planet_names.len(), count.min(data.planet_names.len()));
         self.planet_options = (0..count)
-            .map(|_| {
+            .map(|offer_index| {
                 let type_index = gen_range(0, data.planet_types.len() as i32) as usize;
-                let name_index = gen_range(0, data.planet_names.len() as i32) as usize;
+                let name_index = name_indices
+                    .get(offer_index)
+                    .copied()
+                    .unwrap_or_else(|| gen_range(0, data.planet_names.len() as i32) as usize);
                 let id = format!("planet-{}", self.next_planet_id);
                 self.next_planet_id += 1;
                 Planet::from_type(
@@ -316,6 +343,7 @@ impl GameSession {
             sale_price: 0,
             profit: -price,
             compatibility: 0.0,
+            knowledge_award: 0,
         });
         self.planets.push(planet);
         self.planet_modal_open = false;
@@ -331,53 +359,6 @@ impl GameSession {
             .ok_or_else(|| "That planet is not in your inventory.".to_owned())?;
         self.current_planet_id = Some(planet.id.clone());
         Ok(format!("Selected {}", planet.name))
-    }
-
-    pub fn apply_tool(&mut self, tool: &Tool) -> Result<String, String> {
-        self.require_started()?;
-        if self.current_planet_id.is_none() {
-            return Err("Select a planet first!".to_owned());
-        }
-        if tool_is_locked(tool, &self.completed_research) {
-            return Err(format!("{} is locked.", tool.name));
-        }
-        if self.credits < tool.cost {
-            return Err("Not enough credits!".to_owned());
-        }
-
-        let planet_id = self.current_planet_id.clone().expect("checked above");
-        let planet = self
-            .planets
-            .iter_mut()
-            .find(|planet| planet.id == planet_id)
-            .ok_or_else(|| "That planet is no longer in your inventory.".to_owned())?;
-        for (stat, delta) in tool.effect.iter().chain(tool.side_effects.iter()) {
-            apply_stat(planet, stat, *delta);
-        }
-        planet.invested_cost += tool.cost;
-        self.credits -= tool.cost;
-        self.stats.total_spend += tool.cost;
-        Ok(format!("Used {}", tool.name))
-    }
-
-    pub fn complete_research(&mut self, research: &ResearchDef) -> Result<String, String> {
-        self.require_started()?;
-        if self.research_is_complete(&research.name) {
-            return Err(format!("{} is already researched.", research.name));
-        }
-
-        let cost = research.rp_cost.max(0);
-        if self.research_points < cost {
-            return Err(format!("{} research points needed.", cost));
-        }
-
-        self.research_points -= cost;
-        self.completed_research.push(research.name.clone());
-        Ok(format!("Research complete: {}", research.name))
-    }
-
-    pub fn research_is_complete(&self, name: &str) -> bool {
-        self.completed_research.iter().any(|entry| entry == name)
     }
 
     pub fn sell_planet(&mut self, buyer_id: u64) -> Result<String, String> {
@@ -414,6 +395,10 @@ impl GameSession {
         let research_award = research_points_for_sale(price, compatibility_score);
         self.credits += price;
         self.research_points = self.research_points.saturating_add(research_award);
+        let matches = compatibility_matches(compatibility_score);
+        let knowledge_award = knowledge_award_for_matches(matches);
+        let expertise = buyer.expertise.clone();
+        *self.species_knowledge.entry(expertise.clone()).or_default() += knowledge_award;
         let reputation_award = reputation_for_sale(profit, compatibility_score);
         self.reputation = self.reputation.saturating_add(reputation_award);
         self.stats.planets_sold += 1;
@@ -430,12 +415,13 @@ impl GameSession {
             sale_price: price,
             profit,
             compatibility: compatibility_score,
+            knowledge_award,
         });
         self.planets.retain(|planet| planet.id != planet_id);
         self.current_planet_id = None;
         Ok(format!(
-            "Sold {} to {} for {} CR (+{} RP, +{} REP)",
-            name, buyer.name, price, research_award, reputation_award
+            "Sold {} to {} for {} CR (+{} RP, +{} REP, +{} {} knowledge)",
+            name, buyer.name, price, research_award, reputation_award, knowledge_award, expertise
         ))
     }
 
@@ -473,6 +459,7 @@ impl GameSession {
             sale_price: salvage_price,
             profit,
             compatibility: 0.0,
+            knowledge_award: 0,
         });
         self.planets.retain(|planet| planet.id != planet_id);
         self.current_planet_id = None;
@@ -513,6 +500,7 @@ impl GameSession {
             base_price,
             current_price,
             color: species.color.clone(),
+            expertise: species.expertise.clone(),
         };
         self.next_buyer_id += 1;
         buyer
@@ -537,6 +525,7 @@ impl GameSession {
             base_price,
             current_price,
             color: random_string(&template.colors, "#40B8C8"),
+            expertise: template.expertise.clone(),
         };
         self.next_buyer_id += 1;
         buyer
@@ -583,44 +572,12 @@ pub fn potential_profit(planet: &Planet, buyer: &AlienBuyer) -> i64 {
     sale_price(planet, buyer) - investment_cost(planet)
 }
 
-pub fn salvage_value(planet: &Planet) -> i64 {
-    salvage_value_for_investment(investment_cost(planet))
-}
-
 pub fn market_trend_percent(buyer: &AlienBuyer) -> f32 {
     if buyer.base_price <= 0 {
         0.0
     } else {
         ((buyer.current_price - buyer.base_price) as f32 / buyer.base_price as f32) * 100.0
     }
-}
-
-pub fn company_rank(reputation: i64) -> (&'static str, i64) {
-    match reputation.max(0) {
-        0..=24 => ("Frontier Startup", 25),
-        25..=59 => ("Established Broker", 60),
-        60..=119 => ("Renowned Terraformer", 120),
-        _ => ("Stellar Institution", 120),
-    }
-}
-
-pub fn contract_option_count(reputation: i64) -> usize {
-    match reputation.max(0) {
-        0..=24 => 3,
-        25..=59 => 4,
-        _ => 5,
-    }
-}
-
-pub fn tool_is_locked(tool: &Tool, completed_research: &[String]) -> bool {
-    if tool.unlocked {
-        return false;
-    }
-    let unlocked_by = [Some(tool.name.as_str()), tool.upgrade_required.as_deref()];
-    !unlocked_by
-        .into_iter()
-        .flatten()
-        .any(|name| completed_research.iter().any(|entry| entry == name))
 }
 
 fn within(value: f32, range: [f32; 2]) -> bool {
@@ -684,18 +641,6 @@ fn unique_indices(length: usize, count: usize) -> Vec<usize> {
     chosen
 }
 
-fn apply_stat(planet: &mut Planet, stat: &str, delta: f32) {
-    match stat {
-        "temperature" => planet.temperature = (planet.temperature + delta).clamp(-100.0, 200.0),
-        "atmosphere" => planet.atmosphere = (planet.atmosphere + delta).clamp(0.0, 3.0),
-        "water" => planet.water = (planet.water + delta).clamp(0.0, 1.0),
-        "gravity" => planet.gravity = (planet.gravity + delta).clamp(0.1, 5.0),
-        "radiation" => planet.radiation = (planet.radiation + delta).clamp(0.0, 2.0),
-        "biosphere" => planet.biosphere = (planet.biosphere + delta).clamp(0.0, 3.0),
-        _ => {}
-    }
-}
-
 fn random_string(values: &[String], fallback: &str) -> String {
     if values.is_empty() {
         fallback.to_owned()
@@ -741,6 +686,7 @@ pub fn migrate_save_value(
         research_points: 0,
         completed_research: Vec::new(),
         reputation: 0,
+        species_knowledge: HashMap::new(),
         tutorial_step: TutorialStep::Complete,
     })
 }

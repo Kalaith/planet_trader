@@ -9,7 +9,8 @@
     "radRange": [0.2, 0.8],
     "bioRange": [0.2, 1.4],
     "basePrice": 5000,
-    "color": "#FF4500"
+    "color": "#FF4500",
+    "expertise": "volcanology"
   },
   {
     "name": "Cryophyte Crystals",
@@ -21,7 +22,8 @@
     "radRange": [0.6, 1.0],
     "bioRange": [0.0, 0.5],
     "basePrice": 4500,
-    "color": "#00BFFF"
+    "color": "#00BFFF",
+    "expertise": "harsh-world"
   },
   {
     "name": "Aquatic Molluscoids",
@@ -33,7 +35,8 @@
     "radRange": [0.1, 0.3],
     "bioRange": [1.5, 3.0],
     "basePrice": 6000,
-    "color": "#20B2AA"
+    "color": "#20B2AA",
+    "expertise": "hydrology"
   },
   {
     "name": "Desert Nomads",
@@ -45,7 +48,8 @@
     "radRange": [0.3, 0.7],
     "bioRange": [0.1, 0.8],
     "basePrice": 4000,
-    "color": "#DEB887"
+    "color": "#DEB887",
+    "expertise": "atmospherics"
   },
   {
     "name": "High-Gravity Hunters",
@@ -57,7 +61,8 @@
     "radRange": [0.1, 0.4],
     "bioRange": [0.8, 2.0],
     "basePrice": 7000,
-    "color": "#8B4513"
+    "color": "#8B4513",
+    "expertise": "harsh-world"
   },
   {
     "name": "Energy Feeders",
@@ -69,6 +74,7 @@
     "radRange": [0.8, 1.0],
     "bioRange": [0.0, 0.4],
     "basePrice": 5500,
-    "color": "#9400D3"
+    "color": "#9400D3",
+    "expertise": "ecology"
   }
 ]

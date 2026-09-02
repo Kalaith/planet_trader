@@ -158,5 +158,16 @@
     "unlocked": false,
     "upgradeRequired": "Bio-Luminescence Cultivation",
     "description": "Spreads radiant-tolerant flora that thrive under moderate radiation and help stabilize biospheres."
+  },
+  {
+    "name": "Precision Climate Grid",
+    "category": "temperature",
+    "effect": { "temperature": 1 },
+    "sideEffects": {},
+    "cost": 250,
+    "tier": 4,
+    "unlocked": false,
+    "upgradeRequired": "Planetary Systems Modeling",
+    "description": "Makes exact one-degree climate adjustments with predictable secondary effects."
   }
 ]

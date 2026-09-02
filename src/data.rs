@@ -84,6 +84,8 @@ pub struct Species {
     #[serde(rename = "basePrice")]
     pub base_price: i64,
     pub color: String,
+    #[serde(default = "default_expertise")]
+    pub expertise: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -99,6 +101,8 @@ pub struct SpeciesTemplate {
     #[serde(default = "default_bio_range")]
     pub bio: [f32; 2],
     pub colors: Vec<String>,
+    #[serde(default = "default_expertise")]
+    pub expertise: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -110,6 +114,20 @@ pub struct ResearchDef {
     #[serde(rename = "unlocksTool")]
     pub unlocks_tool: bool,
     pub description: String,
+    #[serde(default = "default_branch")]
+    pub branch: String,
+    #[serde(rename = "creditCost", default)]
+    pub credit_cost: i64,
+    #[serde(rename = "knowledgeRequired", default)]
+    pub knowledge_required: u32,
+    #[serde(default)]
+    pub prerequisite: Option<String>,
+    #[serde(default)]
+    pub reveals: Option<String>,
+    #[serde(default)]
+    pub tier: u32,
+    #[serde(default)]
+    pub hint: String,
 }
 
 #[derive(Debug, Clone)]
@@ -159,6 +177,14 @@ impl GameData {
 
 fn default_true() -> bool {
     true
+}
+
+fn default_expertise() -> String {
+    "frontier".to_owned()
+}
+
+fn default_branch() -> String {
+    "Frontier Engineering".to_owned()
 }
 
 fn default_bio_range() -> [f32; 2] {

@@ -132,14 +132,66 @@ pub(super) fn draw_company(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<U
             .with_border(1.0, Color::new(0.16, 0.36, 0.44, 1.0)),
     );
     draw_ui_text_ex(
-        "CHARTER CONTROLS",
+        "SPECIES KNOWLEDGE",
         controls.x + 18.0,
         controls.y + 30.0,
         TextStyle::new(14.0, Color::new(0.46, 0.82, 0.96, 1.0)).params(),
     );
+    for (index, (key, label)) in KNOWLEDGE_FIELDS
+        .iter()
+        .filter(|(key, _)| *key != "frontier")
+        .enumerate()
+    {
+        let value = ctx.session.knowledge(key);
+        let next = ctx
+            .data
+            .research
+            .iter()
+            .filter(|node| node.branch == *key && node.knowledge_required > value)
+            .map(|node| node.knowledge_required)
+            .min();
+        let row = Rect::new(
+            controls.x + 16.0,
+            controls.y + 42.0 + index as f32 * 32.0,
+            controls.w - 32.0,
+            26.0,
+        );
+        draw_surface(
+            row,
+            &SurfaceStyle::new(Color::new(0.055, 0.115, 0.15, 1.0))
+                .with_border(1.0, Color::new(0.16, 0.32, 0.39, 1.0)),
+        );
+        draw_ui_text_ex(
+            label,
+            row.x + 8.0,
+            row.y + 18.0,
+            TextStyle::new(10.0, dark::TEXT).params(),
+        );
+        draw_text_right(
+            &next
+                .map(|target| format!("{} / {} KN", value, target))
+                .unwrap_or_else(|| format!("{} KN  //  MASTERED", value)),
+            row.right() - 8.0,
+            row.y + 18.0,
+            TextStyle::new(
+                10.0,
+                if value >= 2 {
+                    Color::new(0.46, 0.94, 0.62, 1.0)
+                } else {
+                    dark::TEXT_DIM
+                },
+            ),
+        );
+    }
+    draw_ui_text_ex(
+        "CHARTER CONTROLS",
+        controls.x + 18.0,
+        controls.y + 216.0,
+        TextStyle::new(10.0, dark::TEXT_DIM).params(),
+    );
     if button(
-        Rect::new(controls.x + 18.0, controls.y + 54.0, 176.0, 40.0),
-        "SAVE NOW",
+        Rect::new(controls.x + 16.0, controls.y + 228.0, 112.0, 34.0),
+        "SAVE",
         true,
         ButtonTone::Positive,
         mouse,
@@ -147,17 +199,8 @@ pub(super) fn draw_company(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<U
         actions.push(UiAction::Save);
     }
     if button(
-        Rect::new(controls.x + 212.0, controls.y + 54.0, 176.0, 40.0),
-        "LOAD SAVE",
-        ctx.save_exists,
-        ButtonTone::Primary,
-        mouse,
-    ) {
-        actions.push(UiAction::Load);
-    }
-    if button(
-        Rect::new(controls.x + 18.0, controls.y + 112.0, 370.0, 40.0),
-        "RESTART ORIENTATION",
+        Rect::new(controls.x + 136.0, controls.y + 228.0, 112.0, 34.0),
+        "ORIENTATION",
         true,
         ButtonTone::Muted,
         mouse,
@@ -165,7 +208,7 @@ pub(super) fn draw_company(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<U
         actions.push(UiAction::RestartTutorial);
     }
     if button(
-        Rect::new(controls.x + 18.0, controls.y + 170.0, 370.0, 40.0),
+        Rect::new(controls.x + 256.0, controls.y + 228.0, 134.0, 34.0),
         "RESET COMPANY",
         true,
         ButtonTone::Secondary,
@@ -173,5 +216,10 @@ pub(super) fn draw_company(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<U
     ) {
         actions.push(UiAction::OpenResetConfirm);
     }
-    draw_text_block("Autosave runs after purchases, tools, sales, research, market refreshes, and tutorial progress.", controls.x + 20.0, controls.y + 232.0, controls.w - 40.0, 46.0, 11.0, 3.0, dark::TEXT_DIM);
+    draw_ui_text_ex(
+        "Autosave protects every major action.",
+        controls.x + 18.0,
+        controls.bottom() - 14.0,
+        TextStyle::new(9.0, dark::TEXT_DIM).params(),
+    );
 }

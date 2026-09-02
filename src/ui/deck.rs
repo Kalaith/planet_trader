@@ -6,8 +6,8 @@ pub(super) fn draw_deck(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAc
 
     match ctx.mode {
         GameplayMode::Acquire => acquisition::draw_acquisition(ctx, mouse, actions),
-        GameplayMode::Workshop => panels::draw_workshop_mode(ctx, mouse, actions),
-        GameplayMode::Market => market::draw_market_mode(ctx, mouse, actions),
+        GameplayMode::Workshop => workshop::draw_workshop(ctx, mouse, actions),
+        GameplayMode::Market => market_deck::draw_market(ctx, mouse, actions),
         GameplayMode::Research => research::draw_research_page(ctx, mouse, actions),
         GameplayMode::Company => company::draw_company(ctx, mouse, actions),
     }

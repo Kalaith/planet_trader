@@ -1,7 +1,10 @@
 //! High-level game loop, persistence, and intent handling.
 
 use crate::data::GameData;
-use crate::state::{migrate_save_value, GameSession, Planet, SaveData, TradeRecord, TutorialStep};
+use crate::state::{
+    migrate_save_value, sale_price, GameSession, Planet, SaveData, ToolIntensity, TradeRecord,
+    TutorialStep,
+};
 use crate::ui::{self, AppScreen, GameplayMode, UiAction, UiContext};
 use macroquad::prelude::*;
 use macroquad_toolkit::events::EventBus;
@@ -16,138 +19,17 @@ use macroquad_toolkit::settings::GameSettings;
 use macroquad_toolkit::ui::set_ui_text_scale;
 
 mod capture;
+#[path = "game/capture_scene.rs"]
+mod capture_scene;
+use capture_scene::CaptureSceneSeed;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct CaptureSceneSeed {
-    reset_session: bool,
+fn market_refresh_due(
     game_started: bool,
-    research_points: i64,
-    first_research_complete: bool,
-    research_open: bool,
-    planet_demo: bool,
-    reset_open: bool,
-    screen: AppScreen,
-    settings_open: bool,
-    tutorial_step: TutorialStep,
-}
-
-impl CaptureSceneSeed {
-    fn for_scene(scene: &str) -> Self {
-        match scene {
-            "research" => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 115,
-                first_research_complete: true,
-                research_open: false,
-                planet_demo: false,
-                reset_open: false,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::Complete,
-            },
-            "home" | "title" => Self {
-                reset_session: true,
-                game_started: false,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: false,
-                reset_open: false,
-                screen: AppScreen::Home,
-                settings_open: false,
-                tutorial_step: TutorialStep::Complete,
-            },
-            "tutorial" => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: false,
-                reset_open: false,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::Welcome,
-            },
-            "tutorial_buy" => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: false,
-                reset_open: false,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::BuyPlanet,
-            },
-            "tutorial_market" => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: true,
-                reset_open: false,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::InspectBuyer,
-            },
-            "settings" => Self {
-                reset_session: true,
-                game_started: false,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: false,
-                reset_open: false,
-                screen: AppScreen::Home,
-                settings_open: true,
-                tutorial_step: TutorialStep::Complete,
-            },
-            "biosphere" | "market" => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: true,
-                reset_open: false,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::Complete,
-            },
-            "reset" => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: false,
-                reset_open: true,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::Complete,
-            },
-            _ => Self {
-                reset_session: true,
-                game_started: true,
-                research_points: 0,
-                first_research_complete: false,
-                research_open: false,
-                planet_demo: false,
-                reset_open: false,
-                screen: AppScreen::Gameplay,
-                settings_open: false,
-                tutorial_step: TutorialStep::Complete,
-            },
-        }
-    }
-}
-
-fn market_refresh_due(game_started: bool, elapsed: f32, refresh_seconds: f32) -> bool {
-    game_started && refresh_seconds > 0.0 && elapsed >= refresh_seconds
+    tutorial_complete: bool,
+    elapsed: f32,
+    refresh_seconds: f32,
+) -> bool {
+    game_started && tutorial_complete && refresh_seconds > 0.0 && elapsed >= refresh_seconds
 }
 
 pub struct Game {
@@ -157,12 +39,14 @@ pub struct Game {
     events: EventBus<UiAction>,
     save_exists: bool,
     tool_scroll: f32,
-    market_scroll: f32,
     inventory_scroll: usize,
+    selected_offer: Option<String>,
     expanded_tool: Option<String>,
+    tool_intensity: ToolIntensity,
     expanded_buyer: Option<u64>,
     history_open: bool,
     research_open: bool,
+    research_branch: String,
     reset_open: bool,
     market_elapsed: f32,
     screen: AppScreen,
@@ -192,12 +76,14 @@ impl Game {
             events: EventBus::new(),
             save_exists: false,
             tool_scroll: 0.0,
-            market_scroll: 0.0,
             inventory_scroll: 0,
+            selected_offer: None,
             expanded_tool: None,
+            tool_intensity: ToolIntensity::Standard,
             expanded_buyer: None,
             history_open: false,
             research_open: false,
+            research_branch: "frontier".to_owned(),
             reset_open: false,
             market_elapsed: 0.0,
             screen: AppScreen::Home,
@@ -279,6 +165,7 @@ impl Game {
                     sale_price: 6_700,
                     profit: 4_100,
                     compatibility: 0.83,
+                    knowledge_award: 2,
                 },
                 TradeRecord {
                     transaction_type: "sale".to_owned(),
@@ -290,12 +177,40 @@ impl Game {
                     sale_price: 7_400,
                     profit: 4_350,
                     compatibility: 1.0,
+                    knowledge_award: 3,
                 },
             ];
+            self.session
+                .species_knowledge
+                .insert("hydrology".to_owned(), 4);
+            self.session
+                .species_knowledge
+                .insert("volcanology".to_owned(), 2);
+            self.session
+                .species_knowledge
+                .insert("harsh-world".to_owned(), 1);
         }
         if scene == "contracts" {
             self.session.reputation = 60;
             let _ = self.session.open_purchase_modal(&self.data);
+        }
+        if scene == "advanced" {
+            self.session.credits = 50_000;
+            self.session.completed_research = self
+                .data
+                .research
+                .iter()
+                .map(|node| node.name.clone())
+                .collect();
+            for field in [
+                "hydrology",
+                "volcanology",
+                "atmospherics",
+                "harsh-world",
+                "ecology",
+            ] {
+                self.session.species_knowledge.insert(field.to_owned(), 5);
+            }
         }
         self.save_exists = false;
         self.reset_view();
@@ -311,21 +226,50 @@ impl Game {
             "company" => GameplayMode::Company,
             _ => GameplayMode::Workshop,
         };
+        if scene == "market" || scene == "tutorial_market" {
+            self.expanded_buyer = self.session.current_planet().and_then(|planet| {
+                self.session
+                    .alien_buyers
+                    .iter()
+                    .max_by_key(|buyer| sale_price(planet, buyer))
+                    .map(|buyer| buyer.id)
+            });
+        }
+        if scene == "biosphere" {
+            self.expanded_tool = self
+                .data
+                .terraforming_tools
+                .iter()
+                .find(|tool| tool.unlocked)
+                .map(|tool| tool.id.clone());
+        } else if scene == "advanced" {
+            self.tool_intensity = ToolIntensity::Low;
+            self.tool_scroll = 10_000.0;
+            self.expanded_tool = self
+                .data
+                .terraforming_tools
+                .iter()
+                .find(|tool| tool.name == "Precision Climate Grid")
+                .map(|tool| tool.id.clone());
+        }
     }
 
     pub fn update(&mut self, dt: f32) {
         self.notifications.update(dt);
-        if self.screen == AppScreen::Gameplay && self.session.game_started {
+        if self.screen == AppScreen::Gameplay
+            && self.session.game_started
+            && self.session.tutorial_step.is_complete()
+        {
             self.market_elapsed += dt.max(0.0);
             if market_refresh_due(
                 self.session.game_started,
+                self.session.tutorial_step.is_complete(),
                 self.market_elapsed,
                 self.data.config.buyer_refresh_seconds,
             ) {
                 self.market_elapsed = 0.0;
                 self.session.refresh_buyers(&self.data);
                 self.expanded_buyer = None;
-                self.market_scroll = 0.0;
                 self.autosave();
                 self.notifications.info("The alien market has refreshed");
             }
@@ -354,19 +298,20 @@ impl Game {
             session: &self.session,
             save_exists: self.save_exists,
             tool_scroll: self.tool_scroll,
-            market_scroll: self.market_scroll,
             inventory_scroll: self.inventory_scroll,
+            selected_offer: self.selected_offer.as_deref(),
             expanded_tool: self.expanded_tool.as_deref(),
+            tool_intensity: self.tool_intensity,
             expanded_buyer: self.expanded_buyer,
             history_open: self.history_open,
             research_open: self.research_open,
+            research_branch: &self.research_branch,
             reset_open: self.reset_open,
             screen: self.screen,
             settings_open: self.settings_open,
             new_game_confirm: self.new_game_confirm,
             settings: &self.settings,
             mode: self.mode,
-            market_elapsed: self.market_elapsed,
             planet_gallery: self.planet_gallery,
             ui: &virtual_ui,
         };
@@ -455,15 +400,29 @@ impl Game {
                 self.autosave();
             }
             UiAction::SetMode(mode) => {
+                if mode == GameplayMode::Workshop
+                    && self.session.tutorial_step == TutorialStep::InspectBuyer
+                    && self.expanded_buyer.is_some()
+                {
+                    self.session.tutorial_step = TutorialStep::UseTool;
+                    self.autosave();
+                }
                 self.mode = mode;
                 self.expanded_tool = None;
-                self.expanded_buyer = None;
+                if mode != GameplayMode::Workshop {
+                    self.expanded_buyer = None;
+                }
                 if mode == GameplayMode::Research {
                     self.complete_orientation_if_ready();
                 }
             }
             UiAction::OpenPurchase => match self.session.open_purchase_modal(&self.data) {
                 Ok(()) => {
+                    self.selected_offer = self
+                        .session
+                        .planet_options
+                        .first()
+                        .map(|planet| planet.id.clone());
                     if self.session.tutorial_step == TutorialStep::BuyPlanet {
                         self.session.tutorial_step = TutorialStep::ChooseOffer;
                         self.autosave();
@@ -471,7 +430,11 @@ impl Game {
                 }
                 Err(message) => self.notifications.danger(message),
             },
-            UiAction::ClosePurchase => self.session.close_purchase_modal(),
+            UiAction::ClosePurchase => {
+                self.session.close_purchase_modal();
+                self.selected_offer = None;
+            }
+            UiAction::SelectOffer(id) => self.selected_offer = Some(id),
             UiAction::PurchasePlanet(id) => match self.session.purchase_planet(&id) {
                 Ok(message) => {
                     if self.session.tutorial_step == TutorialStep::ChooseOffer {
@@ -509,7 +472,10 @@ impl Game {
                     .find(|tool| tool.id == id)
                     .cloned();
                 if let Some(tool) = tool {
-                    match self.session.apply_tool(&tool) {
+                    match self
+                        .session
+                        .apply_tool_with_intensity(&tool, self.tool_intensity)
+                    {
                         Ok(message) => {
                             if self.session.tutorial_step == TutorialStep::UseTool {
                                 self.session.tutorial_step = TutorialStep::SellOrSalvage;
@@ -522,17 +488,15 @@ impl Game {
                     }
                 }
             }
+            UiAction::SetToolIntensity(intensity) => {
+                self.tool_intensity = intensity;
+            }
             UiAction::ToggleBuyer(id) => {
                 self.expanded_buyer = if self.expanded_buyer == Some(id) {
                     None
                 } else {
                     Some(id)
                 };
-                if self.session.tutorial_step == TutorialStep::InspectBuyer {
-                    self.session.tutorial_step = TutorialStep::UseTool;
-                    self.mode = GameplayMode::Workshop;
-                    self.autosave();
-                }
             }
             UiAction::SellPlanet(id) => match self.session.sell_planet(id) {
                 Ok(message) => {
@@ -559,10 +523,6 @@ impl Game {
                 Err(message) => self.notifications.warning(message),
             },
             UiAction::ToggleHistory => self.history_open = !self.history_open,
-            UiAction::OpenResearch => {
-                self.mode = GameplayMode::Research;
-                self.complete_orientation_if_ready();
-            }
             UiAction::CloseResearch => self.research_open = false,
             UiAction::OpenResetConfirm => {
                 self.settings_open = false;
@@ -586,11 +546,11 @@ impl Game {
                     }
                 }
             }
+            UiAction::SetResearchBranch(branch) => {
+                self.research_branch = branch;
+            }
             UiAction::ScrollTools(delta) => {
                 self.tool_scroll = (self.tool_scroll + delta as f32 * 150.0).max(0.0);
-            }
-            UiAction::ScrollMarket(delta) => {
-                self.market_scroll = (self.market_scroll + delta as f32 * 150.0).max(0.0);
             }
             UiAction::ScrollInventory(delta) => {
                 let next = self.inventory_scroll as i32 + delta;
@@ -681,12 +641,14 @@ impl Game {
 
     fn reset_view(&mut self) {
         self.tool_scroll = 0.0;
-        self.market_scroll = 0.0;
         self.inventory_scroll = 0;
+        self.selected_offer = None;
         self.expanded_tool = None;
+        self.tool_intensity = ToolIntensity::Standard;
         self.expanded_buyer = None;
         self.history_open = false;
         self.research_open = false;
+        self.research_branch = "frontier".to_owned();
         self.reset_open = false;
         self.settings_open = false;
         self.new_game_confirm = false;

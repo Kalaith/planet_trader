@@ -6,10 +6,10 @@ fn embedded_planet_trader_data_loads() {
 
     assert_eq!(data.config.game_name, "planet_trader");
     assert_eq!(data.planet_types.len(), 15);
-    assert_eq!(data.terraforming_tools.len(), 15);
+    assert_eq!(data.terraforming_tools.len(), 16);
     assert_eq!(data.alien_species_types.len(), 6);
     assert_eq!(data.planet_names.len(), 15);
-    assert_eq!(data.research.len(), 10);
+    assert_eq!(data.research.len(), 13);
     assert!(data
         .alien_species
         .iter()

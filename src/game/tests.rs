@@ -88,8 +88,9 @@ fn ordinary_capture_scene_is_seeded_gameplay() {
 
 #[test]
 fn market_refresh_waits_for_started_session_and_valid_interval() {
-    assert!(!market_refresh_due(false, 60.0, 30.0));
-    assert!(!market_refresh_due(true, 29.99, 30.0));
-    assert!(market_refresh_due(true, 30.0, 30.0));
-    assert!(!market_refresh_due(true, 30.0, 0.0));
+    assert!(!market_refresh_due(false, true, 60.0, 30.0));
+    assert!(!market_refresh_due(true, false, 60.0, 30.0));
+    assert!(!market_refresh_due(true, true, 29.99, 30.0));
+    assert!(market_refresh_due(true, true, 30.0, 30.0));
+    assert!(!market_refresh_due(true, true, 30.0, 0.0));
 }
