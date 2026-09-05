@@ -406,19 +406,7 @@ fn short_demand(description: &str) -> String {
         .next()
         .unwrap_or(description)
         .trim();
-    let mut words = first.split_whitespace();
-    let mut result = String::new();
-    for _ in 0..7 {
-        let Some(word) = words.next() else { break };
-        if !result.is_empty() {
-            result.push(' ');
-        }
-        result.push_str(word);
-    }
-    if words.next().is_some() {
-        result.push_str("...");
-    }
-    result
+    macroquad_toolkit::ui::truncate_text_to_width(first, 1230.0 - 954.0, 10.0)
 }
 
 fn draw_scan_console(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>) {

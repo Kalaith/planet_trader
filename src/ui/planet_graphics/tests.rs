@@ -1,5 +1,28 @@
 use super::*;
 
+#[test]
+fn visual_rng_preserves_legacy_integer_and_float_streams() {
+    for seed in [0, 1, u64::MAX, 0xA5A5_5A5A_D3C1_9E37, 0xDEAD_BEEF] {
+        let mut state = seed ^ 0xA5A5_5A5A_D3C1_9E37;
+        let mut integer = VisualRng::new(seed);
+        let mut unit = VisualRng::new(seed);
+        let mut range = VisualRng::new(seed);
+        for _ in 0..128 {
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            let expected = state.wrapping_mul(0x2545_F491_4F6C_DD1D);
+            let expected_unit = (expected as u32 as f32) / u32::MAX as f32;
+            assert_eq!(integer.next_u64(), expected);
+            assert_eq!(unit.unit().to_bits(), expected_unit.to_bits());
+            assert_eq!(
+                range.between(-4.0, 12.0).to_bits(),
+                (-4.0 + 16.0 * expected_unit).to_bits()
+            );
+        }
+    }
+}
+
 fn sample_planet(
     id: &str,
     temperature: f32,

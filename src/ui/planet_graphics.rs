@@ -48,21 +48,21 @@ struct Palette {
 
 #[derive(Debug, Clone, Copy)]
 struct VisualRng {
-    state: u64,
+    // None preserves the legacy zero fixed point; the toolkit guards zero
+    // for general-purpose randomness, but changing it would repaint a planet.
+    stream: Option<macroquad_toolkit::rng::SeededRng>,
 }
 
 impl VisualRng {
     fn new(seed: u64) -> Self {
+        let state = seed ^ 0xA5A5_5A5A_D3C1_9E37;
         Self {
-            state: seed ^ 0xA5A5_5A5A_D3C1_9E37,
+            stream: (state != 0).then(|| macroquad_toolkit::rng::SeededRng::from_state(state)),
         }
     }
 
     fn next_u64(&mut self) -> u64 {
-        self.state ^= self.state >> 12;
-        self.state ^= self.state << 25;
-        self.state ^= self.state >> 27;
-        self.state.wrapping_mul(0x2545_F491_4F6C_DD1D)
+        self.stream.as_mut().map_or(0, |stream| stream.next_u64())
     }
 
     fn unit(&mut self) -> f32 {
