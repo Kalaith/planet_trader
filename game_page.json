@@ -1,7 +1,6 @@
 {
   "title": "Planet Trader",
   "wasm": "planet_trader",
-  "roost_slug": "rust_planet_trader",
   "status": { "text": "Playable", "class": "playable" },
   "canvas_rendering": "pixelated",
   "about": [
